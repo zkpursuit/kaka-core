@@ -4,9 +4,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * 分布式生成唯一ID
- * </br>
- * Snowflake算法 </br>
+ * 分布式生成唯一ID <br>
+ * Snowflake算法
  *
  * @author 摘取自网络
  */
@@ -84,7 +83,7 @@ public class SnowFlake {
     private long lastTimestamp = -1L;
 
     /**
-     * 构造函数 </br>
+     * 构造函数
      * 参数含义：[0~31]号数据中心，每个数据中心下可以有[0~31]号工作机器
      *
      * @param datacenterId 数据中心ID (0~31)

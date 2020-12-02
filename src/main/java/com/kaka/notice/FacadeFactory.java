@@ -12,7 +12,7 @@ public class FacadeFactory {
     static final Map<String, Facade> instanceMap = new HashMap<>();
 
     /**
-     * 必须先调用此方法进行配置 </br>
+     * 必须先调用此方法进行配置 <br>
      * 一般在应用程序启动时调用，且仅调用一次
      *
      * @param facadeClass
