@@ -10,7 +10,12 @@
 #### 安装教程
 
 1.  直接获得源码使用
-2.  正在发布到maven中央仓库
+2.  maven安装
+	<dependency>
+        <groupId>io.github.zkpursuit</groupId>
+        <artifactId>kaka-core</artifactId>
+        <version>1.0</version>
+    </dependency>
 
 #### 使用说明
 
