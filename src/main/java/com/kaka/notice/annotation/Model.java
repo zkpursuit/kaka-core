@@ -22,6 +22,13 @@ public @interface Model {
      * @return 数据模型唯一名
      */
     String value() default "";
+
+    /**
+     * 优先级，数字越大，优先级越高
+     *
+     * @return 优先级
+     */
+    int priority() default 0;
     
     /**
      * 被注册到的目标{@link com.kaka.notice.Facade}唯一名
