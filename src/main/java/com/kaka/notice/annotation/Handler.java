@@ -40,6 +40,13 @@ public @interface Handler {
     int pooledSize() default -1;
 
     /**
+     * 优先级，数字越小，越是最早执行
+     *
+     * @return 优先级
+     */
+    int priority() default 0;
+
+    /**
      * 被注册到的目标{@link com.kaka.notice.Facade}唯一名
      *
      * @return {@link com.kaka.notice.Facade}唯一名

@@ -41,6 +41,7 @@ public class CommandDetector implements IDetector {
         for (Handler regist : controllers) {
             Object cmd = regist.cmd();
             Class<?> cmdCls = regist.type();
+            int priority = regist.priority();
             if (Command.class.isAssignableFrom(cls)) {
                 Facade cotx;
                 if (regist.context().equals("")) {
@@ -52,19 +53,19 @@ public class CommandDetector implements IDetector {
                     String cmdStr = String.valueOf(cmd);
                     if (StringUtils.isNumeric(cmdStr)) {
                         if (cmdCls == short.class || cmdCls == Short.class) {
-                            cotx.registerCommand(Short.parseShort(cmdStr), (Class<Command>) cls, regist.pooledSize());
+                            cotx.registerCommand(Short.parseShort(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
                         } else if (cmdCls == int.class || cmdCls == Integer.class) {
-                            cotx.registerCommand(Integer.parseInt(cmdStr), (Class<Command>) cls, regist.pooledSize());
+                            cotx.registerCommand(Integer.parseInt(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
                         } else if (cmdCls == long.class || cmdCls == Long.class) {
-                            cotx.registerCommand(Long.parseLong(cmdStr), (Class<Command>) cls, regist.pooledSize());
+                            cotx.registerCommand(Long.parseLong(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
                         }
                     } else {
-                        cotx.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize());
+                        cotx.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize(), priority);
                         logger.log(Level.WARNING, "注解cmd数据类型与注解type参数描述的类型不一致，强制以cmd参数类型注册！{0}", new Object[]{cls});
                     }
                     logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{cmdCls.getTypeName(), regist.cmd(), cls});
                 } else {
-                    cotx.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize());
+                    cotx.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize(), priority);
                     logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{cmdCls.getTypeName(), regist.cmd(), cls});
                 }
             }

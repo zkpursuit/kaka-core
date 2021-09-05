@@ -2,17 +2,12 @@ package com.kaka.notice;
 
 import com.kaka.aop.Aop;
 import com.kaka.aop.AopFactory;
-import com.kaka.util.ObjectPool;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
 import com.kaka.util.concurrent.ConcurrentListMap;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 整个框架的中枢
@@ -24,7 +19,7 @@ public class Facade implements INotifier {
     private final Map<String, Proxy> proxyMap = new ConcurrentHashMap<>();
     private final Map<String, Mediator> mediaMap = new ConcurrentHashMap<>();
     private final ConcurrentListMap<Object, Mediator> notiMediMap = new ConcurrentListMap<>();
-    private final Map<Object, ObjectPool> cmdPoolMap = new ConcurrentHashMap<>();
+    private final Map<Object, CommandPoolSortedSet> cmdPoolMap = new ConcurrentHashMap<>();
     private Executor threadPool;
     private ScheduledExecutorService scheduleThreadPool;
     private final Map<String, ScheduledFuture<?>> scheduleFutureMap = new ConcurrentHashMap<>();
@@ -531,13 +526,22 @@ public class Facade implements INotifier {
      *
      * @param cmd        命令执行器唯一标识
      * @param clasz      命令执行器类对象
-     * @param pooledSize 池化大小
+     * @param pooledSize 池化大小，-1表示不池化
+     */
+    final public void registerCommand(Object cmd, Class<? extends Command> clasz, int pooledSize, int priority) {
+        CommandPoolSortedSet sortedSet = cmdPoolMap.computeIfAbsent(cmd, k -> new CommandPoolSortedSet());
+        sortedSet.add(new CommandPool(this, pooledSize, clasz, priority));
+    }
+
+    /**
+     * 注册命令执行器
+     *
+     * @param cmd        命令执行器唯一标识
+     * @param clasz      命令执行器类对象
+     * @param pooledSize 池化大小，-1表示不池化
      */
     final public void registerCommand(Object cmd, Class<? extends Command> clasz, int pooledSize) {
-        if (cmdPoolMap.containsKey(cmd)) {
-            cmdPoolMap.remove(cmd);
-        }
-        cmdPoolMap.put(cmd, new CommandPool(this, pooledSize, clasz));
+        registerCommand(cmd, clasz, pooledSize, 0);
     }
 
     /**
@@ -562,6 +566,19 @@ public class Facade implements INotifier {
     }
 
     /**
+     * 移除命令执行器
+     *
+     * @param cmd   命令执行器唯一标识
+     * @param clasz 命令执行器类对象
+     */
+    final public void removeCommand(Object cmd, Class<? extends Command> clasz) {
+        if (cmdPoolMap.containsKey(cmd)) {
+            CommandPoolSortedSet sortedSet = cmdPoolMap.get(cmd);
+            sortedSet.remove(new CommandPool(clasz));
+        }
+    }
+
+    /**
      * 消息调度处理
      *
      * @param msg  待处理的消息
@@ -573,22 +590,24 @@ public class Facade implements INotifier {
             return;
         }
         if (cmdPoolMap.containsKey(msg.getWhat())) {
-            final CommandPool pool = (CommandPool) cmdPoolMap.get(msg.getWhat());
-            final Command cmd = pool.obtain();
-            if (cmd != null) {
-                cmd.facade = this;
-                cmd.cmd = msg.getWhat();
-                if (!asyn) {
-                    cmd.execute(msg);
-                    pool.idle(cmd);
-                } else {
-                    if (threadPool == null) {
-                        throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
-                    }
-                    threadPool.execute(() -> {
+            final CommandPoolSortedSet poolSet = cmdPoolMap.get(msg.getWhat());
+            for (CommandPool pool : poolSet) {
+                final Command cmd = pool.obtain();
+                if (cmd != null) {
+                    cmd.facade = this;
+                    cmd.cmd = msg.getWhat();
+                    if (!asyn) {
                         cmd.execute(msg);
                         pool.idle(cmd);
-                    });
+                    } else {
+                        if (threadPool == null) {
+                            throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
+                        }
+                        threadPool.execute(() -> {
+                            cmd.execute(msg);
+                            pool.idle(cmd);
+                        });
+                    }
                 }
             }
         }
@@ -690,9 +709,12 @@ public class Facade implements INotifier {
         Iterator<Object> ks = cmdPoolMap.keySet().iterator();
         while (ks.hasNext()) {
             Object key = ks.next();
-            CommandPool cmdPool = (CommandPool) cmdPoolMap.get(key);
-            if (cmdPool != null) {
-                cmdPool.clear();
+            CommandPoolSortedSet cmdPoolSet = cmdPoolMap.get(key);
+            if (cmdPoolSet != null) {
+                for (CommandPool pool : cmdPoolSet) {
+                    pool.clear();
+                }
+                cmdPoolSet.clear();
             }
         }
         Iterator<String> keys = mediaMap.keySet().iterator();
