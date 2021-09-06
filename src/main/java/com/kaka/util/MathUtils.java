@@ -2,7 +2,10 @@ package com.kaka.util;
 
 import com.kaka.util.math.Rect;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -983,50 +986,6 @@ public final class MathUtils {
         return selected;
     }
 
-//    private static class BagItem {
-//        public int weight;
-//        public int value;
-//
-//        public BagItem(int weight, int value) {
-//            this.weight = weight;
-//            this.value = value;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return "BagItem{" +
-//                    "weight=" + weight +
-//                    ", value=" + value +
-//                    '}';
-//        }
-//    }
-//    private static List<BagItem> knapsack(BagItem[] arr, int W) {
-//        int[][] F = new int[arr.length + 1][W + 1];
-//        for (int i = 0; i <= arr.length; i++) {
-//            for (int v = 0; v <= W; v++) {
-//                if (i < 1 || v == 0) {
-//                    F[i][v] = 0;
-//                } else {
-//                    int w = arr[i - 1].weight;
-//                    if (w > v || F[i - 1][v] > F[i - 1][v - w] + w) {
-//                        F[i][v] = F[i - 1][v];
-//                    } else {
-//                        F[i][v] = F[i - 1][v - w] + w;
-//                    }
-//                }
-//            }
-//        }
-//        List selected = new ArrayList();
-//        int k = W;
-//        for (int i = arr.length; i > 0; i--) {
-//            if (F[i][k] > F[i - 1][k]) {
-//                selected.add(0, arr[i - 1]);
-//                k -= arr[i - 1].weight;
-//            }
-//        }
-//        return selected;
-//    }
-
     public static long saturatedAdd(long a, long b) {
         long naiveSum = a + b;
         return (a ^ b) < 0L | (a ^ naiveSum) >= 0L ? naiveSum : 9223372036854775807L + (naiveSum >>> 63 ^ 1L);
@@ -1116,24 +1075,6 @@ public final class MathUtils {
 //
 //        result = knapsack(new int[]{1, 5, 8, 9, 10, 17, 17, 20, 24, 30}, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 30);
 //        System.out.println(Arrays.deepToString(result.toArray()));
-
-//        BagItem[] arr = new BagItem[10];
-//        arr[0] = new BagItem(100, 100);
-//        arr[1] = new BagItem(200, 200);
-//        arr[2] = new BagItem(300, 300);
-//        arr[3] = new BagItem(500, 500);
-//        arr[4] = new BagItem(900, 900);
-//        arr[5] = new BagItem(1005, 1005);
-//        arr[6] = new BagItem(999, 999);
-//
-//        List<BagItem> list = knapsack(arr, 30);
-//        System.out.println(Arrays.toString(list.toArray()));
-//
-//        int t = 0;
-//        for (BagItem item : list) {
-//            t += item.value;
-//        }
-//        System.out.println(t);
 //    }
 
 }

@@ -12,7 +12,7 @@ class CommandPoolSortedSet implements Set<CommandPool> {
     };
 
     CommandPoolSortedSet() {
-        this.set = Collections.synchronizedSet(new TreeSet<>(comparator));
+        this.set = Collections.synchronizedSortedSet(new TreeSet<>(comparator));
     }
 
     @Override

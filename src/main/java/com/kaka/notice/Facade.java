@@ -4,7 +4,6 @@ import com.kaka.aop.Aop;
 import com.kaka.aop.AopFactory;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
-import com.kaka.util.concurrent.ConcurrentListMap;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -18,7 +17,7 @@ public class Facade implements INotifier {
     String __name;
     private final Map<String, Proxy> proxyMap = new ConcurrentHashMap<>();
     private final Map<String, Mediator> mediaMap = new ConcurrentHashMap<>();
-    private final ConcurrentListMap<Object, Mediator> notiMediMap = new ConcurrentListMap<>();
+    private final MediatorListMap notiMediMap = new MediatorListMap();
     private final Map<Object, CommandPoolSortedSet> cmdPoolMap = new ConcurrentHashMap<>();
     private Executor threadPool;
     private ScheduledExecutorService scheduleThreadPool;

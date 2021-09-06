@@ -5,6 +5,9 @@ import com.kaka.util.ReflectUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link Facade} 工厂
+ */
 public class FacadeFactory {
 
     private static Class<? extends Facade> facadeClass = Facade.class;
