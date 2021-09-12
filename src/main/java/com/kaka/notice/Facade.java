@@ -128,40 +128,31 @@ public class Facade implements INotifier {
     final public <T extends Proxy> T registerProxy(Class<T> proxyClass, String... names) {
         Proxy _proxy = (Proxy) createObject(proxyClass);
         final Proxy proxy = _proxy;
-        String _name1 = proxy.name;
-        String _name2 = proxyClass.getTypeName();
-        if (_name1 != null) {
-            registerProxy(_name1, proxy);
-            if (!_name1.equals(_name2)) {
-                registerProxy(_name2, proxy);
-                proxy.addAlias(_name2);
-            }
-            if (names.length > 0) {
-                Set<String> set = new HashSet<>(names.length);
-                for (String name : names) {
-                    if (name != null && !name.equals(_name1) && !name.equals(_name2)) {
-                        set.add(name);
-                    }
-                }
-                set.forEach((String name) -> {
-                    registerProxy(name, proxy);
-                    proxy.addAlias(name);
-                });
-            }
+        String typeName = proxyClass.getTypeName();
+        Set<String> aliasSet;
+        if (names.length > 0) {
+            aliasSet = new HashSet<>(names.length + 1);
         } else {
-            ReflectUtils.setFieldValue(proxy, "name", _name2);
+            aliasSet = new HashSet<>(1);
+        }
+        if (proxy.name != null) {
             registerProxy(proxy.name, proxy);
-            if (names.length > 0) {
-                Set<String> set = new HashSet<>(names.length);
-                set.addAll(Arrays.asList(names));
-                set.forEach((String name) -> {
-                    if (name != null && !name.equals(_name2)) {
-                        registerProxy(name, proxy);
-                        proxy.addAlias(name);
-                    }
-                });
+            aliasSet.add(typeName);
+        } else {
+            ReflectUtils.setFieldValue(proxy, "name", typeName);
+            registerProxy(typeName, proxy);
+        }
+        if (names.length > 0) {
+            for (String name : names) {
+                if (name != null && !name.equals(proxy.name) && !name.equals(typeName)) {
+                    aliasSet.add(name);
+                }
             }
         }
+        aliasSet.forEach((String name) -> {
+            registerProxy(name, proxy);
+            proxy.addAlias(name);
+        });
         proxy.facade = this;
         proxy.onRegister();
         return (T) proxy;
@@ -186,12 +177,10 @@ public class Facade implements INotifier {
      * @return 数据处理
      */
     final public <T extends Proxy> T registerProxy(Proxy proxy) {
-        Proxy _proxy = (Proxy) createObject(proxy.getClass());
-        //Proxy _proxy = proxy;
-        registerProxy(_proxy.name, _proxy);
-        _proxy.facade = this;
-        _proxy.onRegister();
-        return (T) _proxy;
+        registerProxy(proxy.name, proxy);
+        proxy.facade = this;
+        proxy.onRegister();
+        return (T) proxy;
     }
 
     /**
@@ -263,7 +252,7 @@ public class Facade implements INotifier {
         if (proxy == null) {
             return null;
         }
-        //因为是注册的相同的事件，所以此处注册的别名对应的观察者也一并清除
+        //因为是注册的相同对象，所以此处注册的别名对应的观察者也一并清除
         String[] alis = proxy.getAliases();
         if (alis != null && alis.length > 0) {
             for (String alisName : alis) {
@@ -335,40 +324,31 @@ public class Facade implements INotifier {
     <T extends Mediator> T registerMediator(Class<T> mediatorClass, String... names) {
         Mediator _observer = (Mediator) createObject(mediatorClass);
         final Mediator observer = _observer;
-        String _name1 = observer.name;
-        String _name2 = mediatorClass.getTypeName();
-        if (_name1 != null) {
-            registerMediator(_name1, observer);
-            if (!_name1.equals(_name2)) {
-                registerMediator(_name2, observer);
-                observer.addAlias(_name2);
-            }
-            if (names.length > 0) {
-                Set<String> set = new HashSet<>(names.length);
-                for (String name : names) {
-                    if (name != null && !name.equals(_name1) && !name.equals(_name2)) {
-                        set.add(name);
-                    }
-                }
-                set.forEach((String name) -> {
-                    registerMediator(name, observer);
-                    observer.addAlias(name);
-                });
-            }
+        String typeName = mediatorClass.getTypeName();
+        Set<String> aliasSet;
+        if (names.length > 0) {
+            aliasSet = new HashSet<>(names.length + 1);
         } else {
-            ReflectUtils.setFieldValue(observer, "name", _name2);
+            aliasSet = new HashSet<>(1);
+        }
+        if (observer.name != null) {
             registerMediator(observer.name, observer);
-            if (names.length > 0) {
-                Set<String> set = new HashSet<>(names.length);
-                set.addAll(Arrays.asList(names));
-                set.forEach((String name) -> {
-                    if (name != null && !name.equals(_name2)) {
-                        registerMediator(name, observer);
-                        observer.addAlias(name);
-                    }
-                });
+            aliasSet.add(typeName);
+        } else {
+            ReflectUtils.setFieldValue(observer, "name", typeName);
+            registerMediator(typeName, observer);
+        }
+        if (names.length > 0) {
+            for (String name : names) {
+                if (name != null && !name.equals(observer.name) && !name.equals(typeName)) {
+                    aliasSet.add(name);
+                }
             }
         }
+        aliasSet.forEach((String name) -> {
+            registerMediator(name, observer);
+            observer.addAlias(name);
+        });
         registerMediatorMessageInterests(observer);
         return (T) observer;
     }
@@ -526,6 +506,7 @@ public class Facade implements INotifier {
      * @param cmd        命令执行器唯一标识
      * @param clasz      命令执行器类对象
      * @param pooledSize 池化大小，-1表示不池化
+     * @param priority   执行优先级，数字越小越先执行，可依此模拟切面编程
      */
     final public void registerCommand(Object cmd, Class<? extends Command> clasz, int pooledSize, int priority) {
         CommandPoolSortedSet sortedSet = cmdPoolMap.computeIfAbsent(cmd, k -> new CommandPoolSortedSet());
