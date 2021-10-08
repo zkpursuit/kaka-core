@@ -5,7 +5,10 @@ import com.kaka.aop.AopFactory;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 
 /**
@@ -559,6 +562,25 @@ public class Facade implements INotifier {
     }
 
     /**
+     * 执行所有相同命令号下的{@link com.kaka.notice.Command}对象
+     *
+     * @param poolSet 相同命令号的{@link com.kaka.notice.Command}对象池集合
+     * @param msg     事件消息
+     */
+    private void execCommands(final CommandPoolSortedSet poolSet, final Message msg) {
+        for (CommandPool pool : poolSet) {
+            final Command cmd = pool.obtain();
+            if (cmd != null) {
+                cmd.facade = this;
+                cmd.cmd = msg.getWhat();
+                cmd.execute0(msg);
+                pool.idle(cmd);
+                msg.callback(cmd.getClass());
+            }
+        }
+    }
+
+    /**
      * 消息调度处理
      *
      * @param msg  待处理的消息
@@ -571,26 +593,15 @@ public class Facade implements INotifier {
         }
         if (cmdPoolMap.containsKey(msg.getWhat())) {
             final CommandPoolSortedSet poolSet = cmdPoolMap.get(msg.getWhat());
-            for (CommandPool pool : poolSet) {
-                final Command cmd = pool.obtain();
-                if (cmd != null) {
-                    cmd.facade = this;
-                    cmd.cmd = msg.getWhat();
-                    if (!asyn) {
-                        cmd.execute0(msg);
-                        pool.idle(cmd);
-                        msg.callback(cmd.getClass());
-                    } else {
-                        if (threadPool == null) {
-                            throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
-                        }
-                        threadPool.execute(() -> {
-                            cmd.execute0(msg);
-                            pool.idle(cmd);
-                            msg.callback(cmd.getClass());
-                        });
-                    }
+            if (!asyn) {
+                execCommands(poolSet, msg);
+            } else {
+                if (threadPool == null) {
+                    throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
                 }
+                threadPool.execute(() -> {
+                    execCommands(poolSet, msg);
+                });
             }
         }
         if (notiMediMap.containsKey(msg.getWhat())) {

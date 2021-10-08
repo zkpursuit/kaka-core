@@ -14,7 +14,7 @@ public class SyncResult<V> implements IResult<V> {
     }
 
     SyncResult(V result) {
-        this.result = result;
+        this.set(result);
     }
 
     /**

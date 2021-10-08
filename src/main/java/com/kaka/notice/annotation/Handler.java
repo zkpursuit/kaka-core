@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 public @interface Handler {
 
     /**
-     * 命令号
+     * 命令号，异步事件时相同命令号下的{@link com.kaka.notice.Command}亦将根据priority优先级被同步循序执行
      *
      * @return 命令号
      */
@@ -40,7 +40,7 @@ public @interface Handler {
     int pooledSize() default -1;
 
     /**
-     * 优先级，数字越小，越是最早执行
+     * 相同命令号下{@link com.kaka.notice.Command}执行优先级，数字越小，越是最早执行
      *
      * @return 优先级
      */

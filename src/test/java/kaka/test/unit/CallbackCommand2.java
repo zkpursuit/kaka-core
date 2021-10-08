@@ -8,6 +8,7 @@ import com.kaka.notice.annotation.Handler;
 public class CallbackCommand2 extends Command {
     @Override
     public void execute(Message msg) {
+        System.out.println("CallbackCommand2被执行！");
         this.returnCallbackResult("我爱我家2");
     }
 }

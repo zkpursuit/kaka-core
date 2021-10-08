@@ -28,6 +28,7 @@ public class MyMediator extends Mediator {
                 System.out.println(MyMediator.class.getTypeName() + " -> handleMessage " + msg.getWhat() + " 绑定的数据：" + msg.getBody());
                 break;
             case "40000":
+                System.out.println("MyMediator被执行！");
                 this.returnCallbackResult("我爱我家");
                 break;
         }
