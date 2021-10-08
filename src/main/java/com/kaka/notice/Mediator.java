@@ -7,6 +7,8 @@ package com.kaka.notice;
  */
 abstract public class Mediator extends Proxy {
 
+    final static ThreadLocal<Message> messageThreadLocal = new ThreadLocal<>();
+
     /**
      * 构造方法
      */
@@ -21,6 +23,28 @@ abstract public class Mediator extends Proxy {
      */
     public Mediator(String name) {
         super(name);
+    }
+
+    /**
+     * 设置执行回调参数
+     *
+     * @param params 回调参数
+     */
+    protected void returnCallbackResult(Object params) {
+        Message msg = messageThreadLocal.get();
+        if (msg == null) return;
+        msg.setCallbackParams(this.getClass(), params);
+    }
+
+    /**
+     * 执行事件通知
+     *
+     * @param msg 被执行的事件通知
+     */
+    void handleMessage0(Message msg) {
+        messageThreadLocal.set(msg);
+        this.handleMessage(msg);
+        messageThreadLocal.remove();
     }
 
     /**

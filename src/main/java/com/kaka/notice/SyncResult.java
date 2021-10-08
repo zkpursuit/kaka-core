@@ -3,12 +3,19 @@ package com.kaka.notice;
 /**
  * 同步处理结果
  *
- * @author zkpursuit
  * @param <V>
+ * @author zkpursuit
  */
 public class SyncResult<V> implements IResult<V> {
 
     private volatile V result;
+
+    public SyncResult() {
+    }
+
+    SyncResult(V result) {
+        this.result = result;
+    }
 
     /**
      * 赋值事件处理结果

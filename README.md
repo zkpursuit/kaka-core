@@ -89,6 +89,18 @@ public class Test extends Startup {
         facade.sendMessage(syncMsg2, true); //异步发送事件通知
         System.out.println(result3.get());
 
+        //异步回调获取事件执行结果
+        facade.sendMessage(new Message("40000", "", (Class<?> clasz, IResult<Object> result) -> {
+            System.out.print("异步回调：\t" + clasz.getTypeName() + "\t");
+            Object resultObj = result.get();
+            if (resultObj instanceof Object[]) {
+                Object[] ps = (Object[]) resultObj;
+                System.out.println(Arrays.toString(ps));
+            } else {
+                System.out.println(resultObj);
+            }
+        }), true);
+
         facade.initScheduleThreadPool(Executors.newScheduledThreadPool(2));
         long c = System.currentTimeMillis();
         Scheduler scheduler = Scheduler.create("com/test/units")
@@ -272,5 +284,20 @@ public class MyProxy extends Proxy {
         System.out.println("调用了：" + MyProxy.class.getTypeName() + " -> func方法");
     }
 
+}
+```
+```java
+package com.test.unit;
+
+import com.kaka.notice.Command;
+import com.kaka.notice.Message;
+import com.kaka.notice.annotation.Handler;
+
+@Handler(cmd = "40000", type = String.class, priority = 1)
+public class CallbackCommand1 extends Command {
+    @Override
+    public void execute(Message msg) {
+        this.returnCallbackResult(new Object[]{100, "我爱我家"});
+    }
 }
 ```

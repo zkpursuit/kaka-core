@@ -13,6 +13,7 @@ abstract public class Command extends Notifier implements ObjectPool.Poolable {
      * 注册时的命令号
      */
     Object cmd;
+    private Message msg;
 
     /**
      * 获取注册时的命令号
@@ -30,6 +31,29 @@ abstract public class Command extends Notifier implements ObjectPool.Poolable {
     public void reset() {
         this.facade = null;
         this.cmd = null;
+        this.msg = null;
+    }
+
+    /**
+     * 设置执行回调参数
+     *
+     * @param params 回调参数
+     */
+    protected void returnCallbackResult(Object params) {
+        Message msg = this.msg;
+        if (msg == null) return;
+        msg.setCallbackParams(this.getClass(), params);
+    }
+
+    /**
+     * 执行事件通知
+     *
+     * @param msg 被执行的事件通知
+     */
+    void execute0(Message msg) {
+        this.msg = msg;
+        this.execute(msg);
+        this.msg = null;
     }
 
     /**
@@ -40,8 +64,8 @@ abstract public class Command extends Notifier implements ObjectPool.Poolable {
      * <br>
      * 未池化的对象因不会调用reset方法，内部可使用线程。
      *
-     * @see Message Message处理方法
      * @param msg 通知消息
+     * @see Message Message处理方法
      */
     abstract public void execute(Message msg);
 

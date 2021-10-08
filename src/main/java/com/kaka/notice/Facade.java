@@ -577,15 +577,17 @@ public class Facade implements INotifier {
                     cmd.facade = this;
                     cmd.cmd = msg.getWhat();
                     if (!asyn) {
-                        cmd.execute(msg);
+                        cmd.execute0(msg);
                         pool.idle(cmd);
+                        msg.callback(cmd.getClass());
                     } else {
                         if (threadPool == null) {
                             throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
                         }
                         threadPool.execute(() -> {
-                            cmd.execute(msg);
+                            cmd.execute0(msg);
                             pool.idle(cmd);
+                            msg.callback(cmd.getClass());
                         });
                     }
                 }
@@ -594,13 +596,15 @@ public class Facade implements INotifier {
         if (notiMediMap.containsKey(msg.getWhat())) {
             notiMediMap.forEach(msg.getWhat(), (observer) -> {
                 if (!asyn) {
-                    observer.handleMessage(msg);
+                    observer.handleMessage0(msg);
+                    msg.callback(observer.getClass());
                 } else {
                     if (threadPool == null) {
                         throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
                     }
                     threadPool.execute(() -> {
-                        observer.handleMessage(msg);
+                        observer.handleMessage0(msg);
+                        msg.callback(observer.getClass());
                     });
                 }
             });
