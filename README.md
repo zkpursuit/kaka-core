@@ -15,7 +15,7 @@
     <dependency>
         <groupId>io.github.zkpursuit</groupId>
         <artifactId>kaka-core</artifactId>
-        <version>3.0</version>
+        <version>3.3</version>
     </dependency>
     ```
 
