@@ -4,12 +4,18 @@ import com.kaka.notice.Command;
 import com.kaka.notice.Message;
 import com.kaka.notice.annotation.Handler;
 
+/**
+ * 模拟切面
+ */
 @Handler(cmd = "40000", type = String.class, priority = 2)
-public class CallbackCommand2 extends Command {
+public class SimulateAopCommand extends Command {
     @Override
     public void execute(Message msg) {
-        System.out.println("CallbackCommand2被执行！");
-        this.returnCallbackResult("我爱我家2");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Aop业务执行");
     }
 }
-

@@ -4,8 +4,7 @@ import com.kaka.util.ObjectPool.Poolable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * 消息通知对象，亦可理解为事件上下文对象
@@ -17,8 +16,7 @@ public class Message implements Poolable {
     protected Object what;
     protected Object body;
     private Map<Object, IResult> resultMap;
-    private BiConsumer<Class<?>, IResult<Object>> callback;
-    private Map<Class<?>, Object> callbackParamMap;
+    private Consumer<IResult<Object>> callback;
 
     /**
      * 构造方法
@@ -47,10 +45,9 @@ public class Message implements Poolable {
      * @param body     绑定的数据
      * @param callback 事件执行完成后的回调函数，第一个泛型参数为处理本事件的类，第二个泛型参数为处理结果
      */
-    public Message(Object what, Object body, BiConsumer<Class<?>, IResult<Object>> callback) {
+    public Message(Object what, Object body, Consumer<IResult<Object>> callback) {
         this(what, body);
         this.callback = callback;
-        this.callbackParamMap = new ConcurrentHashMap<>();
     }
 
     public Object getWhat() {
@@ -65,18 +62,46 @@ public class Message implements Poolable {
      * 初始化设置事件通知处理结果
      *
      * @param <T>    数据类型限定
+     * @param key    因广播事件通知，必须为处理结果定义唯一标识
+     * @param result 处理结果数据容器
+     * @return 处理结果数据容器
+     */
+    final protected <T> IResult<T> _setResult(Object key, IResult<T> result) {
+        synchronized (this) {
+            if (this.resultMap == null) {
+                this.resultMap = new HashMap<>();
+            }
+            this.resultMap.put(key, result);
+        }
+        return result;
+    }
+
+    /**
+     * 获取处理结果数据容器
+     *
+     * @param <T> 数据类型限定
+     * @param key 因广播事件通知，必须为处理结果定义唯一标识名
+     * @return 处理结果数据容器
+     */
+    final protected <T> IResult<T> _getResult(Object key) {
+        synchronized (this) {
+            if (this.resultMap == null) {
+                return null;
+            }
+            return this.resultMap.get(key);
+        }
+    }
+
+    /**
+     * 初始化设置事件通知处理结果
+     *
+     * @param <T>    数据类型限定
      * @param name   因广播事件通知，必须为处理结果定义唯一标识名
      * @param result 处理结果数据容器
      * @return 处理结果数据容器
      */
     public <T> IResult<T> setResult(String name, IResult<T> result) {
-        synchronized (this) {
-            if (this.resultMap == null) {
-                this.resultMap = new HashMap<>();
-            }
-            this.resultMap.put(name, result);
-        }
-        return result;
+        return this._setResult(name, result);
     }
 
     /**
@@ -87,12 +112,7 @@ public class Message implements Poolable {
      * @return 处理结果数据容器
      */
     public <T> IResult<T> getResult(String name) {
-        synchronized (this) {
-            if (this.resultMap == null) {
-                return null;
-            }
-            return this.resultMap.get(name);
-        }
+        return this._getResult(name);
     }
 
     /**
@@ -102,8 +122,8 @@ public class Message implements Poolable {
      * @param params            回调参数
      */
     void setCallbackParams(Class<?> eventHandlerClass, Object params) {
-        if (this.callbackParamMap == null) return;
-        this.callbackParamMap.put(eventHandlerClass, params);
+        if (this.callback == null) return;
+        this._setResult(eventHandlerClass, new CallbackResult<>(params, eventHandlerClass));
     }
 
     /**
@@ -112,10 +132,10 @@ public class Message implements Poolable {
      * @param eventHandlerClass 事件执行器的类对象
      */
     void callback(Class<?> eventHandlerClass) {
-        if (this.callback != null && this.callbackParamMap != null) {
-            Object param = this.callbackParamMap.get(eventHandlerClass);
-            this.callback.accept(eventHandlerClass, new SyncResult<>(param));
-        }
+        if (this.callback == null) return;
+        IResult<Object> result = this._getResult(eventHandlerClass);
+        if (result == null) return;
+        this.callback.accept(result);
     }
 
     @Override
@@ -129,9 +149,6 @@ public class Message implements Poolable {
         }
         if (this.callback != null) {
             this.callback = null;
-        }
-        if (this.callbackParamMap != null) {
-            this.callbackParamMap.clear();
         }
     }
 

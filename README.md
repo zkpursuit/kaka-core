@@ -23,11 +23,14 @@
 
 1. 通过Startup.scan方法扫描指定包下的Command、Proxy、Mediator子类并将其注册到Facade中，Command、Proxy、Mediator亦可直接使用Facade对应的方法手动注册；由Facade处理事件流向。
 2. Command、Mediator一般作为业务处理器处理业务，Proxy为数据模型（比如作为数据库service层），Command、Mediator中可通过getProxy方法获得Proxy数据模型。
-3. Command只能监听注册到Facade中的事件，可多个事件注册同一个Command（也可理解为一个Command可监听多个事件），而Mediator则是监听多个自身感兴趣的事件，具体对哪些事件感兴趣则由listMessageInterests方法的返回值决定（总结：一个事件可对应多个Command，一个Command可以对应多个事件；一个事件可以对应多个Mediator，一个Mediator可以对应多个事件；一个事件可以同时对应多个Command和多个Mediator；Command为动态创建，但可池化，Mediator为全局唯一）；Command、Mediator是功能非常相似的事件监听器和事件派发器。
+3. Command只能监听注册到Facade中的事件，可多个事件注册同一个Command（也可理解为一个Command可监听多个事件），而Mediator则是监听多个自身感兴趣的事件，具体对哪些事件感兴趣则由listMessageInterests方法的返回值决定（总结：一个Command可以对应多个事件；一个事件可以对应多个Mediator，一个Mediator可以对应多个事件；一个事件可以同时对应多个Command和多个Mediator；Command为动态创建，但可池化，Mediator为全局唯一）；Command、Mediator是功能非常相似的事件监听器和事件派发器。
 4. Command、Proxy、Mediator中都能通过sendMessage方法向外派发事件，也可在此框架之外直接使用Facade实例调用sendMessage派发事件。
 5. 此框架的事件数据类型尽可能的使用int和String。
 6. Facade实例在调用initThreadPool方法配置了线程池的情况下，Facade、Command、Proxy、Mediator的sendMessage都将直接支持异步派发事件，默认为同步。
 7. 统一同步或者异步获得事件处理结果，异步获取事件结果以wait、notifyAll实现。应该尽可能的少使用此方式，而改用派发事件方式。
+8. 新增支持异步回调获取执行结果，优化第7点。
+9. 新增支持单个事件对应多个Command（与第3点早期版本单个事件仅支持一个Command做了增强），并可依此模拟切面编程。
+10. 如有疑问可添加微信 zkpursuit 咨询。
 
 ```java
 import com.kaka.Startup;
@@ -83,6 +86,9 @@ public class Test extends Startup {
         facade.sendMessage(syncMsg1, false); //同步发送事件通知
         System.out.println(result2.get());
 
+        //基于事件模拟切面编程，仅支持Command
+        facade.sendMessage(new Message("40000"), true);
+
         //哈哈，异步中的异步，其实没必要
         Message syncMsg2 = new Message("30000", "让FutureCommand接收执行");
         IResult<String> result3 = syncMsg2.setResult("ResultMsg", new AsynResult<>());
@@ -90,7 +96,7 @@ public class Test extends Startup {
         System.out.println(result3.get());
 
         //异步回调获取事件执行结果
-        facade.sendMessage(new Message("40000", "", (Class<?> clasz, IResult<Object> result) -> {
+        facade.sendMessage(new Message("50000", "", (Class<?> clasz, IResult<Object> result) -> {
             System.out.print("异步回调：\t" + clasz.getTypeName() + "\t");
             Object resultObj = result.get();
             if (resultObj instanceof Object[]) {
@@ -293,11 +299,77 @@ import com.kaka.notice.Command;
 import com.kaka.notice.Message;
 import com.kaka.notice.annotation.Handler;
 
-@Handler(cmd = "40000", type = String.class, priority = 1)
+@Handler(cmd = "50000", type = String.class, priority = 1)
 public class CallbackCommand1 extends Command {
     @Override
     public void execute(Message msg) {
         this.returnCallbackResult(new Object[]{100, "我爱我家"});
+    }
+}
+```
+```java
+package com.test.unit;
+
+import com.kaka.notice.Command;
+import com.kaka.notice.IResult;
+import com.kaka.notice.Message;
+import com.kaka.notice.annotation.Handler;
+
+/**
+ * 模拟切面，执行后
+ */
+@Handler(cmd = "40000", type = String.class, priority = 3)
+public class SimulateAopAfterCommand extends Command {
+    @Override
+    public void execute(Message msg) {
+        IResult<Long> execStartTime = msg.getResult("execStartTime");
+        long offset = System.currentTimeMillis() - execStartTime.get();
+        System.out.println("Aop业务执行耗时：" + offset);
+    }
+}
+```
+```java
+package com.test.unit;
+
+import com.kaka.notice.Command;
+import com.kaka.notice.IResult;
+import com.kaka.notice.Message;
+import com.kaka.notice.SyncResult;
+import com.kaka.notice.annotation.Handler;
+
+/**
+ * 模拟切面，执行前
+ */
+@Handler(cmd = "40000", type = String.class, priority = 1)
+public class SimulateAopBeforeCommand extends Command {
+    @Override
+    public void execute(Message msg) {
+        IResult<Long> execStartTime = new SyncResult<>(); //中间变量亦可使用 ThreadLocal 存储
+        execStartTime.set(System.currentTimeMillis());
+        msg.setResult("execStartTime", execStartTime);
+    }
+}
+```
+```java
+package com.test.unit;
+
+import com.kaka.notice.Command;
+import com.kaka.notice.Message;
+import com.kaka.notice.annotation.Handler;
+
+/**
+ * 模拟切面
+ */
+@Handler(cmd = "40000", type = String.class, priority = 2)
+public class SimulateAopCommand extends Command {
+    @Override
+    public void execute(Message msg) {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Aop业务执行");
     }
 }
 ```

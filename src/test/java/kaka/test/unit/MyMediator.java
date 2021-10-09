@@ -27,7 +27,7 @@ public class MyMediator extends Mediator {
             case "3000":
                 System.out.println(MyMediator.class.getTypeName() + " -> handleMessage " + msg.getWhat() + " 绑定的数据：" + msg.getBody());
                 break;
-            case "40000":
+            case "50000":
                 System.out.println("MyMediator被执行！");
                 this.returnCallbackResult("我爱我家");
                 break;
@@ -41,7 +41,7 @@ public class MyMediator extends Mediator {
      */
     @Override
     public Object[] listMessageInterests() {
-        return new Object[]{"2000", "3000", "40000"};
+        return new Object[]{"2000", "3000", "50000"};
     }
 
 }

@@ -574,8 +574,8 @@ public class Facade implements INotifier {
                 cmd.facade = this;
                 cmd.cmd = msg.getWhat();
                 cmd.execute0(msg);
-                pool.idle(cmd);
                 msg.callback(cmd.getClass());
+                pool.idle(cmd);
             }
         }
     }
