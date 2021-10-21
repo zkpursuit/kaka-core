@@ -1,5 +1,6 @@
 package com.kaka.notice;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -10,9 +11,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class AsynResult<V> implements IResult<V> {
 
-    private final static Object NULL = new Object();
-    private volatile Object result = NULL;
-    private long defaultWaitMillsecs = 5000;
+    private static class NULL implements Serializable {
+    }
+
+    private final static Object NULL = new NULL();
+    protected volatile Object result = NULL;
+    private final long defaultWaitMillsecs;
 
     /**
      * 构造方法

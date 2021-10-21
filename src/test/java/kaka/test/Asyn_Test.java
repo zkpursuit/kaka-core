@@ -65,8 +65,8 @@ public class Asyn_Test extends Startup {
 
         //异步回调获取事件执行结果
         facade.sendMessage(new Message("50000", "", (IResult<Object> result) -> {
-            Class<?> clasz = ((CallbackResult<Object>) result).eventHanderClass;
-            StringBuilder sb = new StringBuilder("异步回调：\t" + clasz.getTypeName() + "\t");
+            String clasz = ((CallbackResult<Object>) result).eventHanderClass;
+            StringBuilder sb = new StringBuilder("异步回调：\t" + clasz + "\t");
             Object resultObj = result.get();
             if (resultObj instanceof Object[]) {
                 Object[] ps = (Object[]) resultObj;
@@ -86,5 +86,25 @@ public class Asyn_Test extends Startup {
                 .repeat(5); //执行次数
         //此处的执行次数为5次，但因执行到某次时超出设置的结束时间，故而实际次数将少于5次
         facade.sendMessage(new Message("1000", "让MyCommand接收执行"), scheduler);
+
+        //以下通过ActiveMQ消息队列消费处理事件，并获得事件处理结果
+        facade.initRemoteMessageQueue(new ActiveMQ("event_exec_before", "event_exec_after")); //此行全局一次设定
+        Message message = new Message("20000", "让MyCommand接收执行");
+        IResult<String> result4 = message.setResult("ResultMsg", new AsynResult<>(5000));
+        facade.sendMessageByQueue(message);
+        System.out.println("消息队列消费处理事件结果：" + result4.get());
+
+        facade.sendMessageByQueue(new Message("40000", "", (IResult<Object> result) -> {
+            String clasz = ((CallbackResult<Object>) result).eventHanderClass;
+            StringBuilder sb = new StringBuilder("消息队列消费处理事件结果异步回调：\t" + clasz + "\t");
+            Object resultObj = result.get();
+            if (resultObj instanceof Object[]) {
+                Object[] ps = (Object[]) resultObj;
+                sb.append(Arrays.toString(ps));
+            } else {
+                sb.append(resultObj);
+            }
+            System.out.println(sb);
+        }));
     }
 }

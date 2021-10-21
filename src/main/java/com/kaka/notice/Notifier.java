@@ -37,9 +37,27 @@ abstract public class Notifier implements INotifier {
     }
 
     /**
+     * 发送到远程消息队列，并由消息队列消费端处理事件消息。
+     * <br>
+     * {@link SyncResult} 同步获取结果将不受支持。
+     * <br>
+     * 支持{@link AsynResult}或者异步回调获取远程事件执行结果。
+     * <br>
+     * 保证事件的顺利执行完全由消息队列的运行情况而决定。
+     *
+     * @param msg 待发送的消息
+     */
+    @Override
+    public void sendMessageByQueue(Message msg) {
+        if (facade != null) {
+            facade.sendMessageByQueue(msg);
+        }
+    }
+
+    /**
      * 定时调度执行事件通知
      *
-     * @param msg 事件
+     * @param msg       事件
      * @param scheduler 定时调度器
      */
     @Override
@@ -52,7 +70,7 @@ abstract public class Notifier implements INotifier {
     /**
      * 取消调度
      *
-     * @param cmd 事件名
+     * @param cmd   事件名
      * @param group 调度器组名
      */
     @Override
@@ -74,7 +92,7 @@ abstract public class Notifier implements INotifier {
     /**
      * 获取数据模型
      *
-     * @param <T> 类型限定
+     * @param <T>  类型限定
      * @param name 数据模型名
      * @return 数据模型
      */
@@ -102,7 +120,7 @@ abstract public class Notifier implements INotifier {
     /**
      * 获取事件观察者
      *
-     * @param <T> 类型限定
+     * @param <T>          类型限定
      * @param mediatorName 事件观察者唯一标识
      * @return 事件观察者
      */
@@ -116,7 +134,7 @@ abstract public class Notifier implements INotifier {
     /**
      * 获取事件观察者
      *
-     * @param <T> 类型限定
+     * @param <T>           类型限定
      * @param mediatorClass 事件观察者类型
      * @return 事件观察者
      */

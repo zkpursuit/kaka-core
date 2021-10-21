@@ -4,12 +4,11 @@ import com.kaka.aop.Aop;
 import com.kaka.aop.AopFactory;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
+import com.kaka.util.Tool;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 /**
  * 整个框架的中枢
@@ -22,9 +21,11 @@ public class Facade implements INotifier {
     private final Map<String, Mediator> mediaMap = new ConcurrentHashMap<>();
     private final MediatorListMap notiMediMap = new MediatorListMap();
     private final Map<Object, CommandPoolSortedSet> cmdPoolMap = new ConcurrentHashMap<>();
+    private final Map<Object, Set<IListener>> listenerMap = new ConcurrentHashMap<>();
     private Executor threadPool;
     private ScheduledExecutorService scheduleThreadPool;
     private final Map<String, ScheduledFuture<?>> scheduleFutureMap = new ConcurrentHashMap<>();
+    private RemoteMessageQueue remoteMessageQueue;
 
     /**
      * 创建一个内核
@@ -43,26 +44,58 @@ public class Facade implements INotifier {
 
     /**
      * 初始化线程池，用于sendMessage中异步处理消息
+     * <br>
+     * 全局设置一次
      *
      * @param threadPool 线程池
      */
     public void initThreadPool(Executor threadPool) {
-        this.threadPool = threadPool;
+        if (this.threadPool == null) {
+            this.threadPool = threadPool;
+        }
     }
 
     /**
      * 异步定时调度线程池
+     * <br>
+     * 全局设置一次
      *
      * @param scheduleThreadPool 定时调度线程池
      */
     public void initScheduleThreadPool(ScheduledExecutorService scheduleThreadPool) {
-        this.scheduleThreadPool = scheduleThreadPool;
+        if (this.scheduleThreadPool == null) {
+            this.scheduleThreadPool = scheduleThreadPool;
+        }
     }
 
+    /**
+     * 初始化远程消息队列服务
+     * <br>
+     * 全局设置一次
+     *
+     * @param remoteMessageQueue
+     */
+    public void initRemoteMessageQueue(RemoteMessageQueue remoteMessageQueue) {
+        if (this.remoteMessageQueue == null) {
+            this.remoteMessageQueue = remoteMessageQueue;
+            this.remoteMessageQueue.facade = this;
+        }
+    }
+
+    /**
+     * 获取异步执行线程池
+     *
+     * @return 异步执行线程池
+     */
     public Executor getThreadPool() {
         return this.threadPool;
     }
 
+    /**
+     * 获取定时调度线程池
+     *
+     * @return 定时调度线程池
+     */
     public ScheduledExecutorService getScheduleThreadPool() {
         return this.scheduleThreadPool;
     }
@@ -562,6 +595,53 @@ public class Facade implements INotifier {
     }
 
     /**
+     * 添加事件监听器
+     *
+     * @param cmd      事件名
+     * @param listener 事件监听器
+     */
+    final public void addListener(Object cmd, IListener listener) {
+        Set<IListener> listeners = listenerMap.computeIfAbsent(cmd, k -> Collections.synchronizedSet(new LinkedHashSet<>()));
+        listeners.add(listener);
+    }
+
+    /**
+     * 移除事件监听器
+     *
+     * @param cmd      事件名
+     * @param listener 事件监听器
+     */
+    final public void removeListener(Object cmd, IListener listener) {
+        Set<IListener> listeners = listenerMap.get(cmd);
+        if (listeners == null) return;
+        listeners.remove(listener);
+        if (listeners.isEmpty()) {
+            listenerMap.remove(cmd);
+        }
+    }
+
+    /**
+     * 移除事件名对应的所有监听器
+     *
+     * @param cmd 事件名
+     */
+    final public void removeListener(Object cmd) {
+        listenerMap.remove(cmd);
+    }
+
+    /**
+     * 遍历事件名下对应的所有监听器
+     *
+     * @param cmd      事件名
+     * @param consumer 监听器访问函数
+     */
+    private void foreachListener(Object cmd, Consumer<IListener> consumer) {
+        Set<IListener> listeners = listenerMap.get(cmd);
+        if (listeners == null) return;
+        listeners.forEach(consumer);
+    }
+
+    /**
      * 执行所有相同命令号下的{@link com.kaka.notice.Command}对象
      *
      * @param poolSet 相同命令号的{@link com.kaka.notice.Command}对象池集合
@@ -574,7 +654,7 @@ public class Facade implements INotifier {
                 cmd.facade = this;
                 cmd.cmd = msg.getWhat();
                 cmd.execute0(msg);
-                msg.callback(cmd.getClass());
+                msg.callback(cmd.getClass().getTypeName());
                 pool.idle(cmd);
             }
         }
@@ -587,7 +667,7 @@ public class Facade implements INotifier {
      * @param asyn true为异步，设为true时须调用initThreadPool方法初始化线程池
      */
     @Override
-    final public void sendMessage(final Message msg, final boolean asyn) {
+    public void sendMessage(final Message msg, final boolean asyn) {
         if (msg == null) {
             return;
         }
@@ -597,7 +677,7 @@ public class Facade implements INotifier {
                 execCommands(poolSet, msg);
             } else {
                 if (threadPool == null) {
-                    throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
+                    throw new Error(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
                 }
                 threadPool.execute(() -> {
                     execCommands(poolSet, msg);
@@ -608,18 +688,22 @@ public class Facade implements INotifier {
             notiMediMap.forEach(msg.getWhat(), (observer) -> {
                 if (!asyn) {
                     observer.handleMessage0(msg);
-                    msg.callback(observer.getClass());
+                    msg.callback(observer.getClass().getTypeName());
                 } else {
                     if (threadPool == null) {
-                        throw new Error(String.format("执行异步sendMessage操作前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
+                        throw new Error(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
                     }
                     threadPool.execute(() -> {
                         observer.handleMessage0(msg);
-                        msg.callback(observer.getClass());
+                        msg.callback(observer.getClass().getTypeName());
                     });
                 }
             });
         }
+        final Facade _this = this;
+        this.foreachListener(msg.getWhat(), (IListener listener) -> {
+            listener.onMessage(msg, _this);
+        });
     }
 
     /**
@@ -630,6 +714,36 @@ public class Facade implements INotifier {
     @Override
     final public void sendMessage(Message msg) {
         sendMessage(msg, false);
+    }
+
+    /**
+     * 发送到远程消息队列，并由消息队列消费端处理事件消息。
+     * <br>
+     * {@link SyncResult} 同步获取结果将不受支持。
+     * <br>
+     * 支持{@link AsynResult}或者异步回调获取远程事件执行结果。
+     * <br>
+     * 保证事件的顺利执行完全由消息队列的运行情况而决定。
+     *
+     * @param msg 待发送的消息
+     */
+    @Override
+    public void sendMessageByQueue(Message msg) {
+        if (remoteMessageQueue == null) {
+            throw new Error(String.format("执行sendMessageByQueue前请先调用 %s.initRemoteMessageQueue方法初始化", this.getClass().toString()));
+        }
+        Map<Object, IResult> msgResultMap = msg.resultMap;
+        Message mqMsg = new Message(msg.getWhat(), msg.getBody());
+        String id = Tool.uuid();
+        if (msgResultMap != null) {
+            msgResultMap.forEach((Object key, IResult result) -> {
+                if (result instanceof AsynResult) {
+                    mqMsg.setResult((String) key, new RemoteAsynResult<>());
+                }
+            });
+        }
+        remoteMessageQueue.localMessageCache.add(id, msg);
+        remoteMessageQueue.publishEventMessage(new RemoteMessageQueue.MessageWrap(id, mqMsg), remoteMessageQueue.beforeTopic);
     }
 
     /**

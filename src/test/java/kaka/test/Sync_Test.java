@@ -4,6 +4,11 @@ import com.kaka.Startup;
 import com.kaka.notice.Facade;
 import com.kaka.notice.FacadeFactory;
 import com.kaka.notice.Message;
+import com.kaka.util.MathUtils;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 /**
  * 同步使用范例

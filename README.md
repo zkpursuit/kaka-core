@@ -30,7 +30,8 @@
 7. 统一同步或者异步获得事件处理结果，异步获取事件结果以wait、notifyAll实现。应该尽可能的少使用此方式，而改用派发事件方式。
 8. 新增支持异步回调获取执行结果，优化第7点。
 9. 新增支持单个事件对应多个Command（与第3点早期版本单个事件仅支持一个Command做了增强），并可依此模拟切面编程。
-10. 如有疑问可添加微信 zkpursuit 咨询。
+10. 支持对接远程消息队列，几乎支持市面上的所有消息队列，派发事件可如在本地执行后通过AsynResult或者异步回调获取执行结果。
+11. 如有疑问可添加微信 zkpursuit 咨询。
 
 ```java
 import com.kaka.Startup;
@@ -86,25 +87,27 @@ public class Test extends Startup {
         facade.sendMessage(syncMsg1, false); //同步发送事件通知
         System.out.println(result2.get());
 
-        //基于事件模拟切面编程，仅支持Command
-        facade.sendMessage(new Message("40000"), true);
-
         //哈哈，异步中的异步，其实没必要
         Message syncMsg2 = new Message("30000", "让FutureCommand接收执行");
         IResult<String> result3 = syncMsg2.setResult("ResultMsg", new AsynResult<>());
         facade.sendMessage(syncMsg2, true); //异步发送事件通知
         System.out.println(result3.get());
 
+        //基于事件模拟切面编程，仅支持Command
+        facade.sendMessage(new Message("40000"), true);
+
         //异步回调获取事件执行结果
-        facade.sendMessage(new Message("50000", "", (Class<?> clasz, IResult<Object> result) -> {
-            System.out.print("异步回调：\t" + clasz.getTypeName() + "\t");
+        facade.sendMessage(new Message("50000", "", (IResult<Object> result) -> {
+            String clasz = ((CallbackResult<Object>) result).eventHanderClass;
+            StringBuilder sb = new StringBuilder("异步回调：\t" + clasz + "\t");
             Object resultObj = result.get();
             if (resultObj instanceof Object[]) {
                 Object[] ps = (Object[]) resultObj;
-                System.out.println(Arrays.toString(ps));
+                sb.append(Arrays.toString(ps));
             } else {
-                System.out.println(resultObj);
+                sb.append(resultObj);
             }
+            System.out.println(sb);
         }), true);
 
         facade.initScheduleThreadPool(Executors.newScheduledThreadPool(2));
@@ -116,6 +119,26 @@ public class Test extends Startup {
                 .repeat(5); //执行次数
         //此处的执行次数为5次，但因执行到某次时超出设置的结束时间，故而实际次数将少于5次
         facade.sendMessage(new Message("1000", "让MyCommand接收执行"), scheduler);
+
+        //以下通过ActiveMQ消息队列消费处理事件，并获得事件处理结果，ActiveMQ类请查阅test源码
+        facade.initRemoteMessageQueue(new ActiveMQ("event_exec_before", "event_exec_after")); //此行全局一次设定
+        Message message = new Message("20000", "让MyCommand接收执行");
+        IResult<String> result4 = message.setResult("ResultMsg", new AsynResult<>(5000));
+        facade.sendMessageByQueue(message);
+        System.out.println("消息队列消费处理事件结果：" + result4.get());
+
+        facade.sendMessageByQueue(new Message("40000", "", (IResult<Object> result) -> {
+            String clasz = ((CallbackResult<Object>) result).eventHanderClass;
+            StringBuilder sb = new StringBuilder("消息队列消费处理事件结果异步回调：\t" + clasz + "\t");
+            Object resultObj = result.get();
+            if (resultObj instanceof Object[]) {
+                Object[] ps = (Object[]) resultObj;
+                sb.append(Arrays.toString(ps));
+            } else {
+                sb.append(resultObj);
+            }
+            System.out.println(sb);
+        }));
     }
 }
 ```

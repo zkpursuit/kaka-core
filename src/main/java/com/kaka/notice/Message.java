@@ -2,6 +2,7 @@ package com.kaka.notice;
 
 import com.kaka.util.ObjectPool.Poolable;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -11,12 +12,12 @@ import java.util.function.Consumer;
  *
  * @author zkpursuit
  */
-public class Message implements Poolable {
+public class Message implements Poolable, Serializable {
 
     protected Object what;
     protected Object body;
-    private Map<Object, IResult> resultMap;
-    private Consumer<IResult<Object>> callback;
+    protected Map<Object, IResult> resultMap;
+    private volatile Consumer<IResult<Object>> callback;
 
     /**
      * 构造方法
@@ -122,18 +123,18 @@ public class Message implements Poolable {
      * @param params            回调参数
      */
     void setCallbackParams(Class<?> eventHandlerClass, Object params) {
-        if (this.callback == null) return;
-        this._setResult(eventHandlerClass, new CallbackResult<>(params, eventHandlerClass));
+        String id = eventHandlerClass.getTypeName();
+        this._setResult(id, new CallbackResult<>(params, id));
     }
 
     /**
      * 事件执行完成后的回调
      *
-     * @param eventHandlerClass 事件执行器的类对象
+     * @param id 事件执行器的类TypeName，亦为回调结果唯一标识
      */
-    void callback(Class<?> eventHandlerClass) {
+    void callback(String id) {
         if (this.callback == null) return;
-        IResult<Object> result = this._getResult(eventHandlerClass);
+        IResult<Object> result = this._getResult(id);
         if (result == null) return;
         this.callback.accept(result);
     }

@@ -21,7 +21,7 @@ public class ResultCommand extends Command {
     public void execute(Message msg) {
         try {
             //模拟耗时操作
-            Thread.sleep(10000);
+            Thread.sleep(3000);
         } catch (InterruptedException ex) {
             Logger.getLogger(ResultCommand.class.getName()).log(Level.SEVERE, null, ex);
         }

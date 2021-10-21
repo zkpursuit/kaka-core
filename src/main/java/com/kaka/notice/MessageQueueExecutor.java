@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 事件队列执行器
+ * 本地事件消息队列执行器
  * <br> 此执行器当在第一次调用addMessage后将一直执行下去，直到事件队列中的所有事件被执行完毕。
  * <br> 当需要暂停执行时可继承此类自行实现，比如增加一个AtomicBoolean对象标记是否执行。
  *
