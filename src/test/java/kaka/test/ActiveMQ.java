@@ -30,7 +30,7 @@ public class ActiveMQ extends RemoteMessageQueue {
         }
     }
 
-    private static final String BROKER_URL = "tcp://127.0.0.1:61616";
+    private static final String BROKER_URL = "tcp://101.34.22.36:61616";
     private final ActiveMQConnectionFactory activeMQConnectionFactory;
     private final Serializer<MessageWrap> eventSerializer = new KryoSerializer<>();
 

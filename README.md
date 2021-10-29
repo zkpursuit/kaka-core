@@ -33,6 +33,8 @@
 10. 支持对接远程消息队列，几乎支持市面上的所有消息队列，派发事件可如在本地执行后通过AsynResult或者异步回调获取执行结果。
 11. 如有疑问可添加微信 zkpursuit 咨询。
 
+基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords ，游戏体验地址 http://101.34.22.36:8080/ 
+
 ```java
 import com.kaka.Startup;
 import com.kaka.notice.*;
