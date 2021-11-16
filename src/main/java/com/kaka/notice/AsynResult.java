@@ -14,9 +14,9 @@ public class AsynResult<V> implements IResult<V> {
     private static class NULL implements Serializable {
     }
 
+    private final long defaultWaitMillsecs;
     private final static Object NULL = new NULL();
     protected volatile Object result = NULL;
-    private final long defaultWaitMillsecs;
 
     /**
      * 构造方法
@@ -39,7 +39,7 @@ public class AsynResult<V> implements IResult<V> {
      *
      * @return 是否赋值结果
      */
-    private boolean _isDone() {
+    protected boolean _isDone() {
         return this.result != NULL;
     }
 

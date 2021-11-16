@@ -41,7 +41,7 @@ abstract public class ObjectPool<T extends Poolable> {
     public ObjectPool(int max) {
         this.max = max;
         if (this.max > 0) {
-            freeObjects = new ConcurrentLinkedQueue();
+            freeObjects = new ConcurrentLinkedQueue<>();
         }
     }
 

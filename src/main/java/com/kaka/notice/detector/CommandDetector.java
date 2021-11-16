@@ -59,11 +59,27 @@ public class CommandDetector implements IDetector {
                         } else if (cmdCls == long.class || cmdCls == Long.class) {
                             cotx.registerCommand(Long.parseLong(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
                         }
+                        logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{cmdCls.getTypeName(), cmd, cls});
                     } else {
+                        boolean isEnum = false;
+                        if (cmdCls.isEnum()) {
+                            Object[] enumConstants = cmdCls.getEnumConstants();
+                            for (Object ec : enumConstants) {
+                                String ecs = String.valueOf(ec);
+                                if (cmd.equals(ecs)) {
+                                    cmd = ec;
+                                    isEnum = true;
+                                    break;
+                                }
+                            }
+                        }
                         cotx.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize(), priority);
-                        logger.log(Level.WARNING, "注解cmd数据类型与注解type参数描述的类型不一致，强制以cmd参数类型注册！{0}", new Object[]{cls});
+                        if (isEnum) {
+                            logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{cmdCls.getTypeName(), cmd, cls});
+                        } else {
+                            logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{String.class.getTypeName(), cmd, cls});
+                        }
                     }
-                    logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{cmdCls.getTypeName(), regist.cmd(), cls});
                 } else {
                     cotx.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize(), priority);
                     logger.log(Level.INFO, "注册业务处理器：cmd（{0}）：{1}  ==>>>  {2}", new Object[]{cmdCls.getTypeName(), regist.cmd(), cls});

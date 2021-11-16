@@ -15,7 +15,7 @@
     <dependency>
         <groupId>io.github.zkpursuit</groupId>
         <artifactId>kaka-core</artifactId>
-        <version>4.0</version>
+        <version>5.0</version>
     </dependency>
     ```
 
@@ -31,9 +31,19 @@
 8. 新增支持异步回调获取执行结果，优化第7点。
 9. 新增支持单个事件对应多个Command（与第3点早期版本单个事件仅支持一个Command做了增强），并可依此模拟切面编程。
 10. 支持对接远程消息队列，几乎支持市面上的所有消息队列，派发事件可如在本地执行后通过AsynResult或者异步回调获取执行结果。
-11. 如有疑问可添加微信 zkpursuit 咨询。
+11. Handler注解支持枚举类型，例如：
+    ```text 
+    @Handler(cmd="A", type=MyEnum.class)
+    其中"A"为MyEnum中的枚举项
+    ```
+12. 支持对接第三方消息队列。
+13. 支持通过第三方消息队列派发和消费事件并可获取远程事件处理结果。
+14. 使用第三方消息队列消费事件并处理时，返回处理结果与本地执行事件完全相同（注：SyncResult消费处理远程事件时不可用）。
+15. 对接第三方消息队列时，稳定性完全由第三方消息队列决定。
+16. 如有疑问可添加微信 zkpursuit 咨询。
 
 基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords ，游戏体验地址 http://101.34.22.36:8080/ 
+癞子玩法不支持机器人，需要开三个标签页，并需在匹配时间段（5秒）内同时进入游戏。
 
 ```java
 import com.kaka.Startup;
