@@ -14,11 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MessageQueueExecutor {
     //事件队列
-    private final Queue<Message> queue;
+    protected final Queue<Message> queue;
     //事件调度中心
-    private final Facade facade;
+    protected final Facade facade;
     //事件队列是否正在被消费执行
-    private final AtomicBoolean doing;
+    protected final AtomicBoolean doing;
 
     /**
      * 构造方法
@@ -27,8 +27,12 @@ public class MessageQueueExecutor {
      */
     public MessageQueueExecutor(Facade facade) {
         this.facade = facade;
-        this.queue = new ConcurrentLinkedQueue<>();
+        this.queue = initQueue();
         this.doing = new AtomicBoolean(false);
+    }
+
+    protected Queue<Message> initQueue() {
+        return new ConcurrentLinkedQueue<>();
     }
 
     /**

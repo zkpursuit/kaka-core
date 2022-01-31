@@ -20,7 +20,7 @@ abstract public class ObjectPool<T extends Poolable> {
     /**
      * 闲置对象数量峰值
      */
-    private volatile int peak;
+    private int peak;
     /**
      * 对象存储队列
      */
@@ -41,8 +41,18 @@ abstract public class ObjectPool<T extends Poolable> {
     public ObjectPool(int max) {
         this.max = max;
         if (this.max > 0) {
-            freeObjects = new ConcurrentLinkedQueue<>();
+            freeObjects = this.initQueue(max);
         }
+    }
+
+    /**
+     * 初始化对象池存储队列
+     *
+     * @param initialCapacity 队列初始化大小
+     * @return 对象池队列
+     */
+    protected Queue<T> initQueue(int initialCapacity) {
+        return new ConcurrentLinkedQueue<>();
     }
 
     /**
@@ -73,7 +83,7 @@ abstract public class ObjectPool<T extends Poolable> {
         if (object == null) {
             throw new IllegalArgumentException("object cannot be null.");
         }
-        object.reset();
+        this.reset(object);
         if (freeObjects != null) {
             int idleCount = freeObjects.size();
             if (idleCount < max) {
@@ -81,6 +91,15 @@ abstract public class ObjectPool<T extends Poolable> {
                 peak = Math.max(peak, idleCount + 1);
             }
         }
+    }
+
+    /**
+     * 重置对象
+     *
+     * @param object 待重置放入对象池的对象
+     */
+    protected void reset(T object) {
+        object.reset();
     }
 
     /**
@@ -129,7 +148,7 @@ abstract public class ObjectPool<T extends Poolable> {
     /**
      * 可池化对象接口
      */
-    static public interface Poolable {
+    public static interface Poolable {
 
         /**
          * 重置对象数据，保障下次使用时为初始化状态

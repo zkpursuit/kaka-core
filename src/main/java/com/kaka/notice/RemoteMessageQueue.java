@@ -129,15 +129,7 @@ abstract public class RemoteMessageQueue {
                 localResult.set(result.get());
             } else if (result instanceof CallbackResult) {
                 localEventMessage.setResult(keyStr, result);
-                Method method = ReflectUtils.getDeclaredMethod(Message.class, "callback", String.class);
-                if (method != null) {
-                    try {
-                        method.setAccessible(true);
-                        method.invoke(localEventMessage, String.valueOf(key));
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
+                localEventMessage.callback(keyStr);
             }
         });
     }

@@ -2,6 +2,8 @@ package com.kaka.fsm;
 
 import com.kaka.notice.Message;
 
+import java.io.Serializable;
+
 /**
  * 状态机管理其实体的状态转换，且实体可以委托状态机处理其消息。<br>
  * 状态机主要由现态、条件、动作、次态四要素组成。<br>
@@ -11,55 +13,39 @@ import com.kaka.notice.Message;
  * 次态：条件满足后要迁往的新状态。“次态”是相对于“现态”而言的，“次态”一旦被激活，就转变成新的“现态”了。 <br>
  *
  * @param <E> 状态机绑定的实体
- * @param <S> 状态机所有状态类型
  */
-public interface StateMachine<E, S extends State<StateMachine>> {
+public interface StateMachine<E> extends Serializable {
 
     /**
      * 状态机绑定的实体
      *
      * @return 状态机绑定的实体
      */
-    E getOwner();
-
-    /**
-     * 更新状态机
-     * <p>
-     * 必须调用当前状态的update方法
-     * </p>
-     */
-    void update();
-
-    /**
-     * 转换到指定状态
-     *
-     * @param newState 新的目标状态
-     */
-    void changeState(S newState);
-
-    /**
-     * 回溯到上一个状态
-     *
-     * @return true表示正确回溯到上一状态；如果没有上一状态，则直接返回false。
-     */
-    boolean revertToPreviousState();
+    E getEntity();
 
     /**
      * 为此状态机设置初始状态
      *
      * @param state 初始状态
      */
-    void setInitialState(S state);
+    void setInitialState(State<E> state);
+
+    /**
+     * 转换到指定状态
+     *
+     * @param newState 新的目标状态
+     */
+    void changeState(State<E> newState);
 
     /**
      * 获取状态机的当前状态
      */
-    S getCurrentState();
+    State<E> getCurrentState();
 
     /**
      * 获取状态机的上一状态
      */
-    S getPreviousState();
+    State<E> getPreviousState();
 
     /**
      * 判断状态机是否处于指定状态
@@ -67,16 +53,49 @@ public interface StateMachine<E, S extends State<StateMachine>> {
      * @param state 与当前状态比较的目标状态
      * @return true 表示处于指定状态
      */
-    boolean isInState(S state);
+    default boolean isInState(State<E> state) {
+        State<E> currentState = this.getCurrentState();
+        if (currentState == null) return false;
+        return currentState.equals(state);
+    }
 
     /**
-     * 处理接收到的事件消息
+     * 更新状态机
+     * <p>
+     * 必须调用当前状态的update方法
+     * </p>
+     */
+    default void update() {
+        State<E> currentState = this.getCurrentState();
+        E entity = this.getEntity();
+        if (currentState != null) currentState.update(this);
+    }
+
+    /**
+     * 回溯到上一个状态
+     *
+     * @return true表示正确回溯到上一状态；如果没有上一状态，则直接返回false。
+     */
+    default boolean revertToPreviousState() {
+        State<E> previousState = this.getPreviousState();
+        if (previousState == null) {
+            return false;
+        }
+        changeState(previousState);
+        return true;
+    }
+
+    /**
+     * 处理接收到的事件消息，即状态改变的条件
      * <p>
      * 基于此接口的类必须能正确的路由到对应的事件
      * </p>
      *
-     * @param message 接收到的事件消息
+     * @param event 接收到的事件消息
      * @return true表示事件被成功处理
      */
-    boolean handleMessage(Message message);
+    default boolean handleMessage(Message event) {
+        State<E> currentState = this.getCurrentState();
+        return currentState != null && currentState.onMessage(this, event);
+    }
 }
