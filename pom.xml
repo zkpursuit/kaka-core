@@ -6,7 +6,7 @@
 
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.1</version>
+    <version>5.2</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>An event driven framework</description>
     <url>https://github.com/zkpursuit/kaka-core</url>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
-            <version>5.2.0</version>
+            <version>5.3.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -70,7 +70,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.4</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -83,9 +83,8 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.1</version>
+                        <version>3.4.0</version>
                         <configuration>
-                            <aggregate>true</aggregate>
                             <encoding>UTF-8</encoding>
                             <charset>UTF-8</charset>
                             <docencoding>UTF-8</docencoding>
@@ -98,7 +97,9 @@
                                 </goals>
                                 <configuration>
                                     <!--取消对源码中的doc参数注释等检查-->
-                                    <additionalparam>-Xdoclint:none</additionalparam>
+                                    <additionalJOptions>
+                                        <additionalJOption>Xdoclint:none</additionalJOption>
+                                    </additionalJOptions>
                                 </configuration>
                             </execution>
                         </executions>
@@ -106,7 +107,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
@@ -132,7 +133,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>2.5.1</version>
+                        <version>2.5.3</version>
                     </plugin>
                 </plugins>
             </build>
