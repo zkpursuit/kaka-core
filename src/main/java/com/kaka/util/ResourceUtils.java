@@ -18,7 +18,7 @@ public class ResourceUtils {
      *
      * @return 项目根目录
      */
-    public static String getProjectDirectroyPath() {
+    public static String getProjectDirectoryPath() {
         try {
             return new File("").getCanonicalPath();
         } catch (IOException ex) {

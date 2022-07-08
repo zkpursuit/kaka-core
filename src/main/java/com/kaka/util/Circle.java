@@ -1,4 +1,4 @@
-package com.kaka.util.math;
+package com.kaka.util;
 
 import java.io.Serializable;
 

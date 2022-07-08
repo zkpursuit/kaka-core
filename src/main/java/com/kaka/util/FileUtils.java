@@ -29,7 +29,7 @@ public class FileUtils {
         List<File> dirs = new ArrayList<>();
         if (!descendants) {
             dirs.add(dir);
-            File[] files = dir.listFiles(file -> file.isDirectory());
+            File[] files = dir.listFiles(File::isDirectory);
             if (files.length > 0) {
                 for (File file : files) {
                     dirs.add(file);

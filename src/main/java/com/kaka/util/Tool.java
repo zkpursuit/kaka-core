@@ -3,10 +3,8 @@ package com.kaka.util;
 import java.net.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +13,17 @@ import java.util.regex.Pattern;
  *
  * @author zhoukai
  */
-public class Tool {
+public final class Tool {
+
+    private static final String os = System.getProperty("os.name").toLowerCase();
+
+    public static boolean isLinux() {
+        return os.contains("linux");
+    }
+
+    public static boolean isWindows() {
+        return os.contains("windows");
+    }
 
     /**
      * 根据时间和本机mac地址生成唯一标识字符串
@@ -28,18 +36,131 @@ public class Tool {
         return uuid;
     }
 
-    /**
-     * 获取本机网卡MAC地址
-     *
-     * @return mac地址字符串表示
-     */
-    public static String getLocalMacAddress() {
+    private static final byte[][] invalidMacs = {
+            {0x00, 0x05, 0x69},             // VMWare
+            {0x00, 0x1C, 0x14},             // VMWare
+            {0x00, 0x0C, 0x29},             // VMWare
+            {0x00, 0x50, 0x56},             // VMWare
+            {0x08, 0x00, 0x27},             // Virtualbox
+            {0x0A, 0x00, 0x27},             // Virtualbox
+            {0x00, 0x03, (byte) 0xFF},       // Virtual-PC
+            {0x00, 0x15, 0x5D}              // Hyper-V
+    };
+
+    private static boolean isVMMac(byte[] mac) {
+        if (null == mac) {
+            return false;
+        }
+        for (byte[] invalid : invalidMacs) {
+            if (invalid[0] == mac[0] && invalid[1] == mac[1] && invalid[2] == mac[2]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public enum Filter implements Predicate<NetworkInterface> {
+        /**
+         * 过滤器: 所有网卡
+         */
+        ALL,
+        /**
+         * 过滤器: 在线设备,see also {@link NetworkInterface#isUp()}
+         */
+        UP,
+        /**
+         * 过滤器: 虚拟接口,see also {@link NetworkInterface#isVirtual()}
+         */
+        VIRTUAL,
+        /**
+         * 过滤器:LOOPBACK, see also {@link NetworkInterface#isLoopback()}
+         */
+        LOOPBACK,
+        /**
+         * 过滤器:物理网卡
+         */
+        PHYICAL_ONLY;
+
+        @Override
+        public boolean test(NetworkInterface input) {
+            if (null == input) {
+                return false;
+            }
+            try {
+                byte[] hardwareAddress;
+                switch (this) {
+                    case UP:
+                        return input.isUp();
+                    case VIRTUAL:
+                        return input.isVirtual();
+                    case LOOPBACK:
+                        return input.isLoopback();
+                    case PHYICAL_ONLY:
+                        hardwareAddress = input.getHardwareAddress();
+                        return null != hardwareAddress && hardwareAddress.length > 0 && !input.isVirtual() && !isVMMac(hardwareAddress);
+                    case ALL:
+                    default:
+                        return true;
+                }
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static Set<NetworkInterface> getNetworkInterfaces(Filter... filters) {
+        if (filters.length == 0) {
+            filters = new Filter[]{Filter.ALL};
+        }
         try {
-            InetAddress ias = InetAddress.getLocalHost();
-            return getMacAddress(ias);
-        } catch (UnknownHostException e) {
+            Enumeration<NetworkInterface> enums = NetworkInterface.getNetworkInterfaces();
+            Set<NetworkInterface> sets = new HashSet<>();
+            NetworkInterface ni;
+            while (enums.hasMoreElements() && (ni = enums.nextElement()) != null) {
+                for (Filter filter : filters) {
+                    if (filter.test(ni)) {
+                        sets.add(ni);
+                    }
+                }
+            }
+            return sets;
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getMacAddress() throws SocketException {
+        Set<NetworkInterface> nis = getNetworkInterfaces();
+        for (NetworkInterface ni : nis) {
+            for (InterfaceAddress address : ni.getInterfaceAddresses()) {
+                InetAddress inetAddress = address.getAddress();
+                if (inetAddress instanceof Inet4Address) {
+                    Inet4Address inet4Address = (Inet4Address) inetAddress;
+                    String ip = inet4Address.getHostAddress();
+                    if ("127.0.0.1".equals(ip)) continue;
+                    return ip;
+                }
+            }
+        }
+        for (NetworkInterface ni : nis) {
+            byte[] bytes = ni.getHardwareAddress();
+            if (bytes != null) {
+                return new String(StringUtils.encodeByteToHex(bytes));
+            }
         }
         return null;
+    }
+
+    public static final String LOCAL_MAC_ADDRESS;
+
+    static {
+        String LOCAL_MAC_ADDRESS1;
+        try {
+            LOCAL_MAC_ADDRESS1 = getMacAddress();
+        } catch (SocketException e) {
+            LOCAL_MAC_ADDRESS1 = null;
+        }
+        LOCAL_MAC_ADDRESS = LOCAL_MAC_ADDRESS1;
     }
 
     /**
@@ -60,8 +181,8 @@ public class Tool {
             if (macs == null) {
                 return null;
             }
-            for (int i = 0; i < macs.length; i++) {
-                mac = Integer.toHexString(macs[i] & 0xFF);
+            for (byte b : macs) {
+                mac = Integer.toHexString(b & 0xFF);
                 if (mac.length() == 1) {
                     mac = '0' + mac;
                 }
@@ -79,17 +200,17 @@ public class Tool {
      *
      * @return 本机IP地址列表
      */
-    public static final List<InetAddress> getLocalInetAddressList() {
+    public static List<InetAddress> getLocalInetAddressList() {
         List<InetAddress> list = new ArrayList<>();
         try {
-            Enumeration allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
             while (allNetInterfaces.hasMoreElements()) {
                 NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
                 //System.out.println(netInterface.getName());
-                Enumeration addresses = netInterface.getInetAddresses();
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     InetAddress ip = (InetAddress) addresses.nextElement();
-                    if (ip != null && ip instanceof Inet4Address) {
+                    if (ip instanceof Inet4Address) {
                         //System.out.println("本机的IP = " + ip.getHostAddress());
                         list.add(ip);
                     }
@@ -118,7 +239,7 @@ public class Tool {
      * @param index 从右至左，以0为起始
      * @return 转换后的整数
      */
-    public final static int bitsToOneAtIndex(int value, int index) {
+    public static int bitsToOneAtIndex(int value, int index) {
         return value | (1 << index);
     }
 
@@ -129,7 +250,7 @@ public class Tool {
      * @param value2 将int的四个字节保存在后四位
      * @return 转码后的长整形数据
      */
-    public final static long merge(int value1, int value2) {
+    public static long merge(int value1, int value2) {
         return (((long) value1) << 32) + value2;
     }
 
@@ -139,22 +260,22 @@ public class Tool {
      * @param value
      * @return
      */
-    public final static int[] splite(long value) {
+    public static int[] split(long value) {
         return new int[]{(int) (value >> 32), (int) ((value << 32) >> 32)};
     }
 
     /**
      * 判断身份证上的年龄是否达到ageYear年龄
      *
-     * @param idcard  身份证号码
+     * @param idCard  身份证号码
      * @param ageYear 周岁
      * @return 满足为true
      */
-    public static boolean fullYearOfLife(String idcard, int ageYear) {
-        if (idcard == null || "".equals(idcard)) {
+    public static boolean fullYearOfLife(String idCard, int ageYear) {
+        if (idCard == null || "".equals(idCard)) {
             return false;
         }
-        String birthdayStr = idcard.substring(6, 14);
+        String birthdayStr = idCard.substring(6, 14);
         int year = Integer.parseInt(birthdayStr.substring(0, 4));
         int month = Integer.parseInt(birthdayStr.substring(4, 6));
         int day = Integer.parseInt(birthdayStr.substring(6));
@@ -166,7 +287,7 @@ public class Tool {
 
     //IP正则
     private final static String ipRegex = "^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$";
-    //private final static String ipRegex = "((25[0-5]|2[0-4]//d|1//d{2}|[1-9]//d|//d)//.){3}(25[0-5]|2[0-4]//d|1//d{2}|[1-9]//d|//d)";
+    //private static String ipRegex = "((25[0-5]|2[0-4]//d|1//d{2}|[1-9]//d|//d)//.){3}(25[0-5]|2[0-4]//d|1//d{2}|[1-9]//d|//d)";
 
     /**
      * 判断是否为IP地址
@@ -174,7 +295,7 @@ public class Tool {
      * @param addr ip地址表示的字符串
      * @return true为ip地址
      */
-    public final static boolean isIP(String addr) {
+    public static boolean isIP(String addr) {
         if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
             return false;
         }
@@ -186,12 +307,12 @@ public class Tool {
     /**
      * 判断ip是否在某网段内
      *
-     * @param ip 需判断的IP
+     * @param ip      需判断的IP
      * @param startIp 起始网段IP
-     * @param endIp 结束网段IP
+     * @param endIp   结束网段IP
      * @return true在网段内，否在不在网段内
      */
-    public final static boolean ipIsInNetworkSegment(String ip, String startIp, String endIp) {
+    public static boolean ipIsInNetworkSegment(String ip, String startIp, String endIp) {
         if (ip == null) {
             throw new NullPointerException("IP不能为空！");
         }
@@ -233,11 +354,11 @@ public class Tool {
     /**
      * 判断ip是否在某网段内
      *
-     * @param ip 需判断的IP
+     * @param ip        需判断的IP
      * @param ipSegment IP网段，以“-”或“,”或“:”连接的两个IP地址
      * @return true在网段内，否在不在网段内
      */
-    public final static boolean ipIsInNetworkSegment(String ip, String ipSegment) {
+    public static boolean ipIsInNetworkSegment(String ip, String ipSegment) {
         if (ipSegment == null) {
             throw new NullPointerException("IP段不能为空！");
         }
@@ -254,7 +375,7 @@ public class Tool {
      * @param ip IPv4地址
      * @return IPv4地址的数字表示
      */
-    public final static long ipv4ToNumber(String ip) {
+    public static long ipv4ToNumber(String ip) {
         boolean bool = isIP(ip);
         if (!bool) {
             throw new Error(ip + " 无效的IP地址");
@@ -277,7 +398,7 @@ public class Tool {
      * @param ip IPv4地址的数字表示
      * @return IPv4地址
      */
-    public final static String numberToIpv4(long ip) {
+    public static String numberToIpv4(long ip) {
         long ip1 = ip & 0xFF000000;
         ip1 = ip1 >> 24;
         long ip2 = ip & 0x00FF0000;
@@ -299,7 +420,7 @@ public class Tool {
      * @param url 字符串
      * @return true表示字符串参数为url地址
      */
-    public final static boolean isURL(String url) {
+    public static boolean isURL(String url) {
         if (url == null) {
             return false;
         }

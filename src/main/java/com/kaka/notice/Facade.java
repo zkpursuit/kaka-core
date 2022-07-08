@@ -73,7 +73,7 @@ public class Facade implements INotifier {
      * <br>
      * 全局设置一次
      *
-     * @param remoteMessageQueue
+     * @param remoteMessageQueue 远程消息队列实现
      */
     public void initRemoteMessageQueue(RemoteMessageQueue remoteMessageQueue) {
         if (this.remoteMessageQueue == null) {

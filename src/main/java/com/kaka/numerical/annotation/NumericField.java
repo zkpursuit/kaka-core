@@ -17,27 +17,29 @@ public @interface NumericField {
      *
      * @return 节点元素集合
      */
-    public String[] elements();
+    String[] elements();
 
     /**
      * elements中单个节点处理器
      *
      * @return 处理器类
      */
-    public Class<? extends Converter> converter() default Converter.class;
+    Class<? extends Converter> converter() default Converter.class;
 
     /**
      * 每个字段的处理器
      *
      * @param <T> 处理后的数据，如为数组，则其中的数据将被逐个添加到集合对象中，非数组则整个添加到集合对象中
      */
-    public static interface Converter<T> {
+    interface Converter<T> {
+
+        Object NULL = new Object();
 
         /**
          * 数据转型
          *
          * @param value 原始字符串数据
-         * @return 转型后的数据
+         * @return 转型后的数据，当返回值为 NumericField.Converter.NULL时表示不更改原始值
          */
         T transform(String value);
 

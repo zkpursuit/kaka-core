@@ -31,7 +31,7 @@ public class FacadeFactory {
         Facade inst;
         if (instanceMap.get(name) == null) {
             try {
-                inst = (Facade) ReflectUtils.newInstance(facadeClass);
+                inst = ReflectUtils.newInstance(facadeClass);
                 inst.__name = name;
                 instanceMap.put(name, inst);
             } catch (Exception e) {

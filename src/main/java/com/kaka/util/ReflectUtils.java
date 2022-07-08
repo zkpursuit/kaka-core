@@ -1,7 +1,6 @@
 package com.kaka.util;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +9,7 @@ import java.util.regex.Pattern;
  *
  * @author zhoukai
  */
-public class ReflectUtils {
+public final class ReflectUtils {
 
     /**
      * 匹配get或set方法名的正则表达式
@@ -24,7 +23,7 @@ public class ReflectUtils {
      * @param field 字段
      * @param value 新的字段值
      */
-    public static final void setFieldValue(Object obj, Field field, Object value) {
+    public static void setFieldValue(Object obj, Field field, Object value) {
         if (obj == null) {
             return;
         }
@@ -54,7 +53,7 @@ public class ReflectUtils {
      * @param fieldName 字段名
      * @param value     新的字段值
      */
-    public static final void setFieldValue(Object obj, String fieldName, Object value) {
+    public static void setFieldValue(Object obj, String fieldName, Object value) {
         if (obj == null) {
             return;
         }
@@ -75,7 +74,7 @@ public class ReflectUtils {
      * @param fieldName 字段名
      * @param value     新的字段值
      */
-    public static final void setFieldValueByMethod(Object obj, String fieldName, Object value) {
+    public static void setFieldValueByMethod(Object obj, String fieldName, Object value) {
         if (obj == null) {
             return;
         }
@@ -120,7 +119,7 @@ public class ReflectUtils {
      * @param isSet     是否为set方法
      * @return set或get方法名
      */
-    public static final String convertToMethodName(String attribute, Class<?> objClass, boolean isSet) {
+    public static String convertToMethodName(String attribute, Class<?> objClass, boolean isSet) {
         Pattern p = Pattern.compile(REGEX);
         Matcher m = p.matcher(attribute);
         StringBuilder sb = new StringBuilder();
@@ -153,7 +152,7 @@ public class ReflectUtils {
      * @param field  字段
      * @return 字段值
      */
-    public static final Object getFieldValue(Object object, Field field) {
+    public static Object getFieldValue(Object object, Field field) {
         if (object == null) {
             return null;
         }
@@ -178,7 +177,7 @@ public class ReflectUtils {
      * @param fieldName 字段名
      * @return 字段值
      */
-    public static final Object getFieldValue(Object obj, String fieldName) {
+    public static Object getFieldValue(Object obj, String fieldName) {
         if (obj == null) {
             return null;
         }
@@ -222,7 +221,7 @@ public class ReflectUtils {
      * @param methodName 方法名
      * @param args       方法参数
      */
-    public static final void setValueByMethod(Object obj, String methodName, Object... args) {
+    public static void setValueByMethod(Object obj, String methodName, Object... args) {
         try {
             Method method;
             if (args.length == 0) {
@@ -253,7 +252,7 @@ public class ReflectUtils {
      * @param methodName 方法名
      * @return 方法返回值
      */
-    public static final Object getValueByMethod(Object obj, String methodName) {
+    public static Object getValueByMethod(Object obj, String methodName) {
         try {
             Method method = ReflectUtils.getDeclaredMethod(obj.getClass(), methodName);
             if (method != null) {
@@ -272,7 +271,7 @@ public class ReflectUtils {
     /**
      * 循环向上转型, 获 * @param object : 子类对象
      *
-     * @param srcClass
+     * @param srcClass       类
      * @param methodName     : 父类中的方法名
      * @param parameterTypes : 父类中的方法参数类型
      * @return 父类中的方法对象
@@ -291,7 +290,7 @@ public class ReflectUtils {
     /**
      * 循环向上转型, 获 * @param object : 子类对象
      *
-     * @param srcClass
+     * @param srcClass  类
      * @param fieldName : 父类中 * @return 父类中
      * @return 父类中的属性
      */
@@ -314,7 +313,7 @@ public class ReflectUtils {
      * @param ancestor  是否向父级追溯
      * @return 已声明的方法集合
      */
-    public final static Field[] getDeclaredFields(Class beanClass, boolean ancestor) {
+    public static Field[] getDeclaredFields(Class beanClass, boolean ancestor) {
         Field[] fields = null;
         Class clazz = beanClass;
         do {
@@ -341,7 +340,7 @@ public class ReflectUtils {
      * @param beanClass 类对象
      * @return 已声明的方法集合
      */
-    public final static Field[] getDeclaredFields(Class beanClass) {
+    public static Field[] getDeclaredFields(Class beanClass) {
         return getDeclaredFields(beanClass, true);
     }
 
@@ -352,7 +351,7 @@ public class ReflectUtils {
      * @param ancestor 是否向父级追溯
      * @return 已声明的方法集合
      */
-    public final static Method[] getDeclaredMethods(Class clasz, boolean ancestor) {
+    public static Method[] getDeclaredMethods(Class clasz, boolean ancestor) {
         Method[] methods = null;
         Class clazz = clasz;
         do {
@@ -379,7 +378,7 @@ public class ReflectUtils {
      * @param clasz 类对象
      * @return 已声明的方法集合
      */
-    public final static Method[] getDeclaredMethods(Class clasz) {
+    public static Method[] getDeclaredMethods(Class clasz) {
         return getDeclaredMethods(clasz, true);
     }
 
@@ -390,7 +389,7 @@ public class ReflectUtils {
      * @param cls 带泛型的类
      * @return 泛型参数类型，找不到泛型类时默认使用Object.class
      */
-    public final static Class<?> getGenericParadigmClass(Class cls) {
+    public static Class<?> getGenericParadigmClass(Class cls) {
         return getGenericParadigmClass(cls, Object.class);
     }
 
@@ -402,7 +401,7 @@ public class ReflectUtils {
      * @param defaultClass 如果从带泛型的类这个参数中未找到泛型类，将指定此类
      * @return 泛型类
      */
-    public final static Class<?> getGenericParadigmClass(Class cls, Class defaultClass) {
+    public static Class<?> getGenericParadigmClass(Class cls, Class defaultClass) {
         return getGenericParadigmClass(cls, 0, defaultClass);
     }
 
@@ -415,7 +414,7 @@ public class ReflectUtils {
      * @param defaultClass 如果从带泛型的类这个参数中未找到泛型类，将指定此类
      * @return 泛型类
      */
-    public final static Class<?> getGenericParadigmClass(Class cls, int genericIndex, Class defaultClass) {
+    public static Class<?> getGenericParadigmClass(Class cls, int genericIndex, Class defaultClass) {
         do {
             Type genType = cls.getGenericSuperclass();
             if (genType instanceof ParameterizedType) {
@@ -435,8 +434,8 @@ public class ReflectUtils {
      * @param args 构造方法参数
      * @return 对象实例
      */
-    public static final Object newInstance(Class cls, Object... args) {
-        Constructor con;
+    public static <T> T newInstance(Class<T> cls, Object... args) {
+        Constructor<T> con;
         if (args.length == 0) {
             try {
                 con = cls.getDeclaredConstructor();
@@ -448,7 +447,7 @@ public class ReflectUtils {
                 }
             }
         } else {
-            Class[] argTypes = new Class[args.length];
+            Class<?>[] argTypes = new Class[args.length];
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
                 if (arg != null) {
@@ -461,9 +460,6 @@ public class ReflectUtils {
                 throw new Error(ex);
             }
         }
-        if (con == null) {
-            throw new NullPointerException(cls.getTypeName() + "构造方法为空");
-        }
         int modifier = con.getModifiers();
         if (!Modifier.isPublic(modifier)) {
             con.setAccessible(true);
@@ -473,6 +469,26 @@ public class ReflectUtils {
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new Error(ex);
         }
+    }
+
+    /**
+     * 获取参数对象的Class
+     *
+     * @param args 参数列表
+     * @return 参数元素对应的Class列表
+     */
+    public static Class<?>[] toClass(Object... args) {
+        if (args == null) {
+            return null;
+        }
+        if (args.length == 0) {
+            return ArrayUtils.EMPTY_CLASS_ARRAY;
+        }
+        Class<?>[] classes = new Class[args.length];
+        for (int i = 0; i < args.length; ++i) {
+            classes[i] = args[i] == null ? null : args[i].getClass();
+        }
+        return classes;
     }
 
 }

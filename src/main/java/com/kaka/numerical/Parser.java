@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.kaka.util.ReflectUtils.setFieldValue;
 import static com.kaka.util.ReflectUtils.getFieldValue;
+import static com.kaka.util.ReflectUtils.setFieldValue;
 
 /**
  * 配置文件解析器
@@ -31,9 +31,9 @@ abstract public class Parser {
     /**
      * 为对象的字段赋值
      *
-     * @param <T> 对象限定类型
-     * @param object 对象
-     * @param field 对象字段
+     * @param <T>      对象限定类型
+     * @param object   对象
+     * @param field    对象字段
      * @param analyzer 赋值分析器
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -57,7 +57,7 @@ abstract public class Parser {
         if (ProcessorCls == Converter.class) {
             processor = null;
         } else {
-            processor = ProcessorCls.newInstance();
+            processor = ReflectUtils.newInstance(ProcessorCls);
         }
         boolean isCollectionField = false;
         Class<?> filedTypeClass = field.getType();
@@ -92,7 +92,7 @@ abstract public class Parser {
                         if (paramCount > 0) {
                             continue;
                         }
-                        fieldValue = (Collection) constructor.newInstance();
+                        fieldValue = constructor.newInstance();
                         break;
                     }
                 }
@@ -123,7 +123,9 @@ abstract public class Parser {
                 }
             } else {
                 if (resultValue != null) {
-                    setFieldValue(object, field, resultValue);
+                    if (resultValue != Converter.NULL) {
+                        setFieldValue(object, field, resultValue);
+                    }
                 } else {
                     setFieldValue(object, field, value);
                 }
@@ -136,9 +138,9 @@ abstract public class Parser {
      * 将文本数据解析为对象<br>
      * 子类中必须调用此方法将文本反序列化为对象<br>
      *
-     * @param <T> JavaBean对象类型
+     * @param <T>       JavaBean对象类型
      * @param InfoClass 目标对象
-     * @param analyzer 字段内容分析处理器
+     * @param analyzer  字段内容分析处理器
      * @return 序列化后的JavaBean对象
      */
     protected <T> T doParse(Class<T> InfoClass, IAnalyzer analyzer) {

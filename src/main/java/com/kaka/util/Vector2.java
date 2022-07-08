@@ -1,6 +1,5 @@
-package com.kaka.util.math;
+package com.kaka.util;
 
-import com.kaka.util.MathUtils;
 import java.io.Serializable;
 
 /**

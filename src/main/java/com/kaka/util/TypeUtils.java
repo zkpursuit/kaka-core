@@ -18,23 +18,23 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author zhoukai
  */
-public class TypeUtils {
+public final class TypeUtils {
 
-    public static final Object castNullTo(Object value, Object defVal) {
+    public static Object castNullTo(Object value, Object defVal) {
         if (value == null) {
             return defVal;
         }
         return value;
     }
 
-    public static final String castToString(Object value) {
+    public static String castToString(Object value) {
         if (value == null) {
             return null;
         }
         return value.toString();
     }
 
-    public static final Byte castToByte(Object value) {
+    public static Byte castToByte(Object value) {
         if (value == null) {
             return null;
         }
@@ -51,10 +51,10 @@ public class TypeUtils {
             }
             return Byte.parseByte(strVal);
         }
-        throw new TypeException("can not cast to byte, value : " + value);
+        throw new ClassCastException("can not cast to byte, value : " + value);
     }
 
-    public static final Character castToChar(Object value) {
+    public static Character castToChar(Object value) {
         if (value == null) {
             return null;
         }
@@ -70,14 +70,14 @@ public class TypeUtils {
                 return null;
             }
             if (strVal.length() != 1) {
-                throw new TypeException("can not cast to byte, value : " + value);
+                throw new ClassCastException("can not cast to byte, value : " + value);
             }
             return strVal.charAt(0);
         }
-        throw new TypeException("can not cast to byte, value : " + value);
+        throw new ClassCastException("can not cast to byte, value : " + value);
     }
 
-    public static final Short castToShort(Object value) {
+    public static Short castToShort(Object value) {
         if (value == null) {
             return null;
         }
@@ -94,10 +94,10 @@ public class TypeUtils {
             }
             return Short.parseShort(strVal);
         }
-        throw new TypeException("can not cast to short, value : " + value);
+        throw new ClassCastException("can not cast to short, value : " + value);
     }
 
-    public static final BigDecimal castToBigDecimal(Object value) {
+    public static BigDecimal castToBigDecimal(Object value) {
         if (value == null) {
             return null;
         }
@@ -117,7 +117,7 @@ public class TypeUtils {
         return new BigDecimal(strVal);
     }
 
-    public static final BigInteger castToBigInteger(Object value) {
+    public static BigInteger castToBigInteger(Object value) {
         if (value == null) {
             return null;
         }
@@ -137,7 +137,7 @@ public class TypeUtils {
         return new BigInteger(strVal);
     }
 
-    public static final Float castToFloat(Object value) {
+    public static Float castToFloat(Object value) {
         if (value == null) {
             return null;
         }
@@ -154,10 +154,10 @@ public class TypeUtils {
             }
             return Float.parseFloat(strVal);
         }
-        throw new TypeException("can not cast to float, value : " + value);
+        throw new ClassCastException("can not cast to float, value : " + value);
     }
 
-    public static final Double castToDouble(Object value) {
+    public static Double castToDouble(Object value) {
         if (value == null) {
             return null;
         }
@@ -174,10 +174,10 @@ public class TypeUtils {
             }
             return Double.parseDouble(strVal);
         }
-        throw new TypeException("can not cast to double, value : " + value);
+        throw new ClassCastException("can not cast to double, value : " + value);
     }
 
-    public static final Date castToDate(Object value) {
+    public static Date castToDate(Object value) {
         if (value == null) {
             return null;
         }
@@ -210,7 +210,7 @@ public class TypeUtils {
                 try {
                     return (Date) dateFormat.parse(strVal);
                 } catch (ParseException e) {
-                    throw new TypeException("can not cast to Date, value : " + strVal);
+                    throw new ClassCastException("can not cast to Date, value : " + strVal);
                 }
             }
             if (strVal.length() == 0) {
@@ -219,12 +219,12 @@ public class TypeUtils {
             longValue = Long.parseLong(strVal);
         }
         if (longValue < 0) {
-            throw new TypeException("can not cast to Date, value : " + value);
+            throw new ClassCastException("can not cast to Date, value : " + value);
         }
         return new Date(longValue);
     }
 
-    public static final java.sql.Date castToSqlDate(Object value) {
+    public static java.sql.Date castToSqlDate(Object value) {
         if (value == null) {
             return null;
         }
@@ -252,7 +252,7 @@ public class TypeUtils {
             longValue = Long.parseLong(strVal);
         }
         if (longValue <= 0) {
-            throw new TypeException("can not cast to Date, value : " + value);
+            throw new ClassCastException("can not cast to Date, value : " + value);
         }
         return new java.sql.Date(longValue);
     }
@@ -282,12 +282,12 @@ public class TypeUtils {
             longValue = Long.parseLong(strVal);
         }
         if (longValue <= 0) {
-            throw new TypeException("can not cast to Date, value : " + value); // TODO 忽略 1970-01-01 之前的时间处理？
+            throw new ClassCastException("can not cast to Date, value : " + value); // TODO 忽略 1970-01-01 之前的时间处理？
         }
         return new java.sql.Time(longValue);
     }
 
-    public static final java.sql.Timestamp castToTimestamp(Object value) {
+    public static java.sql.Timestamp castToTimestamp(Object value) {
         if (value == null) {
             return null;
         }
@@ -315,12 +315,12 @@ public class TypeUtils {
             longValue = Long.parseLong(strVal);
         }
         if (longValue <= 0) {
-            throw new TypeException("can not cast to Date, value : " + value);
+            throw new ClassCastException("can not cast to Date, value : " + value);
         }
         return new java.sql.Timestamp(longValue);
     }
 
-    public static final Long castToLong(Object value) {
+    public static Long castToLong(Object value) {
         if (value == null) {
             return null;
         }
@@ -341,10 +341,10 @@ public class TypeUtils {
                 //
             }
         }
-        throw new TypeException("can not cast to long, value : " + value);
+        throw new ClassCastException("can not cast to long, value : " + value);
     }
 
-    public static final Integer castToInt(Object value) {
+    public static Integer castToInt(Object value) {
         if (value == null) {
             return null;
         }
@@ -364,10 +364,10 @@ public class TypeUtils {
             }
             return Integer.parseInt(strVal);
         }
-        throw new TypeException("can not cast to int, value : " + value);
+        throw new ClassCastException("can not cast to int, value : " + value);
     }
 
-    public static final Boolean castToBoolean(Object value) {
+    public static Boolean castToBoolean(Object value) {
         if (value == null) {
             return null;
         }
@@ -399,10 +399,10 @@ public class TypeUtils {
                 return null;
             }
         }
-        throw new TypeException("can not cast to boolean, value : " + value);
+        throw new ClassCastException("can not cast to boolean, value : " + value);
     }
 
-    public static final Object cast(Object value, ClassCastException ex) throws ClassNotFoundException {
+    public static Object cast(Object value, ClassCastException ex) throws ClassNotFoundException {
         String exInfo = ex.getLocalizedMessage();
         int idx = exInfo.lastIndexOf(" ");
         String targetClassStr = exInfo.substring(idx + 1);
@@ -410,7 +410,7 @@ public class TypeUtils {
         return TypeUtils.cast(value, targetClass);
     }
 
-    public static final <T> T cast(Object value, Class<T> target) {
+    public static <T> T cast(Object value, Class<T> target) {
         if (value == null) {
             return (T) null;
         }

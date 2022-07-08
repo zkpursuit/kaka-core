@@ -1,5 +1,6 @@
 package com.kaka.util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -333,7 +334,7 @@ public class StringUtils {
      * @return 转换后的数字
      */
     public final static long toNumber(final String src) {
-        byte[] source = src.getBytes(Charsets.utf8);
+        byte[] source = src.getBytes(StandardCharsets.UTF_8);
         String s = null;
         char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         try {
@@ -364,7 +365,7 @@ public class StringUtils {
      * @param toDigits 基础编码数据
      * @return 编码后的字符数组
      */
-    private static char[] encodeByteToHex(final byte[] data, final char[] toDigits) {
+    public static char[] encodeByteToHex(final byte[] data, final char[] toDigits) {
         final int len = data.length;
         final char[] out = new char[len << 1];
         //两个字符构成十六进制值。

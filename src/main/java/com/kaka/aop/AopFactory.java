@@ -10,7 +10,7 @@ public class AopFactory {
     static {
         try {
             Class<? extends Aop> aopClass = (Class<? extends Aop>) Class.forName("com.kaka.aopwear.CglibAop");
-            aop = (Aop) com.kaka.util.ReflectUtils.newInstance(aopClass);
+            aop = com.kaka.util.ReflectUtils.newInstance(aopClass);
         } catch (ClassNotFoundException e) {
         }
     }
