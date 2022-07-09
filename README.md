@@ -15,7 +15,7 @@
     <dependency>
         <groupId>io.github.zkpursuit</groupId>
         <artifactId>kaka-core</artifactId>
-        <version>5.0</version>
+        <version>5.3</version>
     </dependency>
     ```
 
@@ -30,7 +30,7 @@
 7. 统一同步或者异步获得事件处理结果，异步获取事件结果以wait、notifyAll实现。应该尽可能的少使用此方式，而改用派发事件方式。
 8. 新增支持异步回调获取执行结果，优化第7点。
 9. 新增支持单个事件对应多个Command（与第3点早期版本单个事件仅支持一个Command做了增强），并可依此模拟切面编程。
-10. Handler注解支持枚举类型，例如：
+10. Handler注解支持枚举类型，亦可参考Handler自定义注解并实现IDetector的子类解析注解（需要调用startup.addDetector），例如：
     ```text 
     @Handler(cmd="A", type=MyEnum.class)
     其中"A"为MyEnum中的枚举项
