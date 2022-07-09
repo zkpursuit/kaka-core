@@ -3,7 +3,7 @@ package com.kaka.notice;
 /**
  * 同步处理结果
  *
- * @param <V>
+ * @param <V> 泛型参数
  * @author zkpursuit
  */
 public class SyncResult<V> implements IResult<V> {

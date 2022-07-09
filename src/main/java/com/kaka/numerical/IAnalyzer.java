@@ -3,15 +3,15 @@ package com.kaka.numerical;
 /**
  * 数据单元分析匹配
  *
+ * @param <V> 泛型参数
  * @author zhoukai
- * @param <V>
  */
 public interface IAnalyzer<V> {
 
     /**
      * 设置源数据
      *
-     * @param sourceData
+     * @param sourceData 源数据
      */
     void setSourceData(V sourceData);
 

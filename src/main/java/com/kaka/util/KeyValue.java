@@ -1,8 +1,10 @@
 package com.kaka.util;
 
 /**
- * @param <K>
- * @param <V>
+ * 键值对象
+ *
+ * @param <K> 键泛型限定类型
+ * @param <V> 值泛型限定类型
  * @author zkpursuit
  */
 public interface KeyValue<K, V> {

@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * 异步处理结果
  *
+ * @param <V> 泛型参数
  * @author zkpursuit
- * @param <V>
  */
 public class AsynResult<V> implements IResult<V> {
 
@@ -26,7 +26,7 @@ public class AsynResult<V> implements IResult<V> {
     public AsynResult(long defaultWaitMillsecs) {
         this.defaultWaitMillsecs = defaultWaitMillsecs;
     }
-    
+
     /**
      * 默认构造方法
      */
@@ -74,9 +74,9 @@ public class AsynResult<V> implements IResult<V> {
      * 获取事件通知处理结果具体数值
      *
      * @param timeout 超时时间
-     * @param unit 超时时间类型
+     * @param unit    超时时间类型
      * @return 处理结果具体数值
-     * @throws InterruptedException
+     * @throws InterruptedException 超时等待异常
      */
     public V get(long timeout, TimeUnit unit) throws InterruptedException {
         if (await(timeout, unit)) {
@@ -89,7 +89,7 @@ public class AsynResult<V> implements IResult<V> {
      * 等待赋值处理结果
      *
      * @param timeout 超时时间
-     * @param unit 超时时间类型
+     * @param unit    超时时间类型
      * @return true 成功赋值处理结果
      * @throws InterruptedException
      */
@@ -98,7 +98,7 @@ public class AsynResult<V> implements IResult<V> {
         long startTime = timeout <= 0 ? 0 : System.currentTimeMillis();
         long waitTime = timeout;
         synchronized (this) {
-            for (;;) {
+            for (; ; ) {
                 if (_isDone()) {
                     return true;
                 }

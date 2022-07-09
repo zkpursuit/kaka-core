@@ -1,10 +1,6 @@
 package com.kaka.aop.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 方法正常完执行后，不包括抛出异常的情况
@@ -27,7 +23,7 @@ public @interface AfterReturning {
      * 2、空白无任何字符表示仅适配无参数的方法 <br>
      * 3、多个以英文逗号间隔的类型表示适配指定参数个数及类型的方法 <br>
      *
-     * @return
+     * @return 切面表达式
      */
     String value();
 

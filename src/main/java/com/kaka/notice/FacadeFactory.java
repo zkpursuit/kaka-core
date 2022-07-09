@@ -18,9 +18,9 @@ public class FacadeFactory {
      * 必须先调用此方法进行配置 <br>
      * 一般在应用程序启动时调用，且仅调用一次
      *
-     * @param facadeClass
-     * @param <T>
-     * @return
+     * @param facadeClass 事件总线类
+     * @param <T>         事件总线实现类泛型限定
+     * @return 事件总线类实例
      */
     public synchronized static <T extends Facade> T config(Class<? extends Facade> facadeClass) {
         FacadeFactory.facadeClass = facadeClass;

@@ -1,17 +1,18 @@
 package com.kaka.util;
 
-import static com.kaka.util.MathUtils.nextPowerOfTwo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
+import static com.kaka.util.MathUtils.nextPowerOfTwo;
+
 /**
  * int为键的map
  *
+ * @param <V> 泛型参数
  * @author zkpursuit
- * @param <V>
  */
 public class IntMap<V> implements Serializable {
     // primes for hash functions 2, 3, and 4
@@ -270,7 +271,7 @@ public class IntMap<V> implements Serializable {
     }
 
     private void push(int insertKey, V insertValue, int index1, int key1, int index2, int key2, int index3, int key3, int index4,
-            int key4) {
+                      int key4) {
         // avoid getfield opcode
         int[] keyTable = this.keyTable;
         V[] valueTable = this.valueTable;
@@ -569,7 +570,7 @@ public class IntMap<V> implements Serializable {
     public void clear() {
         int[] keyTable = this.keyTable;
         V[] valueTable = this.valueTable;
-        for (int i = capacity + stashSize; i-- > 0;) {
+        for (int i = capacity + stashSize; i-- > 0; ) {
             keyTable[i] = EMPTY;
             valueTable[i] = null;
         }
@@ -585,7 +586,7 @@ public class IntMap<V> implements Serializable {
      * operation.
      *
      * @param identity If true, uses == to compare the specified value with
-     * values in the map. If false, uses {@link #equals(Object)}.
+     *                 values in the map. If false, uses {@link #equals(Object)}.
      */
     public boolean containsValue(Object value, boolean identity) {
         V[] valueTable = this.valueTable;
@@ -594,7 +595,7 @@ public class IntMap<V> implements Serializable {
                 return true;
             }
             int[] keyTable = this.keyTable;
-            for (int i = capacity + stashSize; i-- > 0;) {
+            for (int i = capacity + stashSize; i-- > 0; ) {
                 if (keyTable[i] != EMPTY && valueTable[i] == null) {
                     return true;
                 }
@@ -603,7 +604,7 @@ public class IntMap<V> implements Serializable {
             if (value == zeroValue) {
                 return true;
             }
-            for (int i = capacity + stashSize; i-- > 0;) {
+            for (int i = capacity + stashSize; i-- > 0; ) {
                 if (valueTable[i] == value) {
                     return true;
                 }
@@ -612,7 +613,7 @@ public class IntMap<V> implements Serializable {
             if (hasZeroValue && value.equals(zeroValue)) {
                 return true;
             }
-            for (int i = capacity + stashSize; i-- > 0;) {
+            for (int i = capacity + stashSize; i-- > 0; ) {
                 if (value.equals(valueTable[i])) {
                     return true;
                 }
@@ -656,12 +657,12 @@ public class IntMap<V> implements Serializable {
     }
 
     /**
-     * Returns the key for the specified value, or <tt>notFound</tt> if it is
+     * Returns the key for the specified value, or notFound if it is
      * not in the map. Note this traverses the entire map and compares every
      * value, which may be an expensive operation.
      *
      * @param identity If true, uses == to compare the specified value with
-     * values in the map. If false, uses {@link #equals(Object)}.
+     *                 values in the map. If false, uses {@link #equals(Object)}.
      */
     public int findKey(Object value, boolean identity, int notFound) {
         V[] valueTable = this.valueTable;
@@ -670,7 +671,7 @@ public class IntMap<V> implements Serializable {
                 return 0;
             }
             int[] keyTable = this.keyTable;
-            for (int i = capacity + stashSize; i-- > 0;) {
+            for (int i = capacity + stashSize; i-- > 0; ) {
                 if (keyTable[i] != EMPTY && valueTable[i] == null) {
                     return keyTable[i];
                 }
@@ -679,7 +680,7 @@ public class IntMap<V> implements Serializable {
             if (value == zeroValue) {
                 return 0;
             }
-            for (int i = capacity + stashSize; i-- > 0;) {
+            for (int i = capacity + stashSize; i-- > 0; ) {
                 if (valueTable[i] == value) {
                     return keyTable[i];
                 }
@@ -688,7 +689,7 @@ public class IntMap<V> implements Serializable {
             if (hasZeroValue && value.equals(zeroValue)) {
                 return 0;
             }
-            for (int i = capacity + stashSize; i-- > 0;) {
+            for (int i = capacity + stashSize; i-- > 0; ) {
                 if (value.equals(valueTable[i])) {
                     return keyTable[i];
                 }
@@ -862,7 +863,7 @@ public class IntMap<V> implements Serializable {
         void findNextIndex() {
             hasNext = false;
             int[] keyTable = map.keyTable;
-            for (int n = map.capacity + map.stashSize; ++nextIndex < n;) {
+            for (int n = map.capacity + map.stashSize; ++nextIndex < n; ) {
                 if (keyTable[nextIndex] != EMPTY) {
                     hasNext = true;
                     break;

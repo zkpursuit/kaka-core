@@ -35,10 +35,10 @@ abstract public class Parser {
      * @param object   对象
      * @param field    对象字段
      * @param analyzer 赋值分析器
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
+     * @throws InstantiationException    实例化异常
+     * @throws IllegalAccessException    非法访问异常
+     * @throws IllegalArgumentException  非法参数异常
+     * @throws InvocationTargetException 反射调用异常
      */
     protected <T> void doParse(T object, Field field, IAnalyzer analyzer) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         NumericField att = field.getAnnotation(NumericField.class);
@@ -52,12 +52,12 @@ abstract public class Parser {
             return;
         }
         String[] eles = att.elements();
-        Class<? extends Converter> ProcessorCls = att.converter();
+        Class<? extends Converter> converterClass = att.converter();
         Converter<?> processor;
-        if (ProcessorCls == Converter.class) {
+        if (converterClass == Converter.class) {
             processor = null;
         } else {
-            processor = ReflectUtils.newInstance(ProcessorCls);
+            processor = ReflectUtils.newInstance(converterClass);
         }
         boolean isCollectionField = false;
         Class<?> filedTypeClass = field.getType();
@@ -82,8 +82,8 @@ abstract public class Parser {
                         fieldValue = new java.util.ArrayList<>();
                     }
                 } else {
-                    Constructor[] constructors = filedTypeClass.getConstructors();
-                    for (Constructor constructor : constructors) {
+                    Constructor<?>[] constructors = filedTypeClass.getConstructors();
+                    for (Constructor<?> constructor : constructors) {
                         int modifier = constructor.getModifiers();
                         if (!Modifier.isPublic(modifier)) {
                             continue;
@@ -102,11 +102,8 @@ abstract public class Parser {
         for (String confColName : eles) {
             confColName = confColName.trim().replaceAll(" ", "");
             String value = analyzer.getContent(confColName);
-            Object resultValue = null;
-            if (processor != null) {
-                resultValue = processor.transform(value);
-            }
             if (isCollectionField) {
+                Object resultValue = processor != null ? processor.transform(value) : null;
                 if (resultValue != null && fieldValue != null) {
                     Collection<Object> collection = (Collection<Object>) fieldValue;
                     if (resultValue.getClass().isArray()) {
@@ -122,12 +119,13 @@ abstract public class Parser {
                     }
                 }
             } else {
-                if (resultValue != null) {
-                    if (resultValue != Converter.NULL) {
+                if (processor == null) {
+                    setFieldValue(object, field, value);
+                } else {
+                    Object resultValue = processor.transform(value);
+                    if (resultValue != null) {
                         setFieldValue(object, field, resultValue);
                     }
-                } else {
-                    setFieldValue(object, field, value);
                 }
                 break;
             }

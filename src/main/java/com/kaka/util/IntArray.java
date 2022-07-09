@@ -26,16 +26,18 @@ public class IntArray implements Serializable {
 
     /**
      * Creates an ordered array with the specified capacity.
+     *
+     * @param capacity specified capacity.
      */
     public IntArray(int capacity) {
         this(true, capacity);
     }
 
     /**
-     * @param ordered If false, methods that remove elements may change the
-     * order of other elements in the array, which avoids a memory copy.
+     * @param ordered  If false, methods that remove elements may change the
+     *                 order of other elements in the array, which avoids a memory copy.
      * @param capacity Any elements added beyond this will cause the backing
-     * array to be grown.
+     *                 array to be grown.
      */
     public IntArray(boolean ordered, int capacity) {
         this.ordered = ordered;
@@ -47,6 +49,8 @@ public class IntArray implements Serializable {
      * new array will be ordered if the specific array is ordered. The capacity
      * is set to the number of elements, so any subsequent elements added will
      * cause the backing array to be grown.
+     *
+     * @param array specific array.
      */
     public IntArray(IntArray array) {
         this.ordered = array.ordered;
@@ -59,6 +63,8 @@ public class IntArray implements Serializable {
      * Creates a new ordered array containing the elements in the specified
      * array. The capacity is set to the number of elements, so any subsequent
      * elements added will cause the backing array to be grown.
+     *
+     * @param array specific array.
      */
     public IntArray(int[] array) {
         this(true, array, 0, array.length);
@@ -69,8 +75,11 @@ public class IntArray implements Serializable {
      * capacity is set to the number of elements, so any subsequent elements
      * added will cause the backing array to be grown.
      *
-     * @param ordered If false, methods that remove elements may change the
-     * order of other elements in the array, which avoids a memory copy.
+     * @param ordered    If false, methods that remove elements may change the
+     *                   order of other elements in the array, which avoids a memory copy.
+     * @param array      specified array.
+     * @param startIndex start index.
+     * @param count      count.
      */
     public IntArray(boolean ordered, int[] array, int startIndex, int count) {
         this(ordered, count);
@@ -78,6 +87,11 @@ public class IntArray implements Serializable {
         System.arraycopy(array, startIndex, items, 0, count);
     }
 
+    /**
+     * add value.
+     *
+     * @param value value to be added.
+     */
     public void add(int value) {
         int[] items = this.items;
         if (size == items.length) {
@@ -233,6 +247,12 @@ public class IntArray implements Serializable {
         return -1;
     }
 
+    /**
+     * remove value.
+     *
+     * @param value value to be removed.
+     * @return remove success.
+     */
     public boolean removeValue(int value) {
         int[] items = this.items;
         for (int i = 0, n = size; i < n; i++) {
@@ -246,6 +266,8 @@ public class IntArray implements Serializable {
 
     /**
      * Removes and returns the item at the specified index.
+     *
+     * @param index specified index.
      */
     public int removeIndex(int index) {
         if (index >= size) {
@@ -264,6 +286,9 @@ public class IntArray implements Serializable {
 
     /**
      * Removes the items between the specified indices, inclusive.
+     *
+     * @param start indices
+     * @param end   inclusive
      */
     public void removeRange(int start, int end) {
         if (end >= size) {
@@ -288,6 +313,7 @@ public class IntArray implements Serializable {
     /**
      * Removes from this array all of elements contained in the specified array.
      *
+     * @param array other IntArray
      * @return true if this array was modified.
      */
     public boolean removeAll(IntArray array) {
@@ -309,6 +335,8 @@ public class IntArray implements Serializable {
 
     /**
      * Removes and returns the last item.
+     *
+     * @return last item.
      */
     public int pop() {
         return items[--size];
@@ -316,6 +344,8 @@ public class IntArray implements Serializable {
 
     /**
      * Returns the last item.
+     *
+     * @return last item.
      */
     public int peek() {
         return items[size - 1];
@@ -323,6 +353,8 @@ public class IntArray implements Serializable {
 
     /**
      * Returns the first item.
+     *
+     * @return first item.
      */
     public int first() {
         if (size == 0) {
@@ -331,6 +363,9 @@ public class IntArray implements Serializable {
         return items[0];
     }
 
+    /**
+     * clear.
+     */
     public void clear() {
         size = 0;
     }
@@ -378,6 +413,12 @@ public class IntArray implements Serializable {
         return items;
     }
 
+    /**
+     * resize
+     *
+     * @param newSize new size.
+     * @return new array.
+     */
     protected int[] resize(int newSize) {
         int[] newItems = new int[newSize];
         int[] items = this.items;
@@ -386,10 +427,16 @@ public class IntArray implements Serializable {
         return newItems;
     }
 
+    /**
+     * sort
+     */
     public void sort() {
         Arrays.sort(items, 0, size);
     }
 
+    /**
+     * reverse
+     */
     public void reverse() {
         int[] items = this.items;
         for (int i = 0, lastIndex = size - 1, n = size / 2; i < n; i++) {
@@ -400,6 +447,9 @@ public class IntArray implements Serializable {
         }
     }
 
+    /**
+     * shuffle
+     */
     public void shuffle() {
         int[] items = this.items;
         for (int i = size - 1; i >= 0; i--) {
@@ -413,6 +463,8 @@ public class IntArray implements Serializable {
     /**
      * Reduces the size of the array to the specified size. If the array is
      * already smaller than the specified size, no action is taken.
+     *
+     * @param newSize new size.
      */
     public void truncate(int newSize) {
         if (size > newSize) {
@@ -422,6 +474,8 @@ public class IntArray implements Serializable {
 
     /**
      * Returns a random item from the array, or zero if the array is empty.
+     *
+     * @return random item.
      */
     public int random() {
         if (size == 0) {
@@ -430,12 +484,22 @@ public class IntArray implements Serializable {
         return items[MathUtils.random(0, size - 1)];
     }
 
+    /**
+     * get value array.
+     *
+     * @return value array.
+     */
     public int[] toArray() {
         int[] array = new int[size];
         System.arraycopy(items, 0, array, 0, size);
         return array;
     }
 
+    /**
+     * get hashCode
+     *
+     * @return hashCode
+     */
     public int hashCode() {
         if (!ordered) {
             return super.hashCode();
@@ -448,6 +512,12 @@ public class IntArray implements Serializable {
         return h;
     }
 
+    /**
+     * compare equal.
+     *
+     * @param object other Object
+     * @return true equal.
+     */
     public boolean equals(Object object) {
         if (object == this) {
             return true;
@@ -476,6 +546,11 @@ public class IntArray implements Serializable {
         return true;
     }
 
+    /**
+     * to string.
+     *
+     * @return string.
+     */
     public String toString() {
         if (size == 0) {
             return "[]";
@@ -492,6 +567,12 @@ public class IntArray implements Serializable {
         return buffer.toString();
     }
 
+    /**
+     * to string.
+     *
+     * @param separator separator
+     * @return string.
+     */
     public String toString(String separator) {
         if (size == 0) {
             return "";
@@ -507,12 +588,18 @@ public class IntArray implements Serializable {
     }
 
     /**
+     * @return new IntArray.
      * @see #IntArray(int[])
      */
     static public IntArray with(int... array) {
         return new IntArray(array);
     }
 
+    /**
+     * get size.
+     *
+     * @return size.
+     */
     public int size() {
         return size;
     }

@@ -19,7 +19,7 @@ public @interface Numeric {
     /**
      * 配置文件名或路径
      *
-     * @return
+     * @return 数值配置表标识
      */
     String src();
 

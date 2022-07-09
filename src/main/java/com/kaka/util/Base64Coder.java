@@ -240,7 +240,7 @@ public class Base64Coder {
      * <code>sun.misc.BASE64Decoder.decodeBuffer(String)</code>.
      *
      * @param s A Base64 String to be decoded.
-     * @param inverseCharMap
+     * @param inverseCharMap inverse chars
      * @return An array containing the decoded data bytes.
      * @throws IllegalArgumentException If the input is not valid Base64 encoded
      * data.
@@ -275,7 +275,7 @@ public class Base64Coder {
      * allowed within the Base64 encoded input data.
      *
      * @param s A Base64 String to be decoded.
-     * @param inverseCharMap
+     * @param inverseCharMap inverse chars
      * @return An array containing the decoded data bytes.
      * @throws IllegalArgumentException If the input is not valid Base64 encoded
      * data.

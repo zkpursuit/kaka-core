@@ -158,8 +158,8 @@ public class StringUtils {
     }
 
     /**
-     * kmp字符串查找算法 </br>
-     * 参考博文：https://www.cnblogs.com/ZuoAndFutureGirl/p/9028287.html </br>
+     * kmp字符串查找算法 <br>
+     * 参考博文：https://www.cnblogs.com/ZuoAndFutureGirl/p/9028287.html <br>
      * 经jdk8上测试简单英文字符串匹配搜索100000+次，性能不及String原生indexOf算法
      *
      * @param src  源字符串

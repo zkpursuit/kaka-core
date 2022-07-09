@@ -73,8 +73,8 @@ public class Circle implements Serializable {
     /**
      * 是否包含坐标点
      *
-     * @param x
-     * @param y
+     * @param x 横向坐标
+     * @param y 纵向坐标
      * @return true包含
      */
     public boolean contains(float x, float y) {
@@ -98,8 +98,8 @@ public class Circle implements Serializable {
     /**
      * 是否包含另一个圆
      *
-     * @param c
-     * @return
+     * @param c 另一个圆
+     * @return true：包含
      */
     public boolean contains(Circle c) {
         final float radiusDiff = radius - c.radius;
@@ -116,8 +116,8 @@ public class Circle implements Serializable {
     /**
      * 与另一个圆是否相交
      *
-     * @param c
-     * @return
+     * @param c 另一个圆
+     * @return true：相交
      */
     public boolean overlaps(Circle c) {
         float dx = x - c.x;
@@ -135,7 +135,7 @@ public class Circle implements Serializable {
     /**
      * 圆周长
      *
-     * @return
+     * @return 周长
      */
     public float circumference() {
         return (float) (this.radius * Math.PI * 2);
@@ -144,7 +144,7 @@ public class Circle implements Serializable {
     /**
      * 圆面积
      *
-     * @return
+     * @return 面积
      */
     public float area() {
         return (float) (this.radius * this.radius * Math.PI);

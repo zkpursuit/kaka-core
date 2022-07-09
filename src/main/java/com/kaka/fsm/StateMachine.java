@@ -39,11 +39,15 @@ public interface StateMachine<E> extends Serializable {
 
     /**
      * 获取状态机的当前状态
+     *
+     * @return 当前状态
      */
     State<E> getCurrentState();
 
     /**
      * 获取状态机的上一状态
+     *
+     * @return 上一状态
      */
     State<E> getPreviousState();
 

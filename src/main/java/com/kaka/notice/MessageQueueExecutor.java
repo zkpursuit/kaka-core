@@ -38,7 +38,7 @@ public class MessageQueueExecutor {
     /**
      * 添加事件消息到执行队列
      *
-     * @param element 事件消息
+     * @param message 事件消息
      */
     public void addMessage(Message message) {
         queue.add(message);

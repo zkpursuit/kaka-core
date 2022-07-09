@@ -581,7 +581,7 @@ public class LongMap<V> implements Iterable<LongMap.Entry<V>>, Serializable {
     }
 
     /**
-     * Returns the key for the specified value, or <tt>notFound</tt> if it is
+     * Returns the key for the specified value, or notFound if it is
      * not in the map. Note this traverses the entire map and compares every
      * value, which may be an expensive operation.
      *

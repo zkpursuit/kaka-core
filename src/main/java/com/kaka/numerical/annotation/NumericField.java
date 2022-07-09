@@ -32,14 +32,11 @@ public @interface NumericField {
      * @param <T> 处理后的数据，如为数组，则其中的数据将被逐个添加到集合对象中，非数组则整个添加到集合对象中
      */
     interface Converter<T> {
-
-        Object NULL = new Object();
-
         /**
          * 数据转型
          *
          * @param value 原始字符串数据
-         * @return 转型后的数据，当返回值为 NumericField.Converter.NULL时表示不更改原始值
+         * @return 转型后的数据
          */
         T transform(String value);
 
