@@ -25,7 +25,7 @@ public class StringUtils {
      * @param charRepeat 是否允许字符串中有重复字符，true为可以有重复字符
      * @return 随机的字符串
      */
-    public final static String randomString(char[] chars, int count, boolean charRepeat) {
+    public static String randomString(char[] chars, int count, boolean charRepeat) {
         StringBuilder sb = new StringBuilder();
         int len = chars.length - 1;
         int index;
@@ -61,7 +61,7 @@ public class StringUtils {
      * @param charRepeat 是否允许字符串中有重复字符，true为可以有重复字符
      * @return 包含（A-Z）或（a-z）或（0-9）的字符串
      */
-    public final static String randomString(int count, boolean charRepeat) {
+    public static String randomString(int count, boolean charRepeat) {
         return randomString(namechars, count, charRepeat);
     }
 
@@ -99,7 +99,7 @@ public class StringUtils {
      * @param args  被替换的字符串
      * @return 替换后的字符串
      */
-    public final static String replace(String src, String regex, Object... args) {
+    public static String replace(String src, String regex, Object... args) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(src);
         StringBuffer sb = new StringBuffer();
@@ -135,62 +135,62 @@ public class StringUtils {
         return String.format("%1$0" + count + "d", number);
     }
 
-    // private static void getNextval(char[] p, int[] next) {
-    //     int pLen = p.length;
-    //     next[0] = -1;
-    //     int k = -1;
-    //     int j = 0;
-    //     while (j < pLen - 1) {
-    //         //p[k]表示前缀，p[j]表示后缀
-    //         if (k == -1 || p[j] == p[k]) {
-    //             ++j;
-    //             ++k;
-    //             //较之前next数组求法，改动在下面4行
-    //             if (p[j] != p[k])
-    //                 next[j] = k;   //之前只有这一行
-    //             else
-    //                 //因为不能出现p[j] = p[ next[j ]]，所以当出现时需要继续递归，k = next[k] = next[next[k]]
-    //                 next[j] = next[k];
-    //         } else {
-    //             k = next[k];
-    //         }
-    //     }
-    // }
+    private static void getNextVal(char[] p, int[] next) {
+        int pLen = p.length;
+        next[0] = -1;
+        int k = -1;
+        int j = 0;
+        while (j < pLen - 1) {
+            //p[k]表示前缀，p[j]表示后缀
+            if (k == -1 || p[j] == p[k]) {
+                ++j;
+                ++k;
+                //较之前next数组求法，改动在下面4行
+                if (p[j] != p[k])
+                    next[j] = k;   //之前只有这一行
+                else
+                    //因为不能出现p[j] = p[ next[j ]]，所以当出现时需要继续递归，k = next[k] = next[next[k]]
+                    next[j] = next[k];
+            } else {
+                k = next[k];
+            }
+        }
+    }
 
-    // /**
-    //  * kmp字符串查找算法 </br>
-    //  * 参考博文：https://www.cnblogs.com/ZuoAndFutureGirl/p/9028287.html </br>
-    //  * 经jdk8上测试简单英文字符串匹配搜索100000+次，性能不及String原生indexOf算法
-    //  *
-    //  * @param src  源字符串
-    //  * @param pstr 搜索的字符串
-    //  * @return
-    //  */
-    // public static int indexOfByKmp(String src, String pstr) {
-    //     int i = 0;
-    //     int j = 0;
-    //     int sLen = src.length();
-    //     int pLen = pstr.length();
-    //     char[] s = src.toCharArray();
-    //     char[] p = pstr.toCharArray();
-    //     int[] next = new int[pLen];
-    //     getNextval(p, next);
-    //     while (i < sLen && j < pLen) {
-    //         //①如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++
-    //         if (j == -1 || s[i] == p[j]) {
-    //             i++;
-    //             j++;
-    //         } else {
-    //             //②如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]
-    //             //next[j]即为j所对应的next值
-    //             j = next[j];
-    //         }
-    //     }
-    //     if (j == pLen)
-    //         return i - j;
-    //     else
-    //         return -1;
-    // }
+    /**
+     * kmp字符串查找算法 </br>
+     * 参考博文：https://www.cnblogs.com/ZuoAndFutureGirl/p/9028287.html </br>
+     * 经jdk8上测试简单英文字符串匹配搜索100000+次，性能不及String原生indexOf算法
+     *
+     * @param src  源字符串
+     * @param pstr 搜索的字符串
+     * @return 字符串索引
+     */
+    public static int indexOfByKmp(String src, String pstr) {
+        int i = 0;
+        int j = 0;
+        int sLen = src.length();
+        int pLen = pstr.length();
+        char[] s = src.toCharArray();
+        char[] p = pstr.toCharArray();
+        int[] next = new int[pLen];
+        getNextVal(p, next);
+        while (i < sLen && j < pLen) {
+            //①如果j = -1，或者当前字符匹配成功（即S[i] == P[j]），都令i++，j++
+            if (j == -1 || s[i] == p[j]) {
+                i++;
+                j++;
+            } else {
+                //②如果j != -1，且当前字符匹配失败（即S[i] != P[j]），则令 i 不变，j = next[j]
+                //next[j]即为j所对应的next值
+                j = next[j];
+            }
+        }
+        if (j == pLen) {
+            return i - j;
+        }
+        return -1;
+    }
 
     /**
      * 获取src中匹配regex正则规则的字符串集合
@@ -200,7 +200,7 @@ public class StringUtils {
      * @param regexMatchIndex 0表示匹配整个表达式，其它正数表示正则表达式中的括号中所标示的子表达式
      * @return 字符串集合
      */
-    public final static List<String> match(String src, String regex, int regexMatchIndex) {
+    public static List<String> match(String src, String regex, int regexMatchIndex) {
         if (src == null) {
             return null;
         }
@@ -226,7 +226,7 @@ public class StringUtils {
      * @param regex 正则表达式
      * @return 字符串集合
      */
-    public final static List<String> match(String src, String regex) {
+    public static List<String> match(String src, String regex) {
         return match(src, regex, 0);
     }
 
@@ -237,10 +237,7 @@ public class StringUtils {
      * @param args 替换的新值列表
      * @return 新的字符串
      */
-//    public final static String replace(String src, Object[] args) {
-//        return replace(src, "\\{[ 0-9]*\\}", args);
-//    }
-    public final static String replace(String src, Object... args) {
+    public static String replace(String src, Object... args) {
         return replace(src, "\\{[ 0-9]*\\}", args);
     }
 
@@ -250,7 +247,7 @@ public class StringUtils {
      * @param src 源字符串
      * @return 新的字符串
      */
-    public final static List<String> match(String src) {
+    public static List<String> match(String src) {
         return match(src, "\\{[0-9&]*\\}");
     }
 
@@ -265,7 +262,7 @@ public class StringUtils {
      * @param src 待判断的字符串
      * @return true为纯整型数字
      */
-    public final static boolean isInteger(String src) {
+    public static boolean isInteger(String src) {
         if (src == null) {
             return false;
         }
@@ -286,7 +283,7 @@ public class StringUtils {
      * @param src 待判断的字符串
      * @return true为数字
      */
-    public final static boolean isNumeric(String src) {
+    public static boolean isNumeric(String src) {
         if (src == null) {
             return false;
         }
@@ -302,7 +299,7 @@ public class StringUtils {
      * @param src 源字符串
      * @return true不为null或者""，false为null或者""
      */
-    public final static boolean isNotEmpty(String src) {
+    public static boolean isNotEmpty(String src) {
         if (src == null) {
             return false;
         }
@@ -333,15 +330,15 @@ public class StringUtils {
      * @param src 字符串
      * @return 转换后的数字
      */
-    public final static long toNumber(final String src) {
+    public static long toNumber(final String src) {
         byte[] source = src.getBytes(StandardCharsets.UTF_8);
         String s = null;
-        char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(source);
-            byte tmp[] = md.digest();
-            char str[] = new char[16];
+            byte[] tmp = md.digest();
+            char[] str = new char[16];
             int k = 0;
             for (int i = 0; i < 16; i++) {
                 byte byte0 = tmp[i];
@@ -434,7 +431,7 @@ public class StringUtils {
      * @param c 字符
      * @return 为中文字符返回true，否则为false
      */
-    final public static boolean isChinese(char c) {
+    public static boolean isChinese(char c) {
         Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
         return ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
                 || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
@@ -450,7 +447,7 @@ public class StringUtils {
      * @param src 待判断的源字符串
      * @return 包含中文字符返回true， 否则返回false
      */
-    final public static boolean hasChinese(String src) {
+    public static boolean hasChinese(String src) {
         char[] ch = src.toCharArray();
         for (int i = 0; i < ch.length; i++) {
             char c = ch[i];
@@ -470,7 +467,7 @@ public class StringUtils {
      * @param close     关闭字符串
      * @return 组合后的字符串
      */
-    final public static String group(Collection<?> list, String open, String separator, String close) {
+    public static String group(Collection<?> list, String open, String separator, String close) {
         StringBuilder sb = new StringBuilder();
         sb.append(open);
         int size = list.size();
@@ -494,7 +491,7 @@ public class StringUtils {
      * @param close     关闭字符串
      * @return 组合后的字符串
      */
-    final public static String group(Object array, String open, String separator, String close) {
+    public static String group(Object array, String open, String separator, String close) {
         if (!array.getClass().isArray()) {
             return null;
         }
@@ -520,7 +517,7 @@ public class StringUtils {
      * @param str2 字符串
      * @return 最长公共子串
      */
-    final public static String getMaxSubstring(String str1, String str2) {
+    public static String getMaxSubstring(String str1, String str2) {
         int row = 0;
         int col = str2.length();
         int end_index = 0;
