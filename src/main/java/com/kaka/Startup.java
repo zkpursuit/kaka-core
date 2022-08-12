@@ -61,12 +61,20 @@ public abstract class Startup {
             for (int j = i + 1; j < packages.length; j++) {
                 String currPackage = packages[j];
                 if (selectPackage.length() < currPackage.length()) {
-                    if (currPackage.contains(selectPackage)) {
-                        delIdxs.add(j);
+                    int idx = currPackage.indexOf(selectPackage);
+                    if (idx >= 0) {
+                        idx += selectPackage.length();
+                        if (currPackage.charAt(idx) == '.') {
+                            delIdxs.add(j);
+                        }
                     }
                 } else if (selectPackage.length() > currPackage.length()) {
-                    if (selectPackage.contains(currPackage)) {
-                        delIdxs.add(i);
+                    int idx = selectPackage.indexOf(currPackage);
+                    if (idx >= 0) {
+                        idx += currPackage.length();
+                        if (selectPackage.charAt(idx) == '.') {
+                            delIdxs.add(i);
+                        }
                     }
                 } else if (selectPackage.equals(currPackage)) {
                     delIdxs.add(j);

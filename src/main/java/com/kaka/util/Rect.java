@@ -95,9 +95,9 @@ public class Rect implements Serializable {
     /**
      * 判断是否包含指定的点
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return true包含
      */
     public boolean contains(float x, float y) {
         return this.x <= x && this.x + this.width >= x && this.y <= y && this.y + this.height >= y;
@@ -106,8 +106,8 @@ public class Rect implements Serializable {
     /**
      * 判断是否包含另一个矩形
      *
-     * @param rectangle
-     * @return
+     * @param rectangle 矩形范围
+     * @return true包含
      */
     public boolean contains(Rect rectangle) {
         float xmin = rectangle.x;
@@ -123,10 +123,10 @@ public class Rect implements Serializable {
     /**
      * 是否包含指定的圆
      *
-     * @param circleX 圆X坐标
-     * @param circleY 圆Y坐标
+     * @param circleX      圆X坐标
+     * @param circleY      圆Y坐标
      * @param circleRadius 圆半径
-     * @return
+     * @return true包含
      */
     public boolean contains(float circleX, float circleY, float circleRadius) {
         return (circleX - circleRadius >= x) && (circleX + circleRadius <= x + width)
@@ -136,8 +136,8 @@ public class Rect implements Serializable {
     /**
      * 判断是否与另一个矩形相交
      *
-     * @param r
-     * @return
+     * @param r 矩形范围
+     * @return true重叠
      */
     public boolean overlaps(Rect r) {
         return x < r.x + r.width && x + width > r.x && y < r.y + r.height && y + height > r.y;
@@ -154,8 +154,8 @@ public class Rect implements Serializable {
     /**
      * 将一个矩形并入到此矩形中
      *
-     * @param rect
-     * @return
+     * @param rect 矩形范围
+     * @return 合并后的矩形
      */
     public Rect merge(Rect rect) {
         float minX = Math.min(x, rect.x);
@@ -174,9 +174,9 @@ public class Rect implements Serializable {
     /**
      * 将点并入到矩形区域
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return 合并后的矩形
      */
     public Rect merge(float x, float y) {
         float minX = Math.min(this.x, x);

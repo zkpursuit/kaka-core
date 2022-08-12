@@ -1,10 +1,6 @@
 package com.kaka.notice;
 
-import com.kaka.util.ReflectUtils;
-
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 abstract public class RemoteMessageQueue {

@@ -14,17 +14,17 @@ public class AsynResult<V> implements IResult<V> {
     private static class NULL implements Serializable {
     }
 
-    private final long defaultWaitMillsecs;
+    private final long defaultWaitMillis;
     private final static Object NULL = new NULL();
     protected volatile Object result = NULL;
 
     /**
      * 构造方法
      *
-     * @param defaultWaitMillsecs 默认wait超时时间，单位毫秒
+     * @param defaultWaitMillis 默认wait超时时间，单位毫秒
      */
-    public AsynResult(long defaultWaitMillsecs) {
-        this.defaultWaitMillsecs = defaultWaitMillsecs;
+    public AsynResult(long defaultWaitMillis) {
+        this.defaultWaitMillis = defaultWaitMillis;
     }
 
     /**
@@ -64,7 +64,7 @@ public class AsynResult<V> implements IResult<V> {
     @Override
     public V get() {
         try {
-            return get(defaultWaitMillsecs, TimeUnit.MILLISECONDS);
+            return get(defaultWaitMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             return null;
         }

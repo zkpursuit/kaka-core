@@ -75,7 +75,7 @@ public class FileWatcher implements Runnable {
             try {
                 signal = watcher.take();
                 Path watchDirPath = (Path) signal.watchable();
-                signal.pollEvents().stream().forEach((WatchEvent<?> event) -> {
+                signal.pollEvents().forEach((WatchEvent<?> event) -> {
                     WatchEvent.Kind<?> kind = event.kind();
                     Path fileNamePath = (Path) event.context();
                     if (callback != null) {

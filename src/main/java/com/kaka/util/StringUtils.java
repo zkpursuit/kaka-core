@@ -449,8 +449,7 @@ public class StringUtils {
      */
     public static boolean hasChinese(String src) {
         char[] ch = src.toCharArray();
-        for (int i = 0; i < ch.length; i++) {
-            char c = ch[i];
+        for (char c : ch) {
             if (isChinese(c)) {
                 return true;
             }
@@ -471,9 +470,7 @@ public class StringUtils {
         StringBuilder sb = new StringBuilder();
         sb.append(open);
         int size = list.size();
-        list.forEach((v) -> {
-            sb.append(v).append(separator);
-        });
+        list.forEach((v) -> sb.append(v).append(separator));
         if (size > 0) {
             int len = sb.length();
             sb.delete(len - separator.length(), len);

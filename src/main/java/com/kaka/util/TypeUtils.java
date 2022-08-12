@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- *
  * @author zhoukai
  */
 public final class TypeUtils {
@@ -514,47 +513,35 @@ public final class TypeUtils {
         if (className == null || className.length() == 0) {
             return null;
         }
-
         Class<?> clazz = mappings.get(className);
-
         if (clazz != null) {
             return clazz;
         }
-
         if (className.charAt(0) == '[') {
             Class<?> componentType = loadClass(className.substring(1));
             return Array.newInstance(componentType, 0).getClass();
         }
-
         if (className.startsWith("L") && className.endsWith(";")) {
             String newClassName = className.substring(1, className.length() - 1);
             return loadClass(newClassName);
         }
-
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
             if (classLoader != null) {
                 clazz = classLoader.loadClass(className);
-
                 addClassMapping(className, clazz);
-
                 return clazz;
             }
         } catch (Throwable e) {
             // skip
         }
-
         try {
             clazz = Class.forName(className);
-
             addClassMapping(className, clazz);
-
             return clazz;
         } catch (Throwable e) {
             // skip
         }
-
         return clazz;
     }
 
@@ -562,11 +549,9 @@ public final class TypeUtils {
         if (type instanceof ParameterizedType) {
             return true;
         }
-
         if (type instanceof Class) {
             return isGenericParamType(((Class<?>) type).getGenericSuperclass());
         }
-
         return false;
     }
 
@@ -574,11 +559,9 @@ public final class TypeUtils {
         if (type instanceof ParameterizedType) {
             return type;
         }
-
         if (type instanceof Class) {
             return getGenericParamType(((Class<?>) type).getGenericSuperclass());
         }
-
         return type;
     }
 
@@ -592,7 +575,6 @@ public final class TypeUtils {
                 return char[].class;
             }
         }
-
         return type;
     }
 
@@ -600,11 +582,9 @@ public final class TypeUtils {
         if (type.getClass() == Class.class) {
             return (Class<?>) type;
         }
-
         if (type instanceof ParameterizedType) {
             return getClass(((ParameterizedType) type).getRawType());
         }
-
         return Object.class;
     }
 
@@ -614,12 +594,10 @@ public final class TypeUtils {
                 return field;
             }
         }
-
         Class<?> superClass = clazz.getSuperclass();
         if (superClass != null && superClass != Object.class) {
             return getField(superClass, fieldName);
         }
-
         return null;
     }
 
@@ -631,7 +609,7 @@ public final class TypeUtils {
                 && Character.isUpperCase(name.charAt(0))) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }

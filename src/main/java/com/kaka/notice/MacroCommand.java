@@ -51,10 +51,9 @@ abstract public class MacroCommand extends Command {
      */
     @Override
     public void execute(Message msg) {
-        subCommands.stream().map((command) -> {
+        subCommands.stream().peek((command) -> {
             command.cmd = cmd;
             command.facade = facade;
-            return command;
         }).forEach((command) -> {
             command.execute(msg);
         });

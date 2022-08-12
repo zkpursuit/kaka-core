@@ -576,9 +576,7 @@ public class Facade implements INotifier {
      * @param cmd 命令执行器唯一标识
      */
     final public void removeCommand(Object cmd) {
-        if (cmdPoolMap.containsKey(cmd)) {
-            cmdPoolMap.remove(cmd);
-        }
+        cmdPoolMap.remove(cmd);
     }
 
     /**
@@ -679,9 +677,7 @@ public class Facade implements INotifier {
                 if (threadPool == null) {
                     throw new Error(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
                 }
-                threadPool.execute(() -> {
-                    execCommands(poolSet, msg);
-                });
+                threadPool.execute(() -> execCommands(poolSet, msg));
             }
         }
         if (notiMediMap.containsKey(msg.getWhat())) {
@@ -701,9 +697,7 @@ public class Facade implements INotifier {
             });
         }
         final Facade _this = this;
-        this.foreachListener(msg.getWhat(), (IListener listener) -> {
-            listener.onMessage(msg, _this);
-        });
+        this.foreachListener(msg.getWhat(), (IListener listener) -> listener.onMessage(msg, _this));
     }
 
     /**
@@ -840,6 +834,7 @@ public class Facade implements INotifier {
         cmdPoolMap.clear();
         mediaMap.clear();
         proxyMap.clear();
+        listenerMap.clear();
         this.threadPool = null;
         keys = scheduleFutureMap.keySet().iterator();
         while (keys.hasNext()) {

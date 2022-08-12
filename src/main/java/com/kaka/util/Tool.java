@@ -228,7 +228,7 @@ public final class Tool {
      * @param index 从右至左，以0为起始
      * @return 转换后的整数
      */
-    public final static int bitsToZeroAtIndex(int value, int index) {
+    public static int bitsToZeroAtIndex(int value, int index) {
         return value ^ (1 << index);
     }
 
@@ -257,8 +257,8 @@ public final class Tool {
     /**
      * 按字节分割长整形数据为两个整形数据
      *
-     * @param value
-     * @return
+     * @param value 待分离的数字
+     * @return 分离后的数字
      */
     public static int[] split(long value) {
         return new int[]{(int) (value >> 32), (int) ((value << 32) >> 32)};

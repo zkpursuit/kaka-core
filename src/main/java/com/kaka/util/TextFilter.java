@@ -6,7 +6,7 @@ import com.kaka.util.text.DoubleArrayTrie;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class TextFilter {
+public final class TextFilter {
 
     /**
      * DFA算法替换敏感词
@@ -17,7 +17,7 @@ public class TextFilter {
      * @param matchType   匹配类型
      * @return 替换敏感词后的文本
      */
-    public static final String replace(String text, final char replaceChar, DFA dfa, DFA.MatchType matchType) {
+    public static String replace(String text, final char replaceChar, DFA dfa, DFA.MatchType matchType) {
         final char[] chars = text.toCharArray();
         dfa.findKeywords(text, matchType, (int begin, int end, String value) -> {
             for (int i = begin; i < end; i++) {
@@ -37,7 +37,7 @@ public class TextFilter {
      * @param dat         全局唯一，引用前必须调用build方法初始化敏感词库，build方法参数必须为字典序，故而此参数可先用TreeSet再用List构建
      * @return 替换敏感词后的文本
      */
-    public static final String replace(String text, final char replaceChar, DoubleArrayTrie dat) {
+    public static String replace(String text, final char replaceChar, DoubleArrayTrie dat) {
         final char[] chars = text.toCharArray();
         dat.findKeywords(text, (int begin, int end, Integer keyIndex) -> {
             for (int i = begin; i < end; i++) {
@@ -56,7 +56,7 @@ public class TextFilter {
      * @param matchType   匹配类型
      * @return 替换敏感词后的文本
      */
-    public static final String replace(String text, String replaceText, DFA dfa, DFA.MatchType matchType) {
+    public static String replace(String text, String replaceText, DFA dfa, DFA.MatchType matchType) {
         if (replaceText.length() == 1) {
             char replaceChar = replaceText.charAt(0);
             return replace(text, replaceChar, dfa, matchType);
@@ -92,7 +92,7 @@ public class TextFilter {
      * @param dat         全局唯一，引用前必须调用build方法初始化敏感词库，build方法参数必须为字典序，故而此参数可先用TreeSet再用List构建
      * @return 替换敏感词后的文本
      */
-    public static final String replace(String text, String replaceText, DoubleArrayTrie dat) {
+    public static String replace(String text, String replaceText, DoubleArrayTrie dat) {
         if (replaceText.length() == 1) {
             char replaceChar = replaceText.charAt(0);
             return replace(text, replaceChar, dat);

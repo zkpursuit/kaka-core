@@ -2,7 +2,6 @@ package com.kaka.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -22,7 +21,7 @@ public class ClassScaner {
     /**
      * 获取包下的所有类
      *
-     * @param loader 查询类的类加载器
+     * @param loader      查询类的类加载器
      * @param packageName 类包名
      * @return 包下所有的类
      */
@@ -35,14 +34,13 @@ public class ClassScaner {
     /**
      * 从包pkgName中获取所有的Class
      *
-     * @param loader 类加载器
-     * @param packageName 包名
+     * @param loader                  类加载器
+     * @param packageName             包名
      * @param loaderGetResourcesParam 类加载器getResources中是否传入pkgName对应的相对路径参数
-     * @param classes 找到的类的集合
+     * @param classes                 找到的类的集合
      */
     private static void getClasses(ClassLoader loader, String packageName, boolean loaderGetResourcesParam, Set<Class<?>> classes) {
         try {
-            String _pkgName = packageName;
             String packageDirName = packageName.replace('.', '/');
             Enumeration<URL> dirs;
             if (loaderGetResourcesParam) {
@@ -59,47 +57,41 @@ public class ClassScaner {
                     if (!loaderGetResourcesParam) {
                         filePath = filePath + "/" + packageDirName;
                     }
-                    findClasses(loader, _pkgName, filePath, true, classes);
+                    findClasses(loader, packageName, filePath, true, classes);
                 } else if ("jar".equals(protocol)) {
                     JarFile jar;
-                    try {
-                        jar = ((JarURLConnection) url.openConnection()).getJarFile();
-                        Enumeration<JarEntry> entries = jar.entries();
-                        while (entries.hasMoreElements()) {
-                            JarEntry entry = entries.nextElement();
-                            String name = entry.getName();
-                            if (name.charAt(0) == '/') {
-                                name = name.substring(1);
+                    jar = ((JarURLConnection) url.openConnection()).getJarFile();
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String name = entry.getName();
+                        if (name.charAt(0) == '/') {
+                            name = name.substring(1);
+                        }
+                        // 如果前半部分和定义的包名相同
+                        if (name.startsWith(packageDirName)) {
+                            int idx = name.lastIndexOf('/');
+                            String pn = packageDirName;
+                            // 如果以"/"结尾 是一个包
+                            if (idx != -1) {
+                                // 获取包名 把"/"替换成"."
+                                pn = name.substring(0, idx).replace('/', '.');
                             }
-                            // 如果前半部分和定义的包名相同
-                            if (name.startsWith(packageDirName)) {
-                                int idx = name.lastIndexOf('/');
-                                String pn = packageDirName;
-                                // 如果以"/"结尾 是一个包
-                                if (idx != -1) {
-                                    // 获取包名 把"/"替换成"."
-                                    pn = name.substring(0, idx).replace('/', '.');
-                                }
-                                // 如果可以迭代下去 并且是一个包
-                                if (idx != -1) {
-                                    if (name.endsWith(".class") && !entry.isDirectory()) {
-                                        String className = name.substring(pn.length() + 1, name.length() - 6);
-                                        try {
-                                            classes.add(loader.loadClass(pn + '.' + className));
-                                        } catch (ClassNotFoundException | NoClassDefFoundError | ClassFormatError ex) {
-                                            throw new Error(ex);
-                                        }
+                            // 如果可以迭代下去 并且是一个包
+                            if (idx != -1) {
+                                if (name.endsWith(".class") && !entry.isDirectory()) {
+                                    String className = name.substring(pn.length() + 1, name.length() - 6);
+                                    try {
+                                        classes.add(loader.loadClass(pn + '.' + className));
+                                    } catch (ClassNotFoundException | NoClassDefFoundError | ClassFormatError ex) {
+                                        throw new Error(ex);
                                     }
                                 }
                             }
                         }
-                    } catch (IOException ex) {
-                        throw ex;
                     }
                 }
             }
-        } catch (UnsupportedEncodingException ex) {
-            throw new Error(ex);
         } catch (IOException ex) {
             throw new Error(ex);
         }
@@ -136,14 +128,15 @@ public class ClassScaner {
 //    public static Set<Class<?>> getClasses(Class<?> refClass) {
 //        return getClasses(refClass, true);
 //    }
+
     /**
      * 以文件的形式来获取包下的所有Class
      *
-     * @param loader 类加载器
+     * @param loader      类加载器
      * @param packageName 包名
      * @param packagePath 包名对应的绝对路径
-     * @param recursive 是否递归遍历子孙包
-     * @param classes 类集合
+     * @param recursive   是否递归遍历子孙包
+     * @param classes     类集合
      */
     private static void findClasses(ClassLoader loader, String packageName, final String packagePath, final boolean recursive, Set<Class<?>> classes) {
         // 获取此包的目录 建立一个File
@@ -153,8 +146,9 @@ public class ClassScaner {
             return;
         }
         // 如果存在 就获取包下的所有文件 包括目录
-        File[] dirfiles = dir.listFiles((File file) -> (recursive && file.isDirectory()) || (file.getName().endsWith(".class")));
-        for (File file : dirfiles) {
+        File[] dirFiles = dir.listFiles((File file) -> (recursive && file.isDirectory()) || (file.getName().endsWith(".class")));
+        if (dirFiles == null) return;
+        for (File file : dirFiles) {
             if (file.isDirectory()) {
                 findClasses(loader, packageName + "." + file.getName(), file.getAbsolutePath(), recursive, classes);
                 loader.setClassAssertionStatus(packageName, recursive);

@@ -10,10 +10,10 @@ public class CallbackResult<V> extends SyncResult<V> {
     /**
      * 事件处理器类型
      */
-    public final String eventHanderClass;
+    public final String eventHandlerClass;
 
-    CallbackResult(V result, String eventHanderClass) {
+    CallbackResult(V result, String eventHandlerClass) {
         this.set(result);
-        this.eventHanderClass = eventHanderClass;
+        this.eventHandlerClass = eventHandlerClass;
     }
 }

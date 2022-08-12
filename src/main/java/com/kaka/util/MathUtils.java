@@ -34,7 +34,7 @@ public final class MathUtils {
      *
      * @return {@link ThreadLocalRandom}
      */
-    public static final Random getRandom() {
+    public static Random getRandom() {
         return ThreadLocalRandom.current();
     }
 
@@ -55,9 +55,8 @@ public final class MathUtils {
      * @param end   最大值
      * @return [start, end]的随机数
      */
-    static final public int getRandom(int start, int end) {
-        int number = (int) (Math.random() * (end - start + 1)) + start;
-        return number;
+    static public int getRandom(int start, int end) {
+        return (int) (Math.random() * (end - start + 1)) + start;
     }
 
     /**
@@ -67,7 +66,7 @@ public final class MathUtils {
      * @param end   闭区间结束范围值
      * @return 随机数
      */
-    static final public int random(int start, int end) {
+    static public int random(int start, int end) {
         return start + getRandom().nextInt(end - start + 1);
     }
 
@@ -77,7 +76,7 @@ public final class MathUtils {
      * @param range 闭区间结束范围值
      * @return 随机数
      */
-    static final public long random(long range) {
+    static public long random(long range) {
         return (long) (getRandom().nextDouble() * range);
     }
 
@@ -88,7 +87,7 @@ public final class MathUtils {
      * @param end   闭区间结束范围值
      * @return 随机数
      */
-    static final public long random(long start, long end) {
+    static public long random(long start, long end) {
         return start + (long) (getRandom().nextDouble() * (end - start));
     }
 
@@ -97,7 +96,7 @@ public final class MathUtils {
      *
      * @return 随机布尔值
      */
-    static final public boolean randomBoolean() {
+    static public boolean randomBoolean() {
         return getRandom().nextBoolean();
     }
 
@@ -107,7 +106,7 @@ public final class MathUtils {
      * @param chance [0,1]之间的小数表示的概率
      * @return 随机布尔值
      */
-    static final public boolean randomBoolean(float chance) {
+    static public boolean randomBoolean(float chance) {
         return random() < chance;
     }
 
@@ -116,7 +115,7 @@ public final class MathUtils {
      *
      * @return 随机浮点数
      */
-    static final public float random() {
+    static public float random() {
         return getRandom().nextFloat();
     }
 
@@ -126,7 +125,7 @@ public final class MathUtils {
      * @param range 前闭后开区间结束范围值
      * @return 随机数
      */
-    static final public float random(float range) {
+    static public float random(float range) {
         return getRandom().nextFloat() * range;
     }
 
@@ -137,17 +136,17 @@ public final class MathUtils {
      * @param end   区间结束范围值（不包括）
      * @return 随机数
      */
-    static final public float random(float start, float end) {
+    static public float random(float start, float end) {
         return start + getRandom().nextFloat() * (end - start);
     }
 
     /**
      * 获取比value值大的2次幂数
      *
-     * @param value
-     * @return
+     * @param value 基数
+     * @return 比value值大的2次幂数
      */
-    public final static int nextPowerOfTwo(int value) {
+    public static int nextPowerOfTwo(int value) {
         if (value == 0) {
             return 1;
         }
@@ -163,29 +162,29 @@ public final class MathUtils {
     /**
      * 判断一个数是否为2的次幂数
      *
-     * @param value
-     * @return
+     * @param value 待判断的数
+     * @return true表示此数为2的次幂数
      */
-    public final static boolean isPowerOfTwo(int value) {
+    public static boolean isPowerOfTwo(int value) {
         return value != 0 && (value & value - 1) == 0;
     }
 
     /**
      * 获取两矩形相交的矩形
      *
-     * @param r1
-     * @param r2
+     * @param r1 矩形范围
+     * @param r2 矩形范围
      * @return 相交的矩形
      */
-    public static final Rect getOverlapsRect(Rect r1, Rect r2) {
+    public static Rect getOverlapsRect(Rect r1, Rect r2) {
         if (!r1.overlaps(r2)) {
             return null;
         }
         Rect rect = new Rect();
-        rect.x = (r1.x > r2.x) ? r1.x : r2.x;
-        rect.y = (r1.y > r2.y) ? r1.y : r2.y;
-        rect.width = ((r1.x + r1.width) < (r2.x + r2.width) ? (r1.x + r1.width) : (r2.x + r2.width)) - rect.x;
-        rect.height = ((r1.y + r1.height) < (r2.y + r2.height) ? (r1.y + r1.height) : (r2.y + r2.height)) - rect.y;
+        rect.x = Math.max(r1.x, r2.x);
+        rect.y = Math.max(r1.y, r2.y);
+        rect.width = (Math.min((r1.x + r1.width), (r2.x + r2.width))) - rect.x;
+        rect.height = (Math.min((r1.y + r1.height), (r2.y + r2.height))) - rect.y;
         if (rect.width < 0 || rect.height < 0) {
             rect.width = 0;
             rect.height = 0;
@@ -203,8 +202,8 @@ public final class MathUtils {
      * @param deviationAngle 起始角度，偏移角度,影响起始坐标，360/等分数量/4为正位置
      * @return 等分点数组集合
      */
-    public static final float[][] equalCircle(int circleCenterX, int circleCenterY, int radius, int num, float deviationAngle) {
-        float f1 = 360 / num;
+    public static float[][] equalCircle(int circleCenterX, int circleCenterY, int radius, int num, float deviationAngle) {
+        float f1 = 360f / num;
         float f2 = f1 + deviationAngle;
         float[][] array = new float[num][];
         for (int i = 0; i < num; i++) {
@@ -235,10 +234,10 @@ public final class MathUtils {
      * @param rectangleRightBottomY 矩形右下点y坐标
      * @return 是否相交，true相交
      */
-    public final static boolean isLineIntersectRect(float linePointX1, float linePointY1,
-                                                    float linePointX2, float linePointY2, float rectangleLeftTopX,
-                                                    float rectangleLeftTopY, float rectangleRightBottomX,
-                                                    float rectangleRightBottomY) {
+    public static boolean isLineIntersectRect(float linePointX1, float linePointY1,
+                                              float linePointX2, float linePointY2, float rectangleLeftTopX,
+                                              float rectangleLeftTopY, float rectangleRightBottomX,
+                                              float rectangleRightBottomY) {
 
         float lineHeight = linePointY1 - linePointY2;
         float lineWidth = linePointX2 - linePointX1;
@@ -294,7 +293,7 @@ public final class MathUtils {
      * @param p4y 线段2端点Y坐标
      * @return true相交
      */
-    public static final boolean isLineSegmentCross(
+    public static boolean isLineSegmentCross(
             float p1x, float p1y, float p2x, float p2y,
             float p3x, float p3y, float p4x, float p4y) {
         //每个线段的两点都在另一个线段的左右不同侧，则能断定线段相交
@@ -325,15 +324,15 @@ public final class MathUtils {
      * @param p4y 线段2端点Y坐标
      * @return 平面两线交点(x, y)坐标
      */
-    public static final float[] getCrossPoint(
+    public static float[] getCrossPoint(
             float p1x, float p1y, float p2x, float p2y,
             float p3x, float p3y, float p4x, float p4y) {
         //必须相交求出的才是线段的交点，但是下面的程序段是通用的
-        if (isLineSegmentCross(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) == false) {
+        if (!isLineSegmentCross(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y)) {
             return null;
         }
         //根据两点式化为标准式，进而求线性方程组
-        float crossPoint[] = new float[]{0f, 0f};
+        float[] crossPoint = new float[]{0f, 0f};
         float tempLeft;
         float tempRight;
         //求x坐标
@@ -358,7 +357,7 @@ public final class MathUtils {
      * @param linePotEndY   线段1端点Y坐标
      * @return -1: 点在线段左侧; 0: 点在线段上; 1: 点在线段右侧
      */
-    public final static int pointLinePositionRelation(float px, float py, float linePotStartX, float linePotStartY, float linePotEndX, float linePotEndY) {
+    public static int pointLinePositionRelation(float px, float py, float linePotStartX, float linePotStartY, float linePotEndX, float linePotEndY) {
         linePotStartX -= px;
         linePotStartY -= py;
         linePotEndX -= px;
@@ -451,7 +450,7 @@ public final class MathUtils {
      * @param surplus_num 是否允许大于最小数量的组合
      * @param action      组合访问器，每个组合共用一个int[]实例
      */
-    public final static void combinate3(int[] src, int num, boolean surplus_num, Consumer<int[]> action) {
+    public static void combinate3(int[] src, int num, boolean surplus_num, Consumer<int[]> action) {
         if (!surplus_num) {
             combine(src, 0, num, new int[num], 0, action);
             return;
@@ -471,7 +470,7 @@ public final class MathUtils {
      * @param surplus_num 是否允许大于最小数量的组合
      * @param action      组合访问器
      */
-    public static final void combinate2(int[] src, int num, boolean surplus_num, Consumer<int[]> action) {
+    public static void combinate2(int[] src, int num, boolean surplus_num, Consumer<int[]> action) {
         final int len = src.length;
         final int temp = 1 << len;
         IntArray list = new IntArray(len);
@@ -558,7 +557,7 @@ public final class MathUtils {
      * @param surplus_num 是否允许大于最小数量的组合
      * @param action      组合访问器，每个组合为独立的int[]实例
      */
-    public final static void combinate1(int[] src, int num, boolean surplus_num, Consumer<int[]> action) {
+    public static void combinate1(int[] src, int num, boolean surplus_num, Consumer<int[]> action) {
         if (!surplus_num) {
             combinate(src, num, action);
             return;
@@ -578,7 +577,7 @@ public final class MathUtils {
      * @param resultIdx result中索引变更，即每组组合数据共用result对象，仅改变此索引
      * @param action    一组组合数据的访问器
      */
-    private static void combine(KeyValue[] src, int begin, int number, KeyValue[] result, int resultIdx, Consumer<KeyValue[]> action) {
+    private static <K, V> void combine(KeyValue<K, V>[] src, int begin, int number, KeyValue<K, V>[] result, int resultIdx, Consumer<KeyValue<K, V>[]> action) {
         if (number == 0) {
             action.accept(result);
             return;
@@ -588,8 +587,8 @@ public final class MathUtils {
         }
         boolean flag = true;
         if (resultIdx > 0) {
-            KeyValue prevResult = result[resultIdx - 1];
-            KeyValue currSrc = src[begin];
+            KeyValue<K, V> prevResult = result[resultIdx - 1];
+            KeyValue<K, V> currSrc = src[begin];
             if (prevResult.getKey().equals(currSrc.getKey())) {
                 flag = false;
             }
@@ -611,7 +610,7 @@ public final class MathUtils {
      * @param src    其中的KeyValue对象，key表示类型，value表示类型所指向的内容
      * @param action 组合访问器
      */
-    public final static void combinate(KeyValue[] src, Consumer<KeyValue[]> action) {
+    public static <K, V> void combinate(KeyValue<K, V>[] src, Consumer<KeyValue<K, V>[]> action) {
         //相同类型数量
         int same_key_size = 0;
         //临时保存类型
@@ -669,34 +668,32 @@ public final class MathUtils {
      * @param dimvalue 原始数据
      * @param action   当前组合访问器
      */
-    public final static <T> void descartes(List<List<T>> dimvalue, Consumer<List<T>> action) {
+    public static <T> void descartes(List<List<T>> dimvalue, Consumer<List<T>> action) {
         MathUtils.descartes(dimvalue, 0, new ArrayList<>(dimvalue.size()), action);
     }
 
     /**
      * 组合，笛卡尔积，递归实现
      *
-     * @param <T>
+     * @param <T>      数据限定类型
      * @param dimvalue 原始数据
      * @return 所有组合的集合
      */
-    public final static <T> List<List<T>> descartes(List<List<T>> dimvalue) {
+    public static <T> List<List<T>> descartes(List<List<T>> dimvalue) {
         final List<List<T>> list = new ArrayList<>();
-        MathUtils.descartes(dimvalue, 0, new ArrayList<>(dimvalue.size()), (List<T> group) -> {
-            list.add(group);
-        });
+        MathUtils.descartes(dimvalue, 0, new ArrayList<>(dimvalue.size()), list::add);
         return list;
     }
 
     /**
      * 按src下标索引有序的排列组合
      *
-     * @param <T>
+     * @param <T>    数据限定类型
      * @param src    列表对象
      * @param num    最小数量的组合
      * @param action 组合访问器
      */
-    public final static <T> void delineate(List<T> src, int num, Consumer<List<T>> action) {
+    public static <T> void delineate(List<T> src, int num, Consumer<List<T>> action) {
         if (num == src.size()) {
             action.accept(src);
             return;
@@ -715,13 +712,13 @@ public final class MathUtils {
     /**
      * 按src下标索引有序的排列组合
      *
-     * @param <T>
+     * @param <T>             数据限定类型
      * @param src             列表对象
      * @param min_num         最小数量的组合
      * @param surplus_min_num 是否允许大于最小数量的组合
      * @param action          组合访问器
      */
-    public final static <T> void delineate(List<T> src, int min_num, boolean surplus_min_num, Consumer<List<T>> action) {
+    public static <T> void delineate(List<T> src, int min_num, boolean surplus_min_num, Consumer<List<T>> action) {
         if (!surplus_min_num) {
             delineate(src, min_num, action);
             return;
@@ -738,7 +735,7 @@ public final class MathUtils {
      * @param num    圈定数量
      * @param action 组合访问器
      */
-    public final static void delineate(int[] src, int num, Consumer<int[]> action) {
+    public static void delineate(int[] src, int num, Consumer<int[]> action) {
         if (num == src.length) {
             action.accept(src);
             return;
@@ -759,7 +756,7 @@ public final class MathUtils {
      * @param surplus_min_num 是否允许大于最小数量的组合
      * @param action          组合访问器
      */
-    public final static void delineate(int[] src, int min_num, boolean surplus_min_num, Consumer<int[]> action) {
+    public static void delineate(int[] src, int min_num, boolean surplus_min_num, Consumer<int[]> action) {
         if (!surplus_min_num) {
             delineate(src, min_num, action);
             return;
@@ -776,7 +773,7 @@ public final class MathUtils {
      * @param total 总值
      * @return true命中
      */
-    public final static boolean isHitProbability(float rate, float total) {
+    public static boolean isHitProbability(float rate, float total) {
         if (rate >= total) {
             return true;
         }
@@ -790,7 +787,7 @@ public final class MathUtils {
      * @param rates 各种概率值
      * @return 命中的索引位置
      */
-    public final static int hitProbability(int[] rates) {
+    public static int hitProbability(int[] rates) {
         int totals = 0;
         for (int rate : rates) {
             totals += rate;
@@ -813,7 +810,7 @@ public final class MathUtils {
      * @param rates 各种概率值
      * @return 命中的索引位置
      */
-    public final static int hitProbability(double[] rates) {
+    public static int hitProbability(double[] rates) {
         double totals = 0d;
         for (double rate : rates) {
             totals += rate;
@@ -900,7 +897,7 @@ public final class MathUtils {
      * @param angle  旋转角度，仅限于0度或者90的倍数
      * @return 旋转后的二维矩阵
      */
-    public static final int[][] rotate(int[][] matrix, int angle) {
+    public static int[][] rotate(int[][] matrix, int angle) {
         if (angle % 90 != 0) {
             throw new IllegalArgumentException("angle角度参数必须能整除90");
         }
@@ -915,7 +912,7 @@ public final class MathUtils {
      * @param W   总权重
      * @return 最优项集合，索引从1开始，0号索引为最优时的最大价值；集合中的每项0号下标为价值，1号下标为权重
      */
-    public static List<int[]> knapsack(int val[], int wt[], int W) {
+    public static List<int[]> knapsack(int[] val, int[] wt, int W) {
         //物品数量总和
         int N = wt.length;
         //创建一个二维数组
@@ -1039,7 +1036,6 @@ public final class MathUtils {
         } else {
             long accum = 1L;
             long limit = 9223372036854775807L + (b >>> 63 & (long) (k & 1));
-
             while (true) {
                 switch (k) {
                     case 0:

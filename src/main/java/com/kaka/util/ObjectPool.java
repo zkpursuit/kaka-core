@@ -126,7 +126,7 @@ abstract public class ObjectPool<T extends Poolable> {
     /**
      * 可池化对象数量的最大值
      *
-     * @return
+     * @return 最大池化数量
      */
     public int max() {
         return this.max;
@@ -148,7 +148,7 @@ abstract public class ObjectPool<T extends Poolable> {
     /**
      * 可池化对象接口
      */
-    public static interface Poolable {
+    public interface Poolable {
 
         /**
          * 重置对象数据，保障下次使用时为初始化状态

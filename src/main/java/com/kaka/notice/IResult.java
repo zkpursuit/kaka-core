@@ -9,7 +9,18 @@ import java.io.Serializable;
  * @author zkpursuit
  */
 public interface IResult<V> extends Serializable {
+
+    /**
+     * 设置结果
+     *
+     * @param result 结果
+     */
     void set(V result);
 
+    /**
+     * 获取结果
+     *
+     * @return 结果
+     */
     V get();
 }

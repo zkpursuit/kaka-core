@@ -1,10 +1,6 @@
 package com.kaka.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.function.Consumer;
 
 /**
@@ -19,14 +15,14 @@ public class IOUtils {
     /**
      * 从输入流中读取字节数据
      *
-     * @param in 输入流
-     * @param dest 目标字节数组，存储输入流中的字节数据
+     * @param in      输入流
+     * @param dest    目标字节数组，存储输入流中的字节数据
      * @param destPos 存入目标字节数组时的起始位置
-     * @param length 从输入流中读取字节的数量
+     * @param length  从输入流中读取字节的数量
      * @return 字节数组
-     * @throws IOException
+     * @throws IOException 数据流访问异常
      */
-    private static int readBytes(InputStream in, byte[] dest, int destPos, int length) throws IOException {
+    public static int readBytes(InputStream in, byte[] dest, int destPos, int length) throws IOException {
         if (in == null) {
             return -1;
         }
@@ -57,7 +53,7 @@ public class IOUtils {
      *
      * @param in 输入流
      * @return 字节数组
-     * @throws IOException
+     * @throws IOException 数据流访问异常
      */
     public static byte[] readBytes(final InputStream in) throws IOException {
         return readBytes(in, bufferSize);
@@ -67,9 +63,9 @@ public class IOUtils {
      * 从输入流中读取字节数据
      *
      * @param input 输入流
-     * @param size 预估大小
+     * @param size  预估大小
      * @return 字节数组
-     * @throws IOException
+     * @throws IOException 数据流访问异常
      */
     public static byte[] readBytes(final InputStream input, final int size) throws IOException {
         if (size < 0) {
@@ -91,10 +87,10 @@ public class IOUtils {
     /**
      * 将InputStream输入流转换为字符串
      *
-     * @param is 输入流
+     * @param is      输入流
      * @param charset 字符编码
      * @return 字符串
-     * @throws IOException 捕获异常
+     * @throws IOException 数据流访问异常
      */
     public static String toString(InputStream is, String charset) throws IOException {
         byte[] bytes = readBytes(is);
@@ -104,10 +100,10 @@ public class IOUtils {
     /**
      * 将InputStream输入流转换为字符串
      *
-     * @param is 输入字节流
+     * @param is      输入字节流
      * @param charset 字符编码
      * @return 将输入字节流转换为字符串
-     * @throws IOException
+     * @throws IOException 数据流访问异常
      */
     public static String toString(InputStream is, java.nio.charset.Charset charset) throws IOException {
         byte[] bytes = readBytes(is);
@@ -117,10 +113,10 @@ public class IOUtils {
     /**
      * 转换输入字节流为字符流
      *
-     * @param is 输入字节流
+     * @param is      输入字节流
      * @param charset 字符编码
      * @return 输入字符流
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException 编码错误
      */
     public static BufferedReader toBufferedReader(InputStream is, final String charset) throws UnsupportedEncodingException {
         return new BufferedReader(new InputStreamReader(is, charset));
@@ -129,10 +125,10 @@ public class IOUtils {
     /**
      * 转换输入字节流为字符流
      *
-     * @param is 输入字节流
+     * @param is      输入字节流
      * @param charset 字符编码
      * @return 输入字符流
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException 编码错误
      */
     public static BufferedReader toBufferedReader(InputStream is, final java.nio.charset.Charset charset) throws UnsupportedEncodingException {
         return new BufferedReader(new InputStreamReader(is, charset));
@@ -143,7 +139,7 @@ public class IOUtils {
      *
      * @param reader 输入字符流
      * @param action 字符串行数据访问器
-     * @throws IOException
+     * @throws IOException 数据流访问异常
      */
     public static void readLines(final BufferedReader reader, Consumer<String> action) throws IOException {
         String line = reader.readLine();

@@ -8,16 +8,13 @@
 
 
 #### 安装教程
-
-1.  直接获得源码使用
-2.  maven安装
-    ```xml
+```xml
     <dependency>
         <groupId>io.github.zkpursuit</groupId>
         <artifactId>kaka-core</artifactId>
         <version>5.3</version>
     </dependency>
-    ```
+```
 
 #### 使用说明
 
