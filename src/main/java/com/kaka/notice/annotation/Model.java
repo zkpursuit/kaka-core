@@ -1,10 +1,6 @@
 package com.kaka.notice.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 核心事件通知框架中的数据模型标注类型{@link com.kaka.notice.Proxy}
@@ -29,10 +25,10 @@ public @interface Model {
      * @return 优先级
      */
     int priority() default 0;
-    
+
     /**
      * 被注册到的目标{@link com.kaka.notice.Facade}唯一名
-     * 
+     *
      * @return {@link com.kaka.notice.Facade}唯一名
      */
     String context() default "";

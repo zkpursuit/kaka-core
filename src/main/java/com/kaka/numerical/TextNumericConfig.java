@@ -24,14 +24,14 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
      * @return 字段单元分隔符
      */
     abstract protected String initDelimiter();
-    
+
     /**
      * 获取字段单元分隔符
-     * 
+     *
      * @return 字段单元分隔符
      */
     private String getDelimiter() {
-        if(!StringUtils.isNotEmpty(delimiter)) {
+        if (!StringUtils.isNotEmpty(delimiter)) {
             String str = "分隔符不能为空，请在子类中实现initDelimiter方法，并返回非空字符串；要使initDelimiter方法返回的分隔符生效，请使用";
             str += Facade.class.getTypeName();
             str += "对象注册本对象。";
@@ -45,19 +45,17 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
      */
     @Override
     protected void onRegister() {
-        String _delimiter = initDelimiter();
-        this.delimiter = _delimiter;
+        this.delimiter = initDelimiter();
     }
 
     /**
      * 解析Excel的纯文本文件，默认从第1（序列号从0开始）行开始
      *
      * @param filePath 待解析的文件路径
-     * @throws IOException           文件流处理异常
-     * @throws FileNotFoundException 文件未找到异常
+     * @throws Exception 异常
      */
     @Override
-    public void parse(String filePath) throws IOException, FileNotFoundException {
+    public void parse(String filePath) throws Exception {
         File file = new File(filePath);
         parse(file, "UTF-8", 1);
     }
@@ -68,10 +66,9 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
      * @param file      待解析的文件
      * @param charset   读取文件所用编码
      * @param startLine 解析的开始行索引（序列号从0开始）
-     * @throws UnsupportedEncodingException 不受支持的字符编码异常
-     * @throws FileNotFoundException        文件未找到异常
+     * @throws Exception 异常
      */
-    public final void parse(File file, String charset, int startLine) throws IOException {
+    public final void parse(File file, String charset, int startLine) throws Exception {
         try (FileInputStream fis = new FileInputStream(file)) {
             parse(fis, charset, startLine);
         }
@@ -83,9 +80,9 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
      * @param is        文本内容流
      * @param charset   读取文件流的字符编码
      * @param startLine 解析的开始行索引（序列号从0开始）
-     * @throws UnsupportedEncodingException 不受支持的字符编码异常
+     * @throws Exception 异常
      */
-    public final void parse(InputStream is, String charset, int startLine) throws IOException {
+    public final void parse(InputStream is, String charset, int startLine) throws Exception {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, charset))) {
             parseBefore();
             String[] titles = null;
@@ -94,9 +91,6 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
             TextParser parser = new TextParser();
             Class<T> beanClass = this.getMappingClass();
             while ((line = reader.readLine()) != null && !"".equals(line)) {
-                if ("".equals(line)) {
-                    continue;
-                }
                 if (sl < startLine) {
                     sl++;
                     continue;
@@ -118,8 +112,9 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
      *
      * @param content   文本内容
      * @param startLine 解析的开始行索引（序列号从0开始）
+     * @throws Exception 异常
      */
-    public final void parse(String content, int startLine) {
+    public final void parse(String content, int startLine) throws Exception {
         parseBefore();
         String[] lines = content.split("\n");
         String[] keys = null;

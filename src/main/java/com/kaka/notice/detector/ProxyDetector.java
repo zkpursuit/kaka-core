@@ -54,30 +54,25 @@ public class ProxyDetector extends PriorityDetector {
         list.sort((e1, e2) -> {
             Model m1 = e1.getAnnotation();
             Model m2 = e2.getAnnotation();
-            if (m1.priority() > m2.priority()) {
-                return -1;
-            }
-            if (m1.priority() < m2.priority()) {
-                return 1;
-            }
-            return 0;
+            return Integer.compare(m2.priority(), m1.priority());
         });
         list.forEach((element) -> {
             Model model = element.getAnnotation();
             Class<?> cls = element.getClasz();
-            Facade cotx;
-            if (model.context().equals("")) {
-                cotx = FacadeFactory.getFacade();
+            Facade facade;
+            String context = model.context();
+            if (context.equals("")) {
+                facade = FacadeFactory.getFacade();
             } else {
-                cotx = FacadeFactory.getFacade(model.context());
+                facade = FacadeFactory.getFacade(model.context());
             }
             Proxy proxy;
             String modelName = model.value();
             if (!"".equals(modelName)) {
-                proxy = cotx.registerProxy((Class<? extends Proxy>) cls, modelName);
+                proxy = facade.registerProxy((Class<? extends Proxy>) cls, modelName);
                 logger.log(Level.INFO, "注册业务数据模型：Proxy（{0}）==>>>  {1}", new Object[]{proxy.name, cls});
             } else {
-                proxy = cotx.registerProxy((Class<? extends Proxy>) cls);
+                proxy = facade.registerProxy((Class<? extends Proxy>) cls);
                 logger.log(Level.INFO, "注册业务数据模型：Proxy（{0}）==>>>  {1}", new Object[]{proxy.name, cls});
             }
         });

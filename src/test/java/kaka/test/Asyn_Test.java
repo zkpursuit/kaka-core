@@ -65,7 +65,7 @@ public class Asyn_Test extends Startup {
 
         //异步回调获取事件执行结果
         facade.sendMessage(new Message("50000", "", (IResult<Object> result) -> {
-            String clasz = ((CallbackResult<Object>) result).eventHanderClass;
+            String clasz = ((CallbackResult<Object>) result).eventHandlerClass;
             StringBuilder sb = new StringBuilder("异步回调：\t" + clasz + "\t");
             Object resultObj = result.get();
             if (resultObj instanceof Object[]) {

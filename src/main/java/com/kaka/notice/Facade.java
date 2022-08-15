@@ -162,8 +162,7 @@ public class Facade implements INotifier {
      * @return 数据代理模型对象
      */
     final public <T extends Proxy> T registerProxy(Class<T> proxyClass, String... names) {
-        Proxy _proxy = (Proxy) createObject(proxyClass);
-        final Proxy proxy = _proxy;
+        final Proxy proxy = (Proxy) createObject(proxyClass);
         String typeName = proxyClass.getTypeName();
         Set<String> aliasSet;
         if (names.length > 0) {
@@ -358,8 +357,7 @@ public class Facade implements INotifier {
      * @return 事件观察者对象
      */
     <T extends Mediator> T registerMediator(Class<T> mediatorClass, String... names) {
-        Mediator _observer = (Mediator) createObject(mediatorClass);
-        final Mediator observer = _observer;
+        final Mediator observer = (Mediator) createObject(mediatorClass);
         String typeName = mediatorClass.getTypeName();
         Set<String> aliasSet;
         if (names.length > 0) {

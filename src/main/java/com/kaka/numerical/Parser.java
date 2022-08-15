@@ -7,7 +7,6 @@ import com.kaka.util.ReflectUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -35,12 +34,9 @@ abstract public class Parser {
      * @param object   对象
      * @param field    对象字段
      * @param analyzer 赋值分析器
-     * @throws InstantiationException    实例化异常
-     * @throws IllegalAccessException    非法访问异常
-     * @throws IllegalArgumentException  非法参数异常
-     * @throws InvocationTargetException 反射调用异常
+     * @throws Exception 解析异常
      */
-    protected <T> void doParse(T object, Field field, IAnalyzer analyzer) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    protected <T> void doParse(T object, Field field, IAnalyzer analyzer) throws Exception {
         NumericField att = field.getAnnotation(NumericField.class);
         if (att == null) {
             String value = analyzer.getContent(field.getName());
@@ -140,23 +136,19 @@ abstract public class Parser {
      * @param InfoClass 目标对象
      * @param analyzer  字段内容分析处理器
      * @return 序列化后的JavaBean对象
+     * @throws Exception 解析异常
      */
-    protected <T> T doParse(Class<T> InfoClass, IAnalyzer analyzer) {
-        try {
-            T object = InfoClass.newInstance();
-            Field[] fields = ReflectUtils.getDeclaredFields(InfoClass);
-            for (Field field : fields) {
-                int modifier = field.getModifiers();
-                if (Modifier.isStatic(modifier) && Modifier.isFinal(modifier)) {
-                    continue;
-                }
-                doParse(object, field, analyzer);
+    protected <T> T doParse(Class<T> InfoClass, IAnalyzer analyzer) throws Exception {
+        T object = InfoClass.newInstance();
+        Field[] fields = ReflectUtils.getDeclaredFields(InfoClass);
+        for (Field field : fields) {
+            int modifier = field.getModifiers();
+            if (Modifier.isStatic(modifier) && Modifier.isFinal(modifier)) {
+                continue;
             }
-            return object;
-        } catch (InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            doParse(object, field, analyzer);
         }
-        return null;
+        return object;
     }
 
 }
