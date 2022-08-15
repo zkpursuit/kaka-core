@@ -139,7 +139,7 @@ abstract public class Parser {
      * @throws Exception 解析异常
      */
     protected <T> T doParse(Class<T> InfoClass, IAnalyzer analyzer) throws Exception {
-        T object = InfoClass.newInstance();
+        T object = InfoClass.getDeclaredConstructor().newInstance();
         Field[] fields = ReflectUtils.getDeclaredFields(InfoClass);
         for (Field field : fields) {
             int modifier = field.getModifiers();
