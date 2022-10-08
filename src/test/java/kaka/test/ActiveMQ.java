@@ -1,6 +1,8 @@
 package kaka.test;
 
 import com.kaka.notice.RemoteMessageQueue;
+import com.kaka.notice.remote.LocalMessageCache;
+import com.kaka.notice.remote.MessageWrap;
 import kaka.test.util.KryoSerializer;
 import kaka.test.util.Serializer;
 import org.apache.activemq.ActiveMQConnection;

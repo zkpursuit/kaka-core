@@ -324,6 +324,8 @@ public class StringUtils {
         return digit;
     }
 
+    private static final char[] hex_digits_numbers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
     /**
      * 任意字符串转数字
      *
@@ -333,7 +335,6 @@ public class StringUtils {
     public static long toNumber(final String src) {
         byte[] source = src.getBytes(StandardCharsets.UTF_8);
         String s = null;
-        char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(source);
@@ -343,7 +344,7 @@ public class StringUtils {
             for (int i = 0; i < 16; i++) {
                 byte byte0 = tmp[i];
                 //只取高位
-                str[k++] = hexDigits[(byte0 >>> 4 & 0xf) % 10];
+                str[k++] = hex_digits_numbers[(byte0 >>> 4 & 0xf) % 10];
                 //str[k++] = hexDigits[byte0 & 0xf];
             }
             s = new String(str);  // 换后的结果转换为字符串

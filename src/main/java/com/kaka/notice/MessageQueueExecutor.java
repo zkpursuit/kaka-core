@@ -47,6 +47,28 @@ public class MessageQueueExecutor {
     }
 
     /**
+     * 执行具体事件消息 <br>
+     * 子类中最好捕获异常，防止异常导致线程池故障
+     * <pre>
+     * <code>
+     *     {@literal @}Override
+     *     protected void execute(Message message) {
+     *         try {
+     *             super.execute(message);
+     *         } catch (Exception ex) {
+     *             ……
+     *         }
+     *     }
+     * </code>
+     * </pre>
+     *
+     * @param message 事件消息
+     */
+    protected void execute(Message message) {
+        facade.sendMessage(message);
+    }
+
+    /**
      * 执行事件消息
      */
     protected void execute() {
@@ -58,7 +80,7 @@ public class MessageQueueExecutor {
         final Message event = queue.poll();
         Executor threadPoll = facade.getThreadPool();
         threadPoll.execute(() -> {
-            facade.sendMessage(event);
+            this.execute(event);
             execute();
         });
     }

@@ -17,7 +17,7 @@ public class Message implements Poolable, Serializable {
     protected Object what;
     protected Object body;
     protected Map<Object, IResult> resultMap;
-    private volatile Consumer<IResult<Object>> callback;
+    private transient Consumer<IResult<Object>> callback;
 
     /**
      * 构造方法

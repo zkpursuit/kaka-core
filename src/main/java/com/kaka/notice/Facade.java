@@ -2,9 +2,10 @@ package com.kaka.notice;
 
 import com.kaka.aop.Aop;
 import com.kaka.aop.AopFactory;
+import com.kaka.notice.remote.MessageWrap;
+import com.kaka.util.NanoId;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
-import com.kaka.util.Tool;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -726,7 +727,7 @@ public class Facade implements INotifier {
         }
         Map<Object, IResult> msgResultMap = msg.resultMap;
         Message mqMsg = new Message(msg.getWhat(), msg.getBody());
-        String id = Tool.uuid();
+        String id = NanoId.randomNanoId();
         if (msgResultMap != null) {
             msgResultMap.forEach((Object key, IResult result) -> {
                 if (result instanceof AsynResult) {
@@ -735,7 +736,7 @@ public class Facade implements INotifier {
             });
         }
         remoteMessageQueue.localMessageCache.add(id, msg);
-        remoteMessageQueue.publishEventMessage(new RemoteMessageQueue.MessageWrap(id, mqMsg), remoteMessageQueue.beforeTopic);
+        remoteMessageQueue.publishEventMessage(new MessageWrap(id, mqMsg), remoteMessageQueue.beforeTopic);
     }
 
     /**

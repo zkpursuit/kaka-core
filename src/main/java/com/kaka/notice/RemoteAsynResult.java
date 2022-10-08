@@ -22,7 +22,7 @@ class RemoteAsynResult<V> extends AsynResult<V> {
     }
 
     @Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException {
+    public V get(long timeout, TimeUnit unit) throws Exception {
         return this.get();
     }
 

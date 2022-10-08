@@ -43,7 +43,7 @@ public final class Stopwatch {
 
     public Stopwatch start() {
         if (this.isRunning) {
-            new IllegalStateException(String.valueOf("This stopwatch is already running."));
+            throw new IllegalStateException("This stopwatch is already running.");
         }
         this.isRunning = true;
         this.startTick = this.ticker.read();
@@ -53,7 +53,7 @@ public final class Stopwatch {
     public Stopwatch stop() {
         long tick = this.ticker.read();
         if (!this.isRunning) {
-            new IllegalStateException(String.valueOf("This stopwatch is already stopped."));
+            throw new IllegalStateException("This stopwatch is already stopped.");
         }
         this.isRunning = false;
         this.elapsedNanos += tick - this.startTick;

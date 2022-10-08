@@ -1,7 +1,10 @@
 package com.kaka.notice;
 
+import com.kaka.util.ExceptionUtils;
+
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 异步处理结果
@@ -65,7 +68,10 @@ public class AsynResult<V> implements IResult<V> {
     public V get() {
         try {
             return get(defaultWaitMillis, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
+            if (ex instanceof InterruptedException) {
+                ExceptionUtils.processInterruptedException();
+            }
             return null;
         }
     }
@@ -76,13 +82,13 @@ public class AsynResult<V> implements IResult<V> {
      * @param timeout 超时时间
      * @param unit    超时时间类型
      * @return 处理结果具体数值
-     * @throws InterruptedException 超时等待异常
+     * @throws Exception {@link InterruptedException}，{@link TimeoutException}
      */
-    public V get(long timeout, TimeUnit unit) throws InterruptedException {
+    public V get(long timeout, TimeUnit unit) throws Exception {
         if (await(timeout, unit)) {
             return (V) this.result;
         }
-        return null;
+        throw new TimeoutException("Getting result timeout");
     }
 
     /**
