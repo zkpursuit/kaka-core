@@ -88,6 +88,7 @@ public class AsynResult<V> implements IResult<V> {
         if (await(timeout, unit)) {
             return (V) this.result;
         }
+        this.set(null);
         throw new TimeoutException("Getting result timeout");
     }
 
@@ -100,7 +101,7 @@ public class AsynResult<V> implements IResult<V> {
      * @throws InterruptedException
      */
     private boolean await(long timeout, TimeUnit unit) throws InterruptedException {
-        timeout = unit.convert(timeout, TimeUnit.MILLISECONDS);
+        timeout = unit.toMillis(timeout);
         long startTime = timeout <= 0 ? 0 : System.currentTimeMillis();
         long waitTime = timeout;
         synchronized (this) {

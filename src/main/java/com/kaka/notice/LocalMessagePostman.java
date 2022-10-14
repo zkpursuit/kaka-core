@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @author zkpursuit
  */
-public class MessageQueueExecutor {
-    //事件队列
-    protected final Queue<Message> queue;
+public class LocalMessagePostman {
     //事件调度中心
     protected final Facade facade;
+    //事件队列
+    protected final Queue<Message> queue;
     //事件队列是否正在被消费执行
     protected final AtomicBoolean doing;
 
@@ -25,7 +25,7 @@ public class MessageQueueExecutor {
      *
      * @param facade 事件调度中心
      */
-    public MessageQueueExecutor(Facade facade) {
+    public LocalMessagePostman(Facade facade) {
         this.facade = facade;
         this.queue = initQueue();
         this.doing = new AtomicBoolean(false);

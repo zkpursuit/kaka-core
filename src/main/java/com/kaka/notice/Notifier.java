@@ -48,9 +48,9 @@ abstract public class Notifier implements INotifier {
      * @param msg 待发送的消息
      */
     @Override
-    public void sendMessageByQueue(Message msg) {
+    public void sendRemoteMessage(Message msg) {
         if (facade != null) {
-            facade.sendMessageByQueue(msg);
+            facade.sendRemoteMessage(msg);
         }
     }
 

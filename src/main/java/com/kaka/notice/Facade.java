@@ -2,7 +2,6 @@ package com.kaka.notice;
 
 import com.kaka.aop.Aop;
 import com.kaka.aop.AopFactory;
-import com.kaka.notice.remote.MessageWrap;
 import com.kaka.util.NanoId;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
@@ -26,7 +25,7 @@ public class Facade implements INotifier {
     private Executor threadPool;
     private ScheduledExecutorService scheduleThreadPool;
     private final Map<String, ScheduledFuture<?>> scheduleFutureMap = new ConcurrentHashMap<>();
-    private RemoteMessageQueue remoteMessageQueue;
+    private RemoteMessagePostman remoteMessagePostman;
 
     /**
      * 创建一个内核
@@ -74,12 +73,12 @@ public class Facade implements INotifier {
      * <br>
      * 全局设置一次
      *
-     * @param remoteMessageQueue 远程消息队列实现
+     * @param remoteMessagePostman 远程消息处理器
      */
-    public void initRemoteMessageQueue(RemoteMessageQueue remoteMessageQueue) {
-        if (this.remoteMessageQueue == null) {
-            this.remoteMessageQueue = remoteMessageQueue;
-            this.remoteMessageQueue.facade = this;
+    public void initRemoteMessagePostman(RemoteMessagePostman remoteMessagePostman) {
+        if (this.remoteMessagePostman == null) {
+            this.remoteMessagePostman = remoteMessagePostman;
+            this.remoteMessagePostman.setFacade(this);
         }
     }
 
@@ -721,9 +720,9 @@ public class Facade implements INotifier {
      * @param msg 待发送的消息
      */
     @Override
-    public void sendMessageByQueue(Message msg) {
-        if (remoteMessageQueue == null) {
-            throw new Error(String.format("执行sendMessageByQueue前请先调用 %s.initRemoteMessageQueue方法初始化", this.getClass().toString()));
+    public void sendRemoteMessage(Message msg) {
+        if (this.remoteMessagePostman == null) {
+            throw new Error(String.format("执行sendMessageByQueue前请先调用 %s.initRemoteMessagePostman方法初始化", this.getClass().toString()));
         }
         Map<Object, IResult> msgResultMap = msg.resultMap;
         Message mqMsg = new Message(msg.getWhat(), msg.getBody());
@@ -735,8 +734,9 @@ public class Facade implements INotifier {
                 }
             });
         }
-        remoteMessageQueue.localMessageCache.add(id, msg);
-        remoteMessageQueue.publishEventMessage(new MessageWrap(id, mqMsg), remoteMessageQueue.beforeTopic);
+        this.remoteMessagePostman.remoteMessageCache.add(id, msg);
+        RemoteMessage remoteMessage = new RemoteMessage(this.remoteMessagePostman.cmd_event_handler, id, mqMsg);
+        this.remoteMessagePostman.sendRemoteMessage(remoteMessage);
     }
 
     /**

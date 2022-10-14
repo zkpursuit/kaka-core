@@ -1,8 +1,8 @@
 package kaka.test;
 
-import com.kaka.notice.RemoteMessageQueue;
-import com.kaka.notice.remote.LocalMessageCache;
-import com.kaka.notice.remote.MessageWrap;
+import com.kaka.notice.RemoteMessage;
+import com.kaka.notice.RemoteMessageCache;
+import com.kaka.notice.RemoteMessagePostman;
 import kaka.test.util.KryoSerializer;
 import kaka.test.util.Serializer;
 import org.apache.activemq.ActiveMQConnection;
@@ -16,9 +16,9 @@ import java.util.function.Consumer;
 /**
  * 本类仅为测试用例，ActiveMQ消息队列的访问实现代码是否为最优不做考虑，在此仅为范例参考
  */
-public class ActiveMQ extends RemoteMessageQueue {
+public class ActiveMQ extends RemoteMessagePostman {
 
-    private static class TestLocalMessageCache implements LocalMessageCache {
+    private static class TestRemoteMessageCache implements RemoteMessageCache {
         private final Map<String, com.kaka.notice.Message> localMap = new ConcurrentHashMap<>();
 
         @Override
@@ -27,14 +27,19 @@ public class ActiveMQ extends RemoteMessageQueue {
         }
 
         @Override
+        public com.kaka.notice.Message get(String id) {
+            return localMap.get(id);
+        }
+
+        @Override
         public com.kaka.notice.Message remove(String id) {
             return localMap.remove(id);
         }
     }
 
-    private static final String BROKER_URL = "tcp://101.34.22.36:61616";
+    private static final String BROKER_URL = "tcp://127.0.0.1:61616";
     private final ActiveMQConnectionFactory activeMQConnectionFactory;
-    private final Serializer<MessageWrap> eventSerializer = new KryoSerializer<>();
+    private final Serializer<RemoteMessage> eventSerializer = new KryoSerializer<>();
 
     public ActiveMQ(String beforeTopic, String afterTopic) {
         super(beforeTopic, afterTopic);
@@ -44,18 +49,18 @@ public class ActiveMQ extends RemoteMessageQueue {
     }
 
     @Override
-    protected LocalMessageCache initLocalMessageCache() {
-        return new TestLocalMessageCache();
+    protected RemoteMessageCache initRemoteMessageCache() {
+        return new TestRemoteMessageCache();
     }
 
     @Override
-    protected void publishEventMessage(MessageWrap msgWrap, String topic) {
-        byte[] bytes = this.eventSerializer.serialize(msgWrap);
+    protected void sendRemoteMessage(RemoteMessage remoteMessage) {
+        byte[] bytes = this.eventSerializer.serialize(remoteMessage);
         try {
             Connection connection = activeMQConnectionFactory.createConnection();
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            MessageProducer producer = session.createProducer(session.createQueue(topic));
+            MessageProducer producer = session.createProducer(session.createQueue(remoteMessage.getWhat().toString()));
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             BytesMessage bytesMessage = session.createBytesMessage();
             bytesMessage.writeBytes(bytes);
@@ -71,9 +76,9 @@ public class ActiveMQ extends RemoteMessageQueue {
     private void init() {
         new Thread(() -> {
             try {
-                consume(beforeTopic, (byte[] bytes) -> {
-                    MessageWrap remoteMsgWrap = eventSerializer.deserialize(bytes);
-                    receivedBeforeEventMessage(remoteMsgWrap); //这里很重要，必须调用
+                consume(cmd_event_handler, (byte[] bytes) -> {
+                    RemoteMessage remoteMessage = eventSerializer.deserialize(bytes);
+                    facade.sendMessage(remoteMessage); //这里很重要，必须调用
                 });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -81,9 +86,9 @@ public class ActiveMQ extends RemoteMessageQueue {
         }).start();
         new Thread(() -> {
             try {
-                consume(afterTopic, (byte[] bytes) -> {
-                    MessageWrap remoteMsgWrap = eventSerializer.deserialize(bytes);
-                    receivedAfterEventMessage(remoteMsgWrap); //这里很重要，必须调用
+                consume(cmd_event_result_handler, (byte[] bytes) -> {
+                    RemoteMessage remoteMessage = eventSerializer.deserialize(bytes);
+                    facade.sendMessage(remoteMessage); //这里很重要，必须调用
                 });
             } catch (Exception e) {
                 e.printStackTrace();

@@ -52,6 +52,7 @@ public class AsynLatchResult<V> extends AsynResult<V> {
         if (this.cdl.await(timeout, unit)) {
             return (V) this.result;
         }
+        this.set(null);
         throw new TimeoutException("Getting result timeout");
     }
 

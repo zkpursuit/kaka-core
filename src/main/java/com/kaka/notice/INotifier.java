@@ -33,7 +33,7 @@ interface INotifier {
      *
      * @param msg 待发送的消息
      */
-    void sendMessageByQueue(Message msg);
+    void sendRemoteMessage(Message msg);
 
     /**
      * 定时调度执行事件通知

@@ -6,7 +6,7 @@
 
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.5</version>
+    <version>5.6</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>An event driven framework</description>
     <url>https://github.com/zkpursuit/kaka-core</url>
@@ -30,6 +30,18 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
             <version>5.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client</artifactId>
+            <version>4.9.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-acl</artifactId>
+            <version>4.9.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

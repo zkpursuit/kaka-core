@@ -67,7 +67,7 @@ public class Message implements Poolable, Serializable {
      * @param result 处理结果数据容器
      * @return 处理结果数据容器
      */
-    final protected <T> IResult<T> _setResult(Object key, IResult<T> result) {
+    final protected <T, R extends IResult<T>> R _setResult(Object key, R result) {
         synchronized (this) {
             if (this.resultMap == null) {
                 this.resultMap = new HashMap<>();
@@ -84,12 +84,12 @@ public class Message implements Poolable, Serializable {
      * @param key 因广播事件通知，必须为处理结果定义唯一标识名
      * @return 处理结果数据容器
      */
-    final protected <T> IResult<T> _getResult(Object key) {
+    final protected <T, R extends IResult<T>> R _getResult(Object key) {
         synchronized (this) {
             if (this.resultMap == null) {
                 return null;
             }
-            return this.resultMap.get(key);
+            return (R) this.resultMap.get(key);
         }
     }
 
@@ -101,7 +101,7 @@ public class Message implements Poolable, Serializable {
      * @param result 处理结果数据容器
      * @return 处理结果数据容器
      */
-    public <T> IResult<T> setResult(String name, IResult<T> result) {
+    public <T, R extends IResult<T>> R setResult(String name, R result) {
         return this._setResult(name, result);
     }
 
@@ -112,7 +112,7 @@ public class Message implements Poolable, Serializable {
      * @param name 因广播事件通知，必须为处理结果定义唯一标识名
      * @return 处理结果数据容器
      */
-    public <T> IResult<T> getResult(String name) {
+    public <T, R extends IResult<T>> R getResult(String name) {
         return this._getResult(name);
     }
 

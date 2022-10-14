@@ -1,6 +1,9 @@
 package kaka.test;
 
 import com.kaka.Startup;
+import com.kaka.notice.AsynResult;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 同步使用范例
@@ -15,6 +18,11 @@ public class Sync_Test extends Startup {
 //        test.scan("kaka.test.unit");
 //        facade.sendMessage(new Message("1000", "让MyCommand接收执行"));
 //        facade.sendMessage(new Message("2000", "让MyMediator和MyCommand接收执行"));
+        AsynResult<String> result = new AsynResult<>();
+        result.get(5, TimeUnit.SECONDS);
+        new Thread(() -> {result.set("abc");}).start();
+
+        System.out.println(result.get());
     }
 
 }

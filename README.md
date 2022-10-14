@@ -1,26 +1,35 @@
 # kaka-core
 
 #### 介绍
+
 模块为全局事件驱动框架，无任何第三方依赖；支持同步或者异步获取事件处理结果；可解耦业务，简化程序复杂性，提高代码可读性，降低开发维护成本。
 
 #### 软件架构
+
 基于观察者和命令模式，
 
-
 #### 安装教程
+
 ```xml
-    <dependency>
-        <groupId>io.github.zkpursuit</groupId>
-        <artifactId>kaka-core</artifactId>
-        <version>5.5</version>
-    </dependency>
+
+<dependency>
+    <groupId>io.github.zkpursuit</groupId>
+    <artifactId>kaka-core</artifactId>
+    <version>5.6</version>
+</dependency>
 ```
 
 #### 使用说明
 
-1. 通过Startup.scan方法扫描指定包下的Command、Proxy、Mediator子类并将其注册到Facade中，Command、Proxy、Mediator亦可直接使用Facade对应的方法手动注册；由Facade处理事件流向。
+1.
+
+通过Startup.scan方法扫描指定包下的Command、Proxy、Mediator子类并将其注册到Facade中，Command、Proxy、Mediator亦可直接使用Facade对应的方法手动注册；由Facade处理事件流向。
+
 2. Command、Mediator一般作为业务处理器处理业务，Proxy为数据模型（比如作为数据库service层），Command、Mediator中可通过getProxy方法获得Proxy数据模型。
-3. Command只能监听注册到Facade中的事件，可多个事件注册同一个Command（也可理解为一个Command可监听多个事件），而Mediator则是监听多个自身感兴趣的事件，具体对哪些事件感兴趣则由listMessageInterests方法的返回值决定（总结：一个Command可以对应多个事件；一个事件可以对应多个Mediator，一个Mediator可以对应多个事件；一个事件可以同时对应多个Command和多个Mediator；Command为动态创建，但可池化，Mediator为全局唯一）；Command、Mediator是功能非常相似的事件监听器和事件派发器。
+3.
+
+Command只能监听注册到Facade中的事件，可多个事件注册同一个Command（也可理解为一个Command可监听多个事件），而Mediator则是监听多个自身感兴趣的事件，具体对哪些事件感兴趣则由listMessageInterests方法的返回值决定（总结：一个Command可以对应多个事件；一个事件可以对应多个Mediator，一个Mediator可以对应多个事件；一个事件可以同时对应多个Command和多个Mediator；Command为动态创建，但可池化，Mediator为全局唯一）；Command、Mediator是功能非常相似的事件监听器和事件派发器。
+
 4. Command、Proxy、Mediator中都能通过sendMessage方法向外派发事件，也可在此框架之外直接使用Facade实例调用sendMessage派发事件。
 5. 此框架的事件数据类型尽可能的使用int和String。
 6. Facade实例在调用initThreadPool方法配置了线程池的情况下，Facade、Command、Proxy、Mediator的sendMessage都将直接支持异步派发事件，默认为同步。
@@ -32,15 +41,18 @@
     @Handler(cmd="A", type=MyEnum.class)
     其中"A"为MyEnum中的枚举项
     ```
-11. 支持对接远程消息队列，几乎支持市面上的所有消息队列。
-12. 支持通过第三方消息队列派发和消费事件并可获取远程事件处理结果。
-13. 使用第三方消息队列消费事件并处理时，返回处理结果可如在本地执行后通过AsynResult或者异步回调获取执行结果。
-14. 对接第三方消息队列时，稳定性完全由第三方消息队列决定。
+11. 支持远端分布式事件处理并可获得事件处理结果（此功能由5.6版本重构所得）。
+12. 支持对接远程消息队列，几乎支持市面上的所有消息队列。
+13. 对接消息队列为分布式远程事件处理的具体实现方案之一，可参考以下范例代码 Remote_Test 类。
+14. 使用第三方消息队列消费事件并处理时，返回处理结果可如在本地执行后通过AsynResult或者异步回调获取执行结果。
+15. 对接第三方消息队列时，稳定性完全由第三方消息队列决定。
 
 ### 如有疑问可添加微信 zkpursuit 咨询。
 
-基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords ，游戏体验地址 http://101.34.22.36:8080/，
+基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords ，游戏体验地址 http://101.34.22.36:8080/ ，
 癞子玩法不支持机器人，需要开三个标签页，并需在匹配时间段（5秒）内同时进入游戏。
+
+### 以下范例均在 jdk-17.0.3.1 测试运行，亦可运行在jdk8以上
 
 ```java
 import com.kaka.Startup;
@@ -128,16 +140,45 @@ public class Test extends Startup {
                 .repeat(5); //执行次数
         //此处的执行次数为5次，但因执行到某次时超出设置的结束时间，故而实际次数将少于5次
         facade.sendMessage(new Message("1000", "让MyCommand接收执行"), scheduler);
+    }
+}
+```
 
-        //以下通过ActiveMQ消息队列消费处理事件，并获得事件处理结果，ActiveMQ类请查阅test源码
-        facade.initRemoteMessageQueue(new ActiveMQ("event_exec_before", "event_exec_after")); //此行全局一次设定
-        Message message = new Message("20000", "让MyCommand接收执行");
-        IResult<String> result4 = message.setResult("ResultMsg", new AsynResult<>(5000));
-        facade.sendMessageByQueue(message);
-        System.out.println("消息队列消费处理事件结果：" + result4.get());
+```java
+import com.kaka.Startup;
+import com.kaka.notice.*;
 
-        facade.sendMessageByQueue(new Message("40000", "", (IResult<Object> result) -> {
-            String clasz = ((CallbackResult<Object>) result).eventHanderClass;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+
+/**
+ * 本类中使用的activeMQ或RecketMQ均为最新版本
+ *
+ * @author zkpursuit
+ */
+public class Remote_Test extends Startup {
+
+    public static void main(String[] args) throws Exception {
+        Facade facade = FacadeFactory.getFacade();
+        Remote_Test test = new Remote_Test();
+        test.scan("kaka.test.unit");
+        facade.initThreadPool(Executors.newFixedThreadPool(2));
+
+        //以下通过ActiveMQ消息队列消费处理事件，并获得事件处理结果
+        facade.initRemoteMessagePostman(new ActiveMQ("event_exec_before", "event_exec_after")); //此行全局一次设定
+        //facade.initRemoteMessagePostman(new RocketMQ("event_exec_before", "event_exec_after"));
+
+        Message message = new Message("20000", "让ResultCommand接收执行");
+        IResult<String> result4 = message.setResult("ResultMsg", new AsynLatchResult<>()); //AsynLatchResult可用AsynResult替代
+        facade.sendRemoteMessage(message);
+//        try {
+//            System.out.println("消息队列消费处理事件结果：" + ((AsynLatchResult) result4).get(5, TimeUnit.SECONDS));
+//        } catch (TimeoutException ex) {
+//            System.out.println("获取结果超时");
+//        }
+        System.out.println("消息队列消费处理事件结果：" + result4.get()); //一直等待结果
+        facade.sendRemoteMessage(new Message("40000", "", (IResult<Object> result) -> {
+            String clasz = ((CallbackResult<Object>) result).eventHandlerClass;
             StringBuilder sb = new StringBuilder("消息队列消费处理事件结果异步回调：\t" + clasz + "\t");
             Object resultObj = result.get();
             if (resultObj instanceof Object[]) {
@@ -149,6 +190,7 @@ public class Test extends Startup {
             System.out.println(sb);
         }));
     }
+
 }
 ```
 
@@ -159,6 +201,7 @@ import com.kaka.notice.Command;
 import com.kaka.notice.IResult;
 import com.kaka.notice.Message;
 import com.kaka.notice.annotation.Handler;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
@@ -180,7 +223,7 @@ public class FutureCommand extends Command {
         new Thread(ft).start();
         try {
             IResult result = msg.getResult("ResultMsg");
-            if(result != null) {
+            if (result != null) {
                 result.set(ft.get());
             }
         } catch (InterruptedException | ExecutionException ex) {
@@ -226,6 +269,7 @@ import com.kaka.notice.IResult;
 import com.kaka.notice.Message;
 import com.kaka.notice.SyncResult;
 import com.kaka.notice.annotation.Handler;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -312,7 +356,7 @@ import com.kaka.notice.Proxy;
 import com.kaka.notice.annotation.Model;
 
 /**
- * 
+ *
  * @author zkpursuit
  */
 @Model
@@ -324,6 +368,7 @@ public class MyProxy extends Proxy {
 
 }
 ```
+
 ```java
 package com.test.unit;
 
@@ -339,6 +384,7 @@ public class CallbackCommand1 extends Command {
     }
 }
 ```
+
 ```java
 package com.test.unit;
 
@@ -360,6 +406,7 @@ public class SimulateAopAfterCommand extends Command {
     }
 }
 ```
+
 ```java
 package com.test.unit;
 
@@ -382,6 +429,7 @@ public class SimulateAopBeforeCommand extends Command {
     }
 }
 ```
+
 ```java
 package com.test.unit;
 

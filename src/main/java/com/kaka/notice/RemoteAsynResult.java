@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 class RemoteAsynResult<V> extends AsynResult<V> {
 
     RemoteAsynResult() {
+        super(10000);
     }
 
     public boolean isDone() {
