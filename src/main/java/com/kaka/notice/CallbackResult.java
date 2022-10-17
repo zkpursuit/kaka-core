@@ -12,6 +12,12 @@ public class CallbackResult<V> extends SyncResult<V> {
      */
     public final String eventHandlerClass;
 
+    /**
+     * 构造方法
+     *
+     * @param result            事件处理结果
+     * @param eventHandlerClass 处理事件的类，有可能是远程类，本地不存在，故此处为类的字符串表示
+     */
     CallbackResult(V result, String eventHandlerClass) {
         this.set(result);
         this.eventHandlerClass = eventHandlerClass;

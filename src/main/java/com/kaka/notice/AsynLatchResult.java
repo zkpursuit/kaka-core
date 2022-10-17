@@ -47,6 +47,14 @@ public class AsynLatchResult<V> extends AsynResult<V> {
         return (V) this.result;
     }
 
+    /**
+     * 获取事件通知处理结果具体数值
+     *
+     * @param timeout 超时时间
+     * @param unit    超时时间类型
+     * @return 事件处理结果
+     * @throws Exception {@link InterruptedException}或者{@link TimeoutException}
+     */
     @Override
     public V get(long timeout, TimeUnit unit) throws Exception {
         if (this.cdl.await(timeout, unit)) {
@@ -56,6 +64,11 @@ public class AsynLatchResult<V> extends AsynResult<V> {
         throw new TimeoutException("Getting result timeout");
     }
 
+    /**
+     * 设置事件处理结果
+     *
+     * @param result 事件处理结果
+     */
     @Override
     public void set(V result) {
         this.cdl.countDown();
