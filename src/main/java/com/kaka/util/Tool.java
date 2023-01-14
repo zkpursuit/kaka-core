@@ -222,25 +222,49 @@ public final class Tool {
     }
 
     /**
-     * 将value二进制表示的index位，置为0
+     * 设置value二进制表示的index位，当state为true是置为1，false置为0
      *
-     * @param value
-     * @param index 从右至左，以0为起始
-     * @return 转换后的整数
+     * @param value 十进制数字
+     * @param index bit位索引，从右至左，以0为起始
+     * @param state 当state为true是置为1，false置为0
+     * @return 设置后的十进制数字
      */
-    public static int bitsToZeroAtIndex(int value, int index) {
-        return value ^ (1 << index);
+    public static int setStateAtBitIndex(int value, int index, boolean state) {
+        return state ? (value | (1 << index)) : (value & (~(1 << index)));
     }
 
     /**
-     * 将value二进制表示的index位，置为1
+     * 获取value二进制表示的index位状态，true表示index位为1，false表示index位为0
      *
-     * @param value
-     * @param index 从右至左，以0为起始
-     * @return 转换后的整数
+     * @param value 十进制数字
+     * @param index bit位索引，从右至左，以0为起始
+     * @return true表示index位为1，false表示index位为0
      */
-    public static int bitsToOneAtIndex(int value, int index) {
-        return value | (1 << index);
+    public static boolean getStateAtBitIndex(int value, int index) {
+        return (value & (1 << index)) != 0;
+    }
+
+    /**
+     * 设置value二进制表示的index位，当state为true是置为1，false置为0
+     *
+     * @param value 十进制数字
+     * @param index bit位索引，从右至左，以0为起始
+     * @param state 当state为true是置为1，false置为0
+     * @return 设置后的十进制数字
+     */
+    public static long setStateAtBitIndex(long value, int index, boolean state) {
+        return state ? (value | (1L << index)) : (value & (~(1L << index)));
+    }
+
+    /**
+     * 获取value二进制表示的index位状态，true表示index位为1，false表示index位为0
+     *
+     * @param value 十进制数字
+     * @param index bit位索引，从右至左，以0为起始
+     * @return true表示index位为1，false表示index位为0
+     */
+    public static boolean getStateAtBitIndex(long value, int index) {
+        return (value & (1L << index)) != 0;
     }
 
     /**
@@ -282,7 +306,7 @@ public final class Tool {
         LocalDate birthdayDate = LocalDate.of(year, month, day);
         LocalDate currentDate = LocalDate.now();
         int intervalYear = (int) ChronoUnit.YEARS.between(birthdayDate, currentDate);
-        return intervalYear >= 18;
+        return intervalYear >= ageYear;
     }
 
     //IP正则
