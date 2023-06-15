@@ -16,6 +16,7 @@ public class Asyn_Test extends Startup {
 
     public static void main(String[] args) {
         Facade facade = FacadeFactory.getFacade();
+        facade.registerCommand("print_log", PrintLogHandler.class, 100);
         Asyn_Test test = new Asyn_Test();
         test.scan("kaka.test.unit");
         facade.initThreadPool(Executors.newFixedThreadPool(2));

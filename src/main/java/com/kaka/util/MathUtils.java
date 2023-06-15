@@ -60,6 +60,39 @@ public final class MathUtils {
     }
 
     /**
+     * 通过{@link Math}生成[start, end]的随机数
+     *
+     * @param start 最小值
+     * @param end   最大值
+     * @return [start, end]的随机数
+     */
+    static public long getRandom(long start, long end) {
+        return (long) (Math.random() * (end - start + 1)) + start;
+    }
+
+    /**
+     * 通过{@link Math}生成[start, end]的随机数
+     *
+     * @param start 最小值
+     * @param end   最大值
+     * @return [start, end]的随机数
+     */
+    static public float getRandom(float start, float end) {
+        return (float) (Math.random() * (end - start + 1)) + start;
+    }
+
+    /**
+     * 通过{@link Math}生成[start, end]的随机数
+     *
+     * @param start 最小值
+     * @param end   最大值
+     * @return [start, end]的随机数
+     */
+    static public double getRandom(double start, double end) {
+        return (Math.random() * (end - start + 1)) + start;
+    }
+
+    /**
      * 返回一个[start, end]之间的随机数
      *
      * @param start 闭区间起始范围值
@@ -68,6 +101,21 @@ public final class MathUtils {
      */
     static public int random(int start, int end) {
         return start + getRandom().nextInt(end - start + 1);
+    }
+
+    /**
+     * 返回一个[start, end]之间的随机数
+     *
+     * @param random 随机发生器，可为null
+     * @param start  闭区间起始范围值
+     * @param end    闭区间结束范围值
+     * @return 随机数
+     */
+    static public int random(Random random, int start, int end) {
+        if (random == null) {
+            return MathUtils.getRandom(start, end);
+        }
+        return start + random.nextInt(end - start + 1);
     }
 
     /**
@@ -89,6 +137,21 @@ public final class MathUtils {
      */
     static public long random(long start, long end) {
         return start + (long) (getRandom().nextDouble() * (end - start));
+    }
+
+    /**
+     * 返回一个[start, end]之间的随机数
+     *
+     * @param random 随机发生器，可为null
+     * @param start  闭区间起始范围值
+     * @param end    闭区间结束范围值
+     * @return 随机数
+     */
+    static public long random(Random random, long start, long end) {
+        if (random == null) {
+            return MathUtils.getRandom(start, end);
+        }
+        return start + (long) (random.nextDouble() * (end - start));
     }
 
     /**
@@ -137,6 +200,21 @@ public final class MathUtils {
      * @return 随机数
      */
     static public float random(float start, float end) {
+        return start + getRandom().nextFloat() * (end - start);
+    }
+
+    /**
+     * 返回一个[start, end]之间的随机数
+     *
+     * @param random 随机发生器，可为null
+     * @param start  闭区间起始范围值
+     * @param end    闭区间结束范围值
+     * @return 随机数
+     */
+    static public float random(Random random, float start, float end) {
+        if (random == null) {
+            return MathUtils.getRandom(start, end);
+        }
         return start + getRandom().nextFloat() * (end - start);
     }
 
@@ -794,6 +872,23 @@ public final class MathUtils {
         }
         //取[1, totals]闭区间中的一个随机数
         double randomPoint = MathUtils.random(1, totals);
+        for (int i = 0; i < rates.length; i++) {
+            if (randomPoint < rates[i]) {
+                return i;
+            } else {
+                randomPoint -= rates[i];
+            }
+        }
+        return rates.length - 1;
+    }
+
+    static public int hitProbability(Random random, int[] rates) {
+        int totals = 0;
+        for (int rate : rates) {
+            totals += rate;
+        }
+        //取[1, totals]闭区间中的一个随机数
+        double randomPoint = random(random, 1, totals);
         for (int i = 0; i < rates.length; i++) {
             if (randomPoint < rates[i]) {
                 return i;

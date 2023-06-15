@@ -1,14 +1,10 @@
 package com.kaka.notice.detector;
 
-import com.kaka.notice.Facade;
-import com.kaka.notice.FacadeFactory;
-import com.kaka.notice.Mediator;
-import com.kaka.notice.Proxy;
+import com.kaka.notice.*;
 import com.kaka.notice.annotation.Model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * 基于{@link Proxy}的注册器
@@ -16,8 +12,6 @@ import java.util.logging.Level;
  * @author zkpursuit
  */
 public class ProxyDetector extends PriorityDetector {
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProxyDetector.class.getTypeName());
 
     private final List<Element> list = new ArrayList<>();
 
@@ -59,21 +53,16 @@ public class ProxyDetector extends PriorityDetector {
         list.forEach((element) -> {
             Model model = element.getAnnotation();
             Class<?> cls = element.getClasz();
-            Facade facade;
-            String context = model.context();
-            if (context.equals("")) {
-                facade = FacadeFactory.getFacade();
-            } else {
-                facade = FacadeFactory.getFacade(model.context());
-            }
+            Facade facade = model.context().equals("") ? FacadeFactory.getFacade() : FacadeFactory.getFacade(model.context());
             Proxy proxy;
             String modelName = model.value();
             if (!"".equals(modelName)) {
                 proxy = facade.registerProxy((Class<? extends Proxy>) cls, modelName);
-                logger.log(Level.INFO, "注册业务数据模型：Proxy（{0}）==>>>  {1}", new Object[]{proxy.name, cls});
             } else {
                 proxy = facade.registerProxy((Class<? extends Proxy>) cls);
-                logger.log(Level.INFO, "注册业务数据模型：Proxy（{0}）==>>>  {1}", new Object[]{proxy.name, cls});
+            }
+            if (facade.hasCommand("print_log")) {
+                facade.sendMessage(new Message("print_log", new Object[]{ProxyDetector.class, new Object[]{proxy.name, cls}}));
             }
         });
         list.clear();

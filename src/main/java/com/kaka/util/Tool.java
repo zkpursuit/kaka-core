@@ -289,6 +289,17 @@ public final class Tool {
     }
 
     /**
+     * 从参数数字中析出32位整数
+     *
+     * @param value 64位整数
+     * @param first 是否为第一个整数
+     * @return 32位整数
+     */
+    public static int split(long value, boolean first) {
+        return first ? (int) (value >> 32) : (int) ((value << 32) >> 32);
+    }
+
+    /**
      * 判断身份证上的年龄是否达到ageYear年龄
      *
      * @param idCard  身份证号码

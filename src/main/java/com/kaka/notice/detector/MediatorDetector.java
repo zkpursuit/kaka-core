@@ -3,9 +3,8 @@ package com.kaka.notice.detector;
 import com.kaka.notice.Facade;
 import com.kaka.notice.FacadeFactory;
 import com.kaka.notice.Mediator;
+import com.kaka.notice.Message;
 import com.kaka.notice.annotation.MultiHandler;
-
-import java.util.logging.Logger;
 
 /**
  * 注册事件观察者
@@ -13,8 +12,6 @@ import java.util.logging.Logger;
  * @author zkpursuit
  */
 public class MediatorDetector implements IDetector {
-
-    private static final Logger logger = Logger.getLogger(MediatorDetector.class.getTypeName());
 
     @Override
     public String name() {
@@ -36,14 +33,11 @@ public class MediatorDetector implements IDetector {
         if (sc == null) {
             return false;
         }
-        Facade cotx;
-        if (sc.context().equals("")) {
-            cotx = FacadeFactory.getFacade();
-        } else {
-            cotx = FacadeFactory.getFacade(sc.context());
+        Facade facade = sc.context().equals("") ? FacadeFactory.getFacade() : FacadeFactory.getFacade(sc.context());
+        Mediator observer = facade.registerMediator((Class<? extends Mediator>) cls);
+        if (facade.hasCommand("print_log")) {
+            facade.sendMessage(new Message("print_log", new Object[]{MediatorDetector.class, new Object[]{observer.name, cls}}));
         }
-        Mediator observer = cotx.registerMediator((Class<? extends Mediator>) cls);
-        logger.info("注册事件观察者：Mediator（" + observer.name + "）==>>>  " + cls);
         return true;
     }
 
