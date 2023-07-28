@@ -171,11 +171,9 @@ public class Facade implements INotifier {
             ReflectUtils.setFieldValue(proxy, "name", typeName);
             registerProxy(typeName, proxy);
         }
-        if (names.length > 0) {
-            for (String name : names) {
-                if (name != null && !name.equals(proxy.name) && !name.equals(typeName)) {
-                    aliasSet.add(name);
-                }
+        for (String name : names) {
+            if (name != null && !name.equals(proxy.name) && !name.equals(typeName)) {
+                aliasSet.add(name);
             }
         }
         for (String name : aliasSet) {
@@ -362,11 +360,9 @@ public class Facade implements INotifier {
             ReflectUtils.setFieldValue(observer, "name", typeName);
             registerMediator(typeName, observer);
         }
-        if (names.length > 0) {
-            for (String name : names) {
-                if (name != null && !name.equals(observer.name) && !name.equals(typeName)) {
-                    aliasSet.add(name);
-                }
+        for (String name : names) {
+            if (name != null && !name.equals(observer.name) && !name.equals(typeName)) {
+                aliasSet.add(name);
             }
         }
         for (String name : aliasSet) {
@@ -782,9 +778,7 @@ public class Facade implements INotifier {
      * 释放内存
      */
     public void dispose() {
-        Iterator<Object> ks = cmdPoolMap.keySet().iterator();
-        while (ks.hasNext()) {
-            Object key = ks.next();
+        for (Object key : cmdPoolMap.keySet()) {
             CommandPoolSortedSet cmdPoolSet = cmdPoolMap.get(key);
             if (cmdPoolSet != null) {
                 for (CommandPool pool : cmdPoolSet) {
@@ -793,27 +787,22 @@ public class Facade implements INotifier {
                 cmdPoolSet.clear();
             }
         }
-        Iterator<String> keys = mediatorMap.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            mediatorMap.remove(key);
+        this.cmdPoolMap.clear();
+        for (Object key : cmdMediatorMap.keySet()) {
+            List<Mediator> list = cmdMediatorMap.get(key);
+            if (list != null) {
+                list.clear();
+            }
         }
-        keys = proxyMap.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            proxyMap.remove(key);
-        }
-        cmdMediatorMap.clear();
-        cmdPoolMap.clear();
-        mediatorMap.clear();
-        proxyMap.clear();
-        listenerMap.clear();
+        this.cmdMediatorMap.clear();
+        this.mediatorMap.clear();
+        this.proxyMap.clear();
+        this.listenerMap.clear();
         this.threadPool = null;
-        keys = scheduleFutureMap.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
+        for (String key : scheduleFutureMap.keySet()) {
             this.cancelSchedule(key);
         }
+        this.scheduleFutureMap.clear();
         this.scheduleThreadPool = null;
     }
 
