@@ -1,6 +1,7 @@
 package com.kaka.util;
 
 import java.lang.reflect.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,7 +108,7 @@ public final class ReflectUtils {
                 }
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new Error(ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -134,7 +135,7 @@ public final class ReflectUtils {
                     sb.append("get");
                 }
             } catch (NoSuchFieldException | SecurityException ex) {
-                throw new Error(ex);
+                throw new RuntimeException(ex);
             }
         }
         if (attribute.charAt(0) != '_' && m.find()) {
@@ -166,7 +167,7 @@ public final class ReflectUtils {
         try {
             return field.get(object);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            throw new Error(ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -194,7 +195,7 @@ public final class ReflectUtils {
             try {
                 value = field.get(obj);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                throw new Error(ex);
+                throw new RuntimeException(ex);
             }
         } else {
             try {
@@ -207,8 +208,9 @@ public final class ReflectUtils {
                     }
                     value = method.invoke(obj);
                 }
-            } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                throw new Error(ex);
+            } catch (SecurityException | IllegalAccessException | IllegalArgumentException |
+                     InvocationTargetException ex) {
+                throw new RuntimeException(ex);
             }
         }
         return value;
@@ -241,7 +243,7 @@ public final class ReflectUtils {
                 method.invoke(obj, args);
             }
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new Error(ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -263,7 +265,7 @@ public final class ReflectUtils {
                 return method.invoke(obj);
             }
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new Error(ex);
+            throw new RuntimeException(ex);
         }
         return null;
     }
@@ -383,6 +385,34 @@ public final class ReflectUtils {
     }
 
     /**
+     * 遍历class的所有父class，包括初始class本身
+     *
+     * @param clasz    初始class
+     * @param consumer 父class访问器
+     */
+    public static void traversalSuperClasses(Class<?> clasz, Consumer<Class<?>> consumer) {
+        while (clasz != null) {
+            consumer.accept(clasz);
+            clasz = clasz.getSuperclass();
+        }
+    }
+
+    /**
+     * 遍历class的所有接口class
+     *
+     * @param clasz    初始class
+     * @param consumer 接口class访问器
+     */
+    public static void traversalInterfaceClasses(Class<?> clasz, Consumer<Class<?>> consumer) {
+        traversalSuperClasses(clasz, superClass -> {
+            Class<?>[] interfaces = superClass.getInterfaces();
+            for (Class<?> cls : interfaces) {
+                consumer.accept(cls);
+            }
+        });
+    }
+
+    /**
      * 获取泛型参数类型 <br>
      * 此方法仅对编码时显示写入泛型有效，动态创建对象时无法获得泛型 <br>
      *
@@ -457,7 +487,7 @@ public final class ReflectUtils {
             try {
                 con = cls.getDeclaredConstructor(argTypes);
             } catch (NoSuchMethodException | SecurityException | IllegalArgumentException ex) {
-                throw new Error(ex);
+                throw new RuntimeException(ex);
             }
         }
         int modifier = con.getModifiers();
@@ -466,8 +496,9 @@ public final class ReflectUtils {
         }
         try {
             return con.newInstance(args);
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new Error(ex);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                 InvocationTargetException ex) {
+            throw new RuntimeException(ex);
         }
     }
 

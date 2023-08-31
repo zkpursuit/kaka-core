@@ -84,7 +84,7 @@ public class ClassScaner {
                                     try {
                                         classes.add(loader.loadClass(pn + '.' + className));
                                     } catch (ClassNotFoundException | NoClassDefFoundError | ClassFormatError ex) {
-                                        throw new Error(ex);
+                                        throw new RuntimeException(ex);
                                     }
                                 }
                             }
@@ -93,7 +93,7 @@ public class ClassScaner {
                 }
             }
         } catch (IOException ex) {
-            throw new Error(ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -158,7 +158,7 @@ public class ClassScaner {
                 try {
                     classes.add(loader.loadClass(packageName + '.' + className));
                 } catch (ClassNotFoundException | NoClassDefFoundError | ClassFormatError ex) {
-                    throw new Error(ex);
+                    throw new RuntimeException(ex);
                 }
             }
         }

@@ -23,7 +23,7 @@ public class JavaSerializer<T> implements Serializer<T> {
             objectOutputStream.flush();
             return byteStream.toByteArray();
         } catch (IOException e) {
-            throw new Error(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -37,7 +37,7 @@ public class JavaSerializer<T> implements Serializer<T> {
             ObjectInputStream objectInputStream = new ObjectInputStream(byteStream);
             return (T) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new Error(e);
+            throw new RuntimeException(e);
         }
     }
 
