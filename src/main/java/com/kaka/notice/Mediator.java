@@ -5,7 +5,7 @@ package com.kaka.notice;
  *
  * @author zkpursuit
  */
-abstract public class Mediator extends Proxy {
+abstract public class Mediator extends Proxy implements IMediator {
 
     final static ThreadLocal<Message> messageThreadLocal = new ThreadLocal<>();
 

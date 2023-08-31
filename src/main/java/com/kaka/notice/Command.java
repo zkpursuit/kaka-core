@@ -7,7 +7,7 @@ import com.kaka.util.ObjectPool;
  *
  * @author zkpursuit
  */
-abstract public class Command extends Notifier implements ObjectPool.Poolable {
+abstract public class Command extends Notifier implements ICommand, ObjectPool.Poolable {
 
     /**
      * 注册时的命令号

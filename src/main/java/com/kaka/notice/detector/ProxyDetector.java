@@ -54,13 +54,8 @@ public class ProxyDetector extends PriorityDetector {
             Model model = element.getAnnotation();
             Class<?> cls = element.getClasz();
             Facade facade = model.context().equals("") ? FacadeFactory.getFacade() : FacadeFactory.getFacade(model.context());
-            Proxy proxy;
             String modelName = model.value();
-            if (!"".equals(modelName)) {
-                proxy = facade.registerProxy((Class<? extends Proxy>) cls, modelName);
-            } else {
-                proxy = facade.registerProxy((Class<? extends Proxy>) cls);
-            }
+            Proxy proxy = !"".equals(modelName) ? facade.registerProxy((Class<? extends Proxy>) cls, modelName) : facade.registerProxy((Class<? extends Proxy>) cls);
             if (facade.hasCommand("print_log")) {
                 facade.sendMessage(new Message("print_log", new Object[]{ProxyDetector.class, new Object[]{proxy.name, cls}}));
             }

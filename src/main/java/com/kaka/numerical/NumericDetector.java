@@ -54,24 +54,13 @@ public class NumericDetector extends PriorityDetector {
         list.sort((e1, e2) -> {
             Numeric numeric1 = e1.getAnnotation();
             Numeric numeric2 = e2.getAnnotation();
-            if (numeric1.priority() > numeric2.priority()) {
-                return -1;
-            }
-            if (numeric1.priority() < numeric2.priority()) {
-                return 1;
-            }
-            return 0;
+            return Integer.compare(numeric2.priority(), numeric1.priority());
         });
         list.forEach((element) -> {
             Class<?> cls = element.getClasz();
             Numeric numeric = element.getAnnotation();
-            Facade cotx;
-            if (numeric.context().equals("")) {
-                cotx = FacadeFactory.getFacade();
-            } else {
-                cotx = FacadeFactory.getFacade(numeric.context());
-            }
-            cotx.registerProxy((Class<? extends Proxy>) cls, numeric.src());
+            Facade facade = numeric.context().equals("") ? FacadeFactory.getFacade() : FacadeFactory.getFacade(numeric.context());
+            facade.registerProxy((Class<? extends Proxy>) cls, numeric.src());
         });
         list.clear();
     }

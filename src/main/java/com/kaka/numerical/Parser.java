@@ -49,12 +49,7 @@ abstract public class Parser {
         }
         String[] eles = att.elements();
         Class<? extends Converter> converterClass = att.converter();
-        Converter<?> processor;
-        if (converterClass == Converter.class) {
-            processor = null;
-        } else {
-            processor = ReflectUtils.newInstance(converterClass);
-        }
+        Converter<?> converter = converterClass == Converter.class ? null : ReflectUtils.newInstance(converterClass);
         boolean isCollectionField = false;
         Class<?> filedTypeClass = field.getType();
         Object fieldValue = getFieldValue(object, field);
@@ -99,7 +94,7 @@ abstract public class Parser {
             confColName = confColName.trim().replaceAll(" ", "");
             String value = analyzer.getContent(confColName);
             if (isCollectionField) {
-                Object resultValue = processor != null ? processor.transform(value) : null;
+                Object resultValue = converter != null ? converter.transform(value) : null;
                 if (resultValue != null && fieldValue != null) {
                     Collection<Object> collection = (Collection<Object>) fieldValue;
                     if (resultValue.getClass().isArray()) {
@@ -115,10 +110,10 @@ abstract public class Parser {
                     }
                 }
             } else {
-                if (processor == null) {
+                if (converter == null) {
                     setFieldValue(object, field, value);
                 } else {
-                    Object resultValue = processor.transform(value);
+                    Object resultValue = converter.transform(value);
                     if (resultValue != null) {
                         setFieldValue(object, field, resultValue);
                     }

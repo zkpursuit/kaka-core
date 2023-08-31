@@ -26,10 +26,10 @@ public class TextAnalyzer implements IAnalyzer<String[][]> {
             String title = titles[i].trim();
             String value = lineDatas[i].trim();
             if ("".equals(title)) {
-                throw new Error("存在空列名（列号>>" + (i + 1) + "）");
+                throw new RuntimeException("存在空列名（列号>>" + (i + 1) + "）");
             }
             if (title_content_map.containsKey(title)) {
-                throw new Error("存在重复的列名（列号>>" + (i + 1) + "）：" + title);
+                throw new RuntimeException("存在重复的列名（列号>>" + (i + 1) + "）：" + title);
             }
             title_content_map.put(title, value);
         }

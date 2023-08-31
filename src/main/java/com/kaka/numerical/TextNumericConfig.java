@@ -35,7 +35,7 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
             String str = "分隔符不能为空，请在子类中实现initDelimiter方法，并返回非空字符串；要使initDelimiter方法返回的分隔符生效，请使用";
             str += Facade.class.getTypeName();
             str += "对象注册本对象。";
-            throw new Error(str);
+            throw new RuntimeException(str);
         }
         return delimiter;
     }
