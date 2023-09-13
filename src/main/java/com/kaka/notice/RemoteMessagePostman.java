@@ -57,7 +57,7 @@ abstract public class RemoteMessagePostman {
                 Message remoteEventMessage = (Message) remoteMessage.getBody();
                 Message localEventMessage = this.postman.remoteMessageCache.remove(id);
                 if (localEventMessage == null) {
-                    facade.sendMessage(new Message("remote_processed_message", remoteEventMessage));
+                    this.getFacade().sendMessage(new Message("remote_processed_message", remoteEventMessage));
                     return;
                 }
                 Map<Object, IResult> eventResultMap = remoteEventMessage.resultMap;

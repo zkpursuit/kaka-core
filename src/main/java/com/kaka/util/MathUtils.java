@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 /**
  * 数学计算工具类
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public final class MathUtils {
 

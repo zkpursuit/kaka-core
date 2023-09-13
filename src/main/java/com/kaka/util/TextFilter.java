@@ -71,13 +71,13 @@ public final class TextFilter {
         int[] start = new int[1];
         replaceIdxs.forEach((idx) -> {
             if (idx > 0 && (idx - start[0]) > 0) {
-                sb.append(text.substring(start[0], idx));
+                sb.append(text, start[0], idx);
             }
             sb.append(replaceText);
             start[0] = idx + 1;
         });
         if (start[0] > 0 && start[0] < text.length()) {
-            sb.append(text.substring(start[0], text.length()));
+            sb.append(text.substring(start[0]));
         }
         return sb.toString();
     }
@@ -107,13 +107,13 @@ public final class TextFilter {
         int[] start = new int[1];
         for (Integer idx : replaceIdxs) {
             if (idx > 0 && (idx - start[0]) > 0) {
-                sb.append(text.substring(start[0], idx));
+                sb.append(text, start[0], idx);
             }
             sb.append(replaceText);
             start[0] = idx + 1;
         }
         if (start[0] > 0 && start[0] < text.length()) {
-            sb.append(text.substring(start[0], text.length()));
+            sb.append(text.substring(start[0]));
         }
         return sb.toString();
     }

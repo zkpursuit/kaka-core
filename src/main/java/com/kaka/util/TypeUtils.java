@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * @author zhoukai
+ * @author zkpursuit
  */
 public final class TypeUtils {
 

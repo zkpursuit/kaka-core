@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FileUtils {
+/**
+ * 文件（夹）访问助手
+ *
+ * @author zkpursuit
+ */
+class FileUtils {
 
     private static void getDirectories(File dir, List<File> dirs) {
         if (dir.isDirectory()) {
             dirs.add(dir);
             File[] files = dir.listFiles(File::isDirectory);
             if (files == null) return;
-            if (files.length > 0) {
-                for (File file : files) {
-                    getDirectories(file, dirs);
-                }
+            for (File file : files) {
+                getDirectories(file, dirs);
             }
         }
     }

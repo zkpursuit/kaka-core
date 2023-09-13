@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * 对象池
  *
  * @param <T> 可闲置对象类型
- * @author zhoukai
+ * @author zkpursuit
  */
 abstract public class ObjectPool<T extends Poolable> {
 

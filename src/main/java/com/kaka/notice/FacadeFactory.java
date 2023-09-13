@@ -7,6 +7,8 @@ import java.util.Map;
 
 /**
  * {@link Facade} 工厂
+ *
+ * @author zkpursuit
  */
 public class FacadeFactory {
 

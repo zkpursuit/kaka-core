@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 数值配置文件序列化的对象中字段注解，标示字段的值需特殊处理后获得<br>
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -12,6 +12,10 @@ abstract public class Notifier implements INotifier {
      */
     Facade facade;
 
+    void setFacade(Facade facade) {
+        this.facade = facade;
+    }
+
     /**
      * 同步发送消息
      *

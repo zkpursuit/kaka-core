@@ -7,6 +7,8 @@ package com.kaka.notice;
  * 应该尽可能使用其它缓存框架来限定对象的缓存时间，当未消费到事件消息时可适当自动移除缓存
  * <br>
  * 非消息队列不可用的情况，都能消费事件消息，从而从本地缓存中移除对应的事件消息
+ *
+ * @author zkpursuit
  */
 public interface RemoteMessageCache {
     /**

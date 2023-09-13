@@ -5,7 +5,7 @@ package com.kaka.notice;
  *
  * @author zkpursuit
  */
-public interface IMediator {
+public interface IMediator extends INotifier {
 
     /**
      * 处理消息监听

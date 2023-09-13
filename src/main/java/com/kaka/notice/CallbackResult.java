@@ -4,6 +4,7 @@ package com.kaka.notice;
  * 异步回调执行结果
  *
  * @param <V> 结果数据类型，内部已固定为Object
+ * @author zkpursuit
  */
 public class CallbackResult<V> extends SyncResult<V> {
 

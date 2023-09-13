@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * excel文件复制成的制表符分割的txt文件分析器，用于分析每行每个单元格内容
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public class TextAnalyzer implements IAnalyzer<String[][]> {
 

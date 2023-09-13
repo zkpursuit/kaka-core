@@ -22,17 +22,17 @@ public class DoubleArrayTrie {
         int right; // 节点在字典中的索引范围右边界
     };
 
-    private int check[];
-    private int base[];
+    private int[] check;
+    private int[] base;
 
-    private boolean used[]; // 记录计算出的begin所对应的使用情况
+    private boolean[] used; // 记录计算出的begin所对应的使用情况
     private int size; // base和check的数组大小
     private int allocSize; // 被分配的数组大小
     private List<String> key; // 字典
     private int keyMaxLen = 0; //字典中单个关键词的最大长度
     private int keySize; // 字典大小
-    private int length[];
-    private int value[];
+    private int[] length;
+    private int[] value;
     private int progress;
     private int nextCheckPosition;
     int error_; // 错误标识

@@ -4,6 +4,8 @@ package com.kaka.notice;
  * 事件监听器
  * <br>
  * 在已有类继承体系内的对象可直接继承此接口引入事件通知
+ *
+ * @author zkpursuit
  */
 public interface IListener {
     /**

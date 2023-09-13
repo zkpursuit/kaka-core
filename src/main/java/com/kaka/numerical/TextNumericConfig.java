@@ -9,7 +9,7 @@ import java.io.*;
  * 对复制excel表格数据内容生成的txt数值配置文件进行解析并转换为JavaBean对象<br>
  *
  * @param <T> 解析后的序列化对象类型（JavaBean对象类型）
- * @author zhoukai
+ * @author zkpursuit
  */
 abstract public class TextNumericConfig<T> extends NumericConfig<T> {
 

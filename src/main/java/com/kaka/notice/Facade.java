@@ -1,7 +1,5 @@
 package com.kaka.notice;
 
-import com.kaka.aop.Aop;
-import com.kaka.aop.AopFactory;
 import com.kaka.util.NanoId;
 import com.kaka.util.ReflectUtils;
 import com.kaka.util.StringUtils;
@@ -106,13 +104,6 @@ public class Facade implements INotifier {
      * @return 实例
      */
     Object createObject(Class clasz) {
-        Aop aop = AopFactory.getAop();
-        if (aop != null) {
-            Object inst = aop.createInstance(clasz);
-            if (inst != null) {
-                return inst;
-            }
-        }
         try {
             return ReflectUtils.newInstance(clasz);
         } catch (Exception ex) {
@@ -180,7 +171,7 @@ public class Facade implements INotifier {
             registerProxy(name, proxy);
             proxy.addAlias(name);
         }
-        proxy.facade = this;
+        proxy.setFacade(this);
         proxy.onRegister();
         return (T) proxy;
     }
@@ -205,7 +196,7 @@ public class Facade implements INotifier {
      */
     final public <T extends Proxy> T registerProxy(Proxy proxy) {
         registerProxy(proxy.name, proxy);
-        proxy.facade = this;
+        proxy.setFacade(this);
         proxy.onRegister();
         return (T) proxy;
     }
@@ -335,7 +326,7 @@ public class Facade implements INotifier {
             List<Mediator> list = cmdMediatorMap.computeIfAbsent(nid, k -> Collections.synchronizedList(new ArrayList<>()));
             list.add(mediator);
         }
-        mediator.facade = this;
+        mediator.setFacade(this);
         mediator.onRegister();
     }
 
@@ -434,7 +425,7 @@ public class Facade implements INotifier {
                 if (list == null || list.isEmpty()) continue;
                 list.remove(mediator);
             }
-            mediator.facade = null;
+            mediator.setFacade(null);
             mediator.onRemove();
         }
         return (T) mediator;
@@ -623,7 +614,7 @@ public class Facade implements INotifier {
         for (CommandPool pool : poolSet) {
             final Command cmd = pool.obtain();
             if (cmd == null) continue;
-            cmd.facade = this;
+            cmd.setFacade(this);
             cmd.cmd = msg.getWhat();
             cmd.execute0(msg);
             msg.callback(cmd.getClass().getTypeName());

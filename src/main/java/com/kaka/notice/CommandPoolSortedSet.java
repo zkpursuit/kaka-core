@@ -2,6 +2,11 @@ package com.kaka.notice;
 
 import java.util.*;
 
+/**
+ * {@link CommandPool}排序结构
+ *
+ * @author zkpursuit
+ */
 class CommandPoolSortedSet implements Set<CommandPool> {
 
     private final Set<CommandPool> set;

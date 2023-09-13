@@ -13,7 +13,7 @@ import java.rmi.server.UnicastRemoteObject;
 /**
  * 简单RMI服务的发布和调用，实际应用RMI服务可使用ZooKeeper或其它分布式组件
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public final class RMI {
 

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 /**
  * 反射工具
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public final class ReflectUtils {
 
@@ -473,7 +473,7 @@ public final class ReflectUtils {
                 try {
                     return cls.newInstance();
                 } catch (InstantiationException | IllegalAccessException ex) {
-                    throw new Error("无法找到无参构造方法", e);
+                    throw new RuntimeException("无法找到无参构造方法", e);
                 }
             }
         } else {

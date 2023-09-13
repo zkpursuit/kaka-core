@@ -319,7 +319,7 @@ public class StringUtils {
     private static int toDigit(final char ch, final int index) {
         final int digit = Character.digit(ch, 16);
         if (digit == -1) {
-            throw new Error("Illegal hexadecimal character " + ch + " at index " + index);
+            throw new IllegalArgumentException("Illegal hexadecimal character " + ch + " at index " + index);
         }
         return digit;
     }
@@ -403,7 +403,7 @@ public class StringUtils {
     public static byte[] decodeHexToByte(final char[] data) {
         final int len = data.length;
         if ((len & 0x01) != 0) {
-            throw new Error("字符数组长度必然为偶数。");
+            throw new IllegalArgumentException("字符数组长度必然为偶数。");
         }
         final byte[] out = new byte[len >> 1];
         for (int i = 0, j = 0; j < len; i++) {

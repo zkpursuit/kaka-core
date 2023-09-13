@@ -1,11 +1,13 @@
 package com.kaka.notice;
 
+import com.kaka.util.ObjectPool;
+
 /**
  * 控制命令类接口
  *
  * @author zkpursuit
  */
-public interface ICommand {
+public interface ICommand extends INotifier, ObjectPool.Poolable {
     /**
      * 处理消息，此方法中不要用线程处理
      * <br>

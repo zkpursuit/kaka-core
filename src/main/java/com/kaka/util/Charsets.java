@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
  * 字符编码常量 <br>
  * 已废弃，可能在后续版本中移除，另可参见 {@link StandardCharsets}
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 @Deprecated
 public class Charsets {

@@ -1,13 +1,11 @@
 package com.kaka.notice;
 
-import com.kaka.util.ObjectPool;
-
 /**
  * 控制命令类
  *
  * @author zkpursuit
  */
-abstract public class Command extends Notifier implements ICommand, ObjectPool.Poolable {
+abstract public class Command extends Notifier implements ICommand {
 
     /**
      * 注册时的命令号
@@ -29,7 +27,7 @@ abstract public class Command extends Notifier implements ICommand, ObjectPool.P
      */
     @Override
     public void reset() {
-        this.facade = null;
+        this.setFacade(null);
         this.cmd = null;
         this.msg = null;
     }

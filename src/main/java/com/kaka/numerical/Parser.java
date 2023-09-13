@@ -18,7 +18,7 @@ import static com.kaka.util.ReflectUtils.setFieldValue;
 /**
  * 配置文件解析器
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 abstract public class Parser {
 

@@ -7,7 +7,7 @@ import com.kaka.util.ReflectUtils;
  * 数值表配置
  *
  * @param <T> 解析成为的目标类型
- * @author zhoukai
+ * @author zkpursuit
  */
 abstract public class NumericConfig<T> extends Proxy {
 

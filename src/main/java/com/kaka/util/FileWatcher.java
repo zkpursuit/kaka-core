@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /**
  * 文件变动监控
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public class FileWatcher implements Runnable {
 
@@ -40,9 +40,8 @@ public class FileWatcher implements Runnable {
         if (descendants) {
             File dir = new File(watchDir);
             List<File> dirs = FileUtils.getDirectories(dir, true);
-            int size = dirs.size();
-            for (int i = 0; i < size; i++) {
-                String absPath = dirs.get(i).getAbsolutePath();
+            for (File file : dirs) {
+                String absPath = file.getAbsolutePath();
                 Path path = Paths.get(absPath);
                 path.register(watcher, ENTRY_CREATE, OVERFLOW, ENTRY_MODIFY, ENTRY_DELETE);
             }

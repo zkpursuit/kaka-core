@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
  * 工具类
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public final class Tool {
 
@@ -413,7 +413,7 @@ public final class Tool {
     public static long ipv4ToNumber(String ip) {
         boolean bool = isIP(ip);
         if (!bool) {
-            throw new Error(ip + " 无效的IP地址");
+            throw new IllegalArgumentException(ip + " 无效的IP地址");
         }
         String[] parts = ip.split("\\.");
         long sip1 = Long.parseLong(parts[0]);

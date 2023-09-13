@@ -4,7 +4,7 @@ package com.kaka.numerical;
  * 数据单元分析匹配
  *
  * @param <V> 泛型参数
- * @author zhoukai
+ * @author zkpursuit
  */
 public interface IAnalyzer<V> {
 

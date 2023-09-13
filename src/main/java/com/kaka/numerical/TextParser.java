@@ -3,7 +3,7 @@ package com.kaka.numerical;
 /**
  * excel文件复制成的制表符分割的txt文件数据行解析器
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public class TextParser extends Parser {
 

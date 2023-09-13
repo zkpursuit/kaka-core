@@ -1,8 +1,5 @@
 package com.kaka;
 
-import com.kaka.aop.Aop;
-import com.kaka.aop.AopFactory;
-import com.kaka.aop.annotation.Aspect;
 import com.kaka.notice.detector.*;
 import com.kaka.numerical.NumericDetector;
 import com.kaka.util.ClassScaner;
@@ -12,7 +9,7 @@ import java.util.*;
 /**
  * 启动器，其中包含类扫描及事件通知模型的注册
  *
- * @author zhoukai
+ * @author zkpursuit
  */
 public abstract class Startup {
 
@@ -90,18 +87,6 @@ public abstract class Startup {
                 Set<Class<?>> _classes = ClassScaner.getClasses(loader, packages[i]);
                 if (!_classes.isEmpty()) {
                     classes.addAll(_classes);
-                }
-            }
-        }
-        final Aop aop = AopFactory.getAop();
-        if (aop != null) {
-            for (Class<?> cls : classes) {
-                Aspect aspect = cls.getAnnotation(Aspect.class);
-                if (aspect != null) {
-                    aop.registerAspect(cls);
-                }
-                if (!aop.isPrepared(cls)) {
-                    aop.registerInterceptTarget(cls);
                 }
             }
         }

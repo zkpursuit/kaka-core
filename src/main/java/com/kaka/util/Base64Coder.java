@@ -30,7 +30,6 @@ package com.kaka.util;
  * @author Christian d'Heureuse
  * @author vaxquis
  */
-
 public class Base64Coder {
 
     public static class CharMap {

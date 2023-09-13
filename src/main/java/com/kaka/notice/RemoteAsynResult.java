@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
  * 远程消息队列异步执行结果
  *
  * @param <V> 结果数据类型
+ * @author zkpursuit
  */
 class RemoteAsynResult<V> extends AsynResult<V> {
 
