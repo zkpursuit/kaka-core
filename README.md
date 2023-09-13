@@ -15,21 +15,15 @@
 <dependency>
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.7</version>
+    <version>5.9</version>
 </dependency>
 ```
 
 #### 使用说明
 
-1.
-
-通过Startup.scan方法扫描指定包下的Command、Proxy、Mediator子类并将其注册到Facade中，Command、Proxy、Mediator亦可直接使用Facade对应的方法手动注册；由Facade处理事件流向。
-
+1. 通过Startup.scan方法扫描指定包下的Command、Proxy、Mediator子类并将其注册到Facade中，Command、Proxy、Mediator亦可直接使用Facade对应的方法手动注册；由Facade处理事件流向。
 2. Command、Mediator一般作为业务处理器处理业务，Proxy为数据模型（比如作为数据库service层），Command、Mediator中可通过getProxy方法获得Proxy数据模型。
-3.
-
-Command只能监听注册到Facade中的事件，可多个事件注册同一个Command（也可理解为一个Command可监听多个事件），而Mediator则是监听多个自身感兴趣的事件，具体对哪些事件感兴趣则由listMessageInterests方法的返回值决定（总结：一个Command可以对应多个事件；一个事件可以对应多个Mediator，一个Mediator可以对应多个事件；一个事件可以同时对应多个Command和多个Mediator；Command为动态创建，但可池化，Mediator为全局唯一）；Command、Mediator是功能非常相似的事件监听器和事件派发器。
-
+3. Command只能监听注册到Facade中的事件，可多个事件注册同一个Command（也可理解为一个Command可监听多个事件），而Mediator则是监听多个自身感兴趣的事件，具体对哪些事件感兴趣则由listMessageInterests方法的返回值决定（总结：一个Command可以对应多个事件；一个事件可以对应多个Mediator，一个Mediator可以对应多个事件；一个事件可以同时对应多个Command和多个Mediator；Command为动态创建，但可池化，Mediator为全局唯一）；Command、Mediator是功能非常相似的事件监听器和事件派发器。
 4. Command、Proxy、Mediator中都能通过sendMessage方法向外派发事件，也可在此框架之外直接使用Facade实例调用sendMessage派发事件。
 5. 此框架的事件数据类型尽可能的使用int和String。
 6. Facade实例在调用initThreadPool方法配置了线程池的情况下，Facade、Command、Proxy、Mediator的sendMessage都将直接支持异步派发事件，默认为同步。
@@ -52,7 +46,7 @@ Command只能监听注册到Facade中的事件，可多个事件注册同一个C
 基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords ，游戏体验地址 http://101.34.22.36:8080/ ，
 癞子玩法不支持机器人，需要开三个标签页，并需在匹配时间段（5秒）内同时进入游戏。
 
-### 以下范例均在 jdk-17.0.3.1 测试运行，亦可运行在jdk8以上
+### 运行时最低要求jdk8+，以下范例均在 jdk-17.0.3.1 测试运行
 
 ```java
 import com.kaka.Startup;
