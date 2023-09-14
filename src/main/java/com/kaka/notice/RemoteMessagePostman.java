@@ -15,8 +15,8 @@ abstract public class RemoteMessagePostman {
 
     protected Facade facade;
     protected final RemoteMessageCache remoteMessageCache;
-    protected final String cmd_event_handler; //收到远端事件数据后处理事件
-    protected final String cmd_event_result_handler; //收到远端事件处理后的结果给本地缓存的事件赋值处理结果
+    protected final String event_topic; //收到远端事件数据后处理事件
+    protected final String event_result_topic; //收到远端事件处理后的结果给本地缓存的事件赋值处理结果
 
     /**
      * 处理远端事件
@@ -34,7 +34,7 @@ abstract public class RemoteMessagePostman {
         public void handleMessage(Message msg) {
             RemoteMessage remoteMessage = (RemoteMessage) msg;
             String cmd = msg.getWhat().toString();
-            if (this.postman.cmd_event_handler.equals(cmd)) {
+            if (this.postman.event_topic.equals(cmd)) {
                 //接收远端事件并执行事件处理逻辑
                 String id = remoteMessage.id;
                 Message localEventMessage = this.postman.remoteMessageCache.remove(id);
@@ -46,12 +46,12 @@ abstract public class RemoteMessagePostman {
                 Message remoteEventMessage = (Message) remoteMessage.getBody();
                 this.sendMessage(remoteEventMessage);
                 if (remoteEventMessage.resultMap != null && !remoteEventMessage.resultMap.isEmpty()) {
-                    remoteMessage.what = this.postman.cmd_event_result_handler;
+                    remoteMessage.what = this.postman.event_result_topic;
                     this.postman.sendRemoteMessage(remoteMessage);
                 }
                 return;
             }
-            if (this.postman.cmd_event_result_handler.equals(cmd)) {
+            if (this.postman.event_result_topic.equals(cmd)) {
                 //事件消息发送方接收到来自远端的处理结果
                 String id = remoteMessage.id;
                 Message remoteEventMessage = (Message) remoteMessage.getBody();
@@ -77,20 +77,20 @@ abstract public class RemoteMessagePostman {
 
         @Override
         public Object[] listMessageInterests() {
-            return new Object[]{this.postman.cmd_event_handler, this.postman.cmd_event_result_handler};
+            return new Object[]{this.postman.event_topic, this.postman.event_result_topic};
         }
     }
 
     /**
      * 构造方法
      *
-     * @param cmd_event_handler        收到远端事件数据后处理事件
-     * @param cmd_event_result_handler 收到远端事件处理后的结果给本地缓存的事件赋值处理结果
+     * @param event_topic        收到远端事件数据后处理事件
+     * @param event_result_topic 收到远端事件处理后的结果给本地缓存的事件赋值处理结果
      */
-    public RemoteMessagePostman(String cmd_event_handler, String cmd_event_result_handler) {
+    public RemoteMessagePostman(String event_topic, String event_result_topic) {
         this.remoteMessageCache = this.initRemoteMessageCache();
-        this.cmd_event_handler = cmd_event_handler;
-        this.cmd_event_result_handler = cmd_event_result_handler;
+        this.event_topic = event_topic;
+        this.event_result_topic = event_result_topic;
     }
 
     /**

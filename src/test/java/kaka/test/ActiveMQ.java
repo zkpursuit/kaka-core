@@ -76,7 +76,7 @@ public class ActiveMQ extends RemoteMessagePostman {
     private void init() {
         new Thread(() -> {
             try {
-                consume(cmd_event_handler, (byte[] bytes) -> {
+                consume(event_topic, (byte[] bytes) -> {
                     RemoteMessage remoteMessage = eventSerializer.deserialize(bytes);
                     facade.sendMessage(remoteMessage); //这里很重要，必须调用
                 });
@@ -86,7 +86,7 @@ public class ActiveMQ extends RemoteMessagePostman {
         }).start();
         new Thread(() -> {
             try {
-                consume(cmd_event_result_handler, (byte[] bytes) -> {
+                consume(event_result_topic, (byte[] bytes) -> {
                     RemoteMessage remoteMessage = eventSerializer.deserialize(bytes);
                     facade.sendMessage(remoteMessage); //这里很重要，必须调用
                 });

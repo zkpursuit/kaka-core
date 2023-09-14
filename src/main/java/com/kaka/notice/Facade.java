@@ -694,7 +694,7 @@ public class Facade implements INotifier {
     @Override
     public void sendRemoteMessage(Message msg) {
         if (this.remoteMessagePostman == null) {
-            throw new RuntimeException(String.format("执行sendMessageByQueue前请先调用 %s.initRemoteMessagePostman方法初始化", this.getClass().toString()));
+            throw new RuntimeException(String.format("执行sendRemoteMessage前请先调用 %s.initRemoteMessagePostman方法初始化", this.getClass().toString()));
         }
         Map<Object, IResult> msgResultMap = msg.resultMap;
         Message mqMsg = new Message(msg.getWhat(), msg.getBody());
@@ -707,7 +707,7 @@ public class Facade implements INotifier {
             });
         }
         this.remoteMessagePostman.remoteMessageCache.add(id, msg);
-        RemoteMessage remoteMessage = new RemoteMessage(this.remoteMessagePostman.cmd_event_handler, id, mqMsg);
+        RemoteMessage remoteMessage = new RemoteMessage(this.remoteMessagePostman.event_topic, id, mqMsg);
         this.remoteMessagePostman.sendRemoteMessage(remoteMessage);
     }
 
