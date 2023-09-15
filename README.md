@@ -1,14 +1,42 @@
-# kaka-core
+<h1 style="text-align:center;">
+  kaka-core
+</h1>
+<p style="text-align:center;">
+	<strong>基于事件驱动的领域模型框架</strong>
+</p>
+
+<p style="text-align:center;">
+    <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0.txt">
+		<img src="https://img.shields.io/:license-Apache2-blue.svg" alt="Apache 2" />
+	</a>
+    <a target="_blank" href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
+		<img src="https://img.shields.io/badge/JDK8+-green.svg" alt="JDK8+" />
+	</a>
+    <br />
+    <a target="_blank" href='https://gitee.com/zkpursuit/kaka-core/stargazers'>
+        <img src='https://gitee.com/zkpursuit/kaka-core/badge/star.svg' alt='gitee star'/>
+    </a>
+    <a target="_blank" href='https://github.com/zkpursuit/kaka-core/stargazers'>
+        <img src="https://img.shields.io/github/stars/zkpursuit/kaka-core.svg?logo=github" alt="github star"/>
+    </a>
+</p>
+
+<p style="text-align:center;">
+	<img src="https://img.shields.io/badge/QQ交流群-801241310-orange" alt="help"/>
+    <img src="https://img.shields.io/badge/答疑交流（微信）-zkpursuit-blue" alt="help"/>
+</p>
+
+<hr />
 
 #### 介绍
 
-模块为全局事件驱动框架，无任何第三方依赖；支持同步或者异步获取事件处理结果；可解耦业务，简化程序复杂性，提高代码可读性，降低开发维护成本。
+模块为全局事件驱动框架，无任何第三方依赖；支持同步或者异步获取事件处理结果；支持对接第三方消息队列；可解耦业务，简化程序复杂性，提高代码可读性，降低开发维护成本。
 
 #### 软件架构
 
-基于观察者和命令模式，
+基于观察者和命令模式
 
-#### 安装教程
+#### 安装使用
 
 ```xml
 
@@ -41,9 +69,8 @@
 14. 使用第三方消息队列消费事件并处理时，返回处理结果可如在本地执行后通过AsynResult或者异步回调获取执行结果。
 15. 对接第三方消息队列时，稳定性完全由第三方消息队列决定。
 
-### 如有疑问可添加微信 zkpursuit 咨询。
-
-基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords ，游戏体验地址 http://101.34.22.36:8080/ ，
+基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords
+，游戏体验地址 http://101.34.22.36:8080/ ，
 癞子玩法不支持机器人，需要开三个标签页，并需在匹配时间段（5秒）内同时进入游戏。
 
 ### 运行时最低要求jdk8+，以下范例均在 jdk-17.0.3.1 测试运行
