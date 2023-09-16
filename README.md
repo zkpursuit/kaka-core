@@ -1,11 +1,11 @@
-<h1 style="text-align:center;">
+<h1 align="center" style="text-align:center;">
   kaka-core
 </h1>
-<p style="text-align:center;">
+<p align="center" style="text-align:center;">
 	<strong>基于事件驱动的领域模型框架</strong>
 </p>
 
-<p style="text-align:center;">
+<p align="center" style="text-align:center;">
     <a target="_blank" href="https://www.apache.org/licenses/LICENSE-2.0.txt">
 		<img src="https://img.shields.io/:license-Apache2-blue.svg" alt="Apache 2" />
 	</a>
@@ -21,7 +21,7 @@
     </a>
 </p>
 
-<p style="text-align:center;">
+<p align="center" style="text-align:center;">
 	<img src="https://img.shields.io/badge/QQ交流群-801241310-orange" alt="help"/>
     <img src="https://img.shields.io/badge/答疑交流（微信）-zkpursuit-blue" alt="help"/>
 </p>
