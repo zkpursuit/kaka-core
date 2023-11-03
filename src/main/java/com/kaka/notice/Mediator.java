@@ -1,7 +1,9 @@
 package com.kaka.notice;
 
 /**
- * 消息观察者，感知有兴趣的消息通知
+ * 消息观察者，感知有兴趣的消息通知 <br>
+ * 以后可能更名，候选名称：<br>
+ * Multicaster
  *
  * @author zkpursuit
  */

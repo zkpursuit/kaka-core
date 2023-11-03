@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class StringUtils {
 
-    private static final char[] namechars = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
+    private static final char[] nameChars = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
 
     /**
      * 随机生成字符串
@@ -62,7 +62,7 @@ public class StringUtils {
      * @return 包含（A-Z）或（a-z）或（0-9）的字符串
      */
     public static String randomString(int count, boolean charRepeat) {
-        return randomString(namechars, count, charRepeat);
+        return randomString(nameChars, count, charRepeat);
     }
 
     /**
@@ -73,7 +73,7 @@ public class StringUtils {
      * @param with 替换的字符
      * @return 替换后的新字符串
      */
-    public static String replace(String s, String sub, String with) {
+    public static String replaceSub(String s, String sub, String with) {
         int c = 0;
         int i = s.indexOf(sub, c);
         if (i == -1) {
@@ -81,12 +81,12 @@ public class StringUtils {
         }
         StringBuilder buf = new StringBuilder(s.length() + with.length());
         do {
-            buf.append(s.substring(c, i));
+            buf.append(s, c, i);
             buf.append(with);
             c = i + sub.length();
         } while ((i = s.indexOf(sub, c)) != -1);
         if (c < s.length()) {
-            buf.append(s.substring(c, s.length()));
+            buf.append(s.substring(c));
         }
         return buf.toString();
     }
@@ -99,7 +99,7 @@ public class StringUtils {
      * @param args  被替换的字符串
      * @return 替换后的字符串
      */
-    public static String replace(String src, String regex, Object... args) {
+    public static String replaceByRegex(String src, String regex, Object... args) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(src);
         StringBuffer sb = new StringBuffer();
@@ -111,6 +111,18 @@ public class StringUtils {
         }
         matcher.appendTail(sb);
         return sb.toString();
+    }
+
+    /**
+     * 格式化字符串 <br>
+     * 将src字符串中的{}字符串依次替换为args中的值
+     *
+     * @param src  源字符串
+     * @param args 替换的新值列表
+     * @return 新的字符串
+     */
+    public static String format(String src, Object... args) {
+        return replaceByRegex(src, "\\{[ 0-9]*\\}", args);
     }
 
     /**
@@ -159,7 +171,7 @@ public class StringUtils {
 
     /**
      * kmp字符串查找算法 <br>
-     * 参考博文：https://www.cnblogs.com/ZuoAndFutureGirl/p/9028287.html <br>
+     * 参考博文：<a href="https://www.cnblogs.com/ZuoAndFutureGirl/p/9028287.html">...</a> <br>
      * 经jdk8上测试简单英文字符串匹配搜索100000+次，性能不及String原生indexOf算法
      *
      * @param src  源字符串
@@ -231,17 +243,6 @@ public class StringUtils {
     }
 
     /**
-     * 将src字符串中的{}字符串依次替换为args中的值
-     *
-     * @param src  源字符串
-     * @param args 替换的新值列表
-     * @return 新的字符串
-     */
-    public static String replace(String src, Object... args) {
-        return replace(src, "\\{[ 0-9]*\\}", args);
-    }
-
-    /**
      * 获取src中匹配{数字}正则规则的字符串集合
      *
      * @param src 源字符串
@@ -266,7 +267,7 @@ public class StringUtils {
         if (src == null) {
             return false;
         }
-        if ("".equals(src)) {
+        if (src.isEmpty()) {
             return false;
         }
         return intPattern.matcher(src).matches();
@@ -287,7 +288,7 @@ public class StringUtils {
         if (src == null) {
             return false;
         }
-        if ("".equals(src)) {
+        if (src.isEmpty()) {
             return false;
         }
         return numberPattern.matcher(src).matches();
@@ -303,7 +304,7 @@ public class StringUtils {
         if (src == null) {
             return false;
         }
-        return !"".equals(src);
+        return !src.isEmpty();
     }
 
     public static final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};

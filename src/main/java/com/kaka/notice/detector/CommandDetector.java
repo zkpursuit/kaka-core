@@ -34,21 +34,21 @@ public class CommandDetector implements IDetector {
         if (controllers.length == 0) {
             return false;
         }
-        for (Handler regist : controllers) {
-            Object cmd = regist.cmd();
-            Class<?> cmdCls = regist.type();
-            int priority = regist.priority();
+        for (Handler h : controllers) {
+            Object cmd = h.cmd();
+            Class<?> cmdCls = h.type();
+            int priority = h.priority();
             if (Command.class.isAssignableFrom(cls)) {
-                Facade facade = regist.context().equals("") ? FacadeFactory.getFacade() : FacadeFactory.getFacade(regist.context());
+                Facade facade = h.context().isEmpty() ? FacadeFactory.getFacade() : FacadeFactory.getFacade(h.context());
                 if (cmdCls != String.class) {
                     String cmdStr = String.valueOf(cmd);
                     if (StringUtils.isNumeric(cmdStr)) {
                         if (cmdCls == short.class || cmdCls == Short.class) {
-                            facade.registerCommand(Short.parseShort(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
+                            facade.registerCommand(Short.parseShort(cmdStr), (Class<Command>) cls, h.pooledSize(), priority);
                         } else if (cmdCls == int.class || cmdCls == Integer.class) {
-                            facade.registerCommand(Integer.parseInt(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
+                            facade.registerCommand(Integer.parseInt(cmdStr), (Class<Command>) cls, h.pooledSize(), priority);
                         } else if (cmdCls == long.class || cmdCls == Long.class) {
-                            facade.registerCommand(Long.parseLong(cmdStr), (Class<Command>) cls, regist.pooledSize(), priority);
+                            facade.registerCommand(Long.parseLong(cmdStr), (Class<Command>) cls, h.pooledSize(), priority);
                         }
                         if (facade.hasCommand("print_log")) {
                             facade.sendMessage(new Message("print_log", new Object[]{CommandDetector.class, new Object[]{cmdCls.getTypeName(), cmd, cls}}));
@@ -66,7 +66,7 @@ public class CommandDetector implements IDetector {
                                 }
                             }
                         }
-                        facade.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize(), priority);
+                        facade.registerCommand(cmd, (Class<Command>) cls, h.pooledSize(), priority);
                         if (facade.hasCommand("print_log")) {
                             Object[] eventArgs;
                             if (isEnum) {
@@ -78,7 +78,7 @@ public class CommandDetector implements IDetector {
                         }
                     }
                 } else {
-                    facade.registerCommand(cmd, (Class<Command>) cls, regist.pooledSize(), priority);
+                    facade.registerCommand(cmd, (Class<Command>) cls, h.pooledSize(), priority);
                     if (facade.hasCommand("print_log")) {
                         facade.sendMessage(new Message("print_log", new Object[]{CommandDetector.class, new Object[]{cmdCls.getTypeName(), cmd, cls}}));
                     }

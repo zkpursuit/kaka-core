@@ -11,11 +11,30 @@ import java.util.Set;
 abstract public class Proxy extends Notifier {
 
     public final String name;
+    public int priority;
 
     /**
      * 别名
      */
     private Set<String> aliasSet = null;
+
+    /**
+     * 设置优先级
+     *
+     * @param priority 优先级数值，数值越大表示优先级越高
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    /**
+     * 获取优先级，值越大表示越先被注册，此值默认依赖自动扫描注解中设定的优先级 <br>
+     *
+     * @return 优先级
+     */
+    public int getPriority() {
+        return priority;
+    }
 
     /**
      * 添加别名

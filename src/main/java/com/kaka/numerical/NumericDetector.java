@@ -59,8 +59,14 @@ public class NumericDetector extends PriorityDetector {
         list.forEach((element) -> {
             Class<?> cls = element.getClasz();
             Numeric numeric = element.getAnnotation();
-            Facade facade = numeric.context().equals("") ? FacadeFactory.getFacade() : FacadeFactory.getFacade(numeric.context());
-            facade.registerProxy((Class<? extends Proxy>) cls, numeric.src());
+            Facade facade = numeric.context().isEmpty() ? FacadeFactory.getFacade() : FacadeFactory.getFacade(numeric.context());
+            Proxy proxy;
+            if (numeric.ignoreCase()) {
+                proxy = facade.registerProxy((Class<? extends Proxy>) cls, numeric.src(), numeric.src().toLowerCase());
+            } else {
+                proxy = facade.registerProxy((Class<? extends Proxy>) cls, numeric.src());
+            }
+            proxy.setPriority(numeric.priority());
         });
         list.clear();
     }

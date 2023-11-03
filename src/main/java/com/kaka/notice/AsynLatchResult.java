@@ -19,11 +19,21 @@ public class AsynLatchResult<V> extends AsynResult<V> {
         this.cdl = new CountDownLatch(1);
     }
 
+    /**
+     * 内部调用，尽可能的防止锁嵌套，避免死锁
+     *
+     * @return 是否赋值结果
+     */
     @Override
     protected boolean _isDone() {
         return this.cdl.getCount() == 0;
     }
 
+    /**
+     * 结果是否处理完成
+     *
+     * @return true处理完成
+     */
     @Override
     public boolean isDone() {
         return this._isDone();

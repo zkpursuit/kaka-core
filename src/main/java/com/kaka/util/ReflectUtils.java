@@ -83,7 +83,7 @@ public final class ReflectUtils {
             return;
         }
         fieldName = fieldName.trim();
-        if (fieldName.length() == 0) {
+        if (fieldName.isEmpty()) {
             return;
         }
         String method_name = convertToMethodName(fieldName, obj.getClass(), true);

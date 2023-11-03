@@ -307,7 +307,7 @@ public final class Tool {
      * @return 满足为true
      */
     public static boolean fullYearOfLife(String idCard, int ageYear) {
-        if (idCard == null || "".equals(idCard)) {
+        if (idCard == null || idCard.isEmpty()) {
             return false;
         }
         String birthdayStr = idCard.substring(6, 14);
@@ -331,7 +331,7 @@ public final class Tool {
      * @return true为ip地址
      */
     public static boolean isIP(String addr) {
-        if (addr.length() < 7 || addr.length() > 15 || "".equals(addr)) {
+        if (addr.length() < 7 || addr.length() > 15) {
             return false;
         }
         Pattern pat = Pattern.compile(ipRegex);
@@ -397,7 +397,7 @@ public final class Tool {
         if (ipSegment == null) {
             throw new NullPointerException("IP段不能为空！");
         }
-        if (ipSegment.equals("")) {
+        if (ipSegment.isEmpty()) {
             throw new NullPointerException("IP段不能为空！");
         }
         String[] ips = ipSegment.split("-|,|;");
@@ -441,12 +441,7 @@ public final class Tool {
         long ip3 = ip & 0x0000FF00;
         ip3 = ip3 >> 8;
         long ip4 = ip & 0x000000FF;
-        StringBuilder sb = new StringBuilder();
-        sb.append(ip1).append('.');
-        sb.append(ip2).append('.');
-        sb.append(ip3).append('.');
-        sb.append(ip4);
-        return sb.toString();
+        return String.valueOf(ip1) + '.' + ip2 + '.' + ip3 + '.' + ip4;
     }
 
     /**
@@ -460,7 +455,7 @@ public final class Tool {
             return false;
         }
         url = url.trim();
-        if (url.equals("")) {
+        if (url.isEmpty()) {
             return false;
         }
         String strRegex = "^((https|http|ftp|rtsp|mms)?://)"
