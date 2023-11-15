@@ -107,7 +107,7 @@ public class StringUtils {
             if (!matcher.find()) {
                 break;
             }
-            matcher.appendReplacement(sb, String.valueOf(arg));
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(String.valueOf(arg)));
         }
         matcher.appendTail(sb);
         return sb.toString();
