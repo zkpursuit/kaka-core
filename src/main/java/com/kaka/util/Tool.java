@@ -268,20 +268,20 @@ public final class Tool {
     }
 
     /**
-     * 将两个整形数据转码为一个长整形数据
+     * 将两个32位整数合并为为一个64位整数
      *
-     * @param value1 将int的四个字节保存在前四位
-     * @param value2 将int的四个字节保存在后四位
-     * @return 转码后的长整形数据
+     * @param value1 32位整数
+     * @param value2 32位整数
+     * @return 64位整数
      */
     public static long merge(int value1, int value2) {
         return (((long) value1) << 32) + value2;
     }
 
     /**
-     * 按字节分割长整形数据为两个整形数据
+     * 从一个64位整数分离出两个32位整数
      *
-     * @param value 待分离的数字
+     * @param value 64位整数
      * @return 分离后的数字
      */
     public static int[] split(long value) {
@@ -289,7 +289,7 @@ public final class Tool {
     }
 
     /**
-     * 从参数数字中析出32位整数
+     * 从一个64位整数分离出一个32位整数
      *
      * @param value 64位整数
      * @param first 是否为第一个整数
@@ -297,6 +297,38 @@ public final class Tool {
      */
     public static int split(long value, boolean first) {
         return first ? (int) (value >> 32) : (int) ((value << 32) >> 32);
+    }
+
+    /**
+     * 将两个16位整数合并为为一个32位整数
+     *
+     * @param value1 16位整数
+     * @param value2 16位整数
+     * @return 32位整数
+     */
+    public static int merge(short value1, short value2) {
+        return (((int) value1) << 16) + value2;
+    }
+
+    /**
+     * 从一个32位整数分离出两个16位整数
+     *
+     * @param value 32位整数
+     * @return 分离后的数字
+     */
+    public static short[] split(int value) {
+        return new short[]{(short) (value >> 16), (short) ((value << 16) >> 16)};
+    }
+
+    /**
+     * 从参数数字中析出16位整数
+     *
+     * @param value 32位整数
+     * @param first 是否为第一个整数
+     * @return 16位整数
+     */
+    public static short split(int value, boolean first) {
+        return first ? (short) (value >> 16) : (short) ((value << 16) >> 16);
     }
 
     /**
