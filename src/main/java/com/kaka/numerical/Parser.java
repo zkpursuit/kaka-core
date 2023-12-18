@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,11 +51,11 @@ abstract public class Parser {
         String[] eles = att.elements();
         Class<? extends Converter> converterClass = att.converter();
         Converter<?> converter = converterClass == Converter.class ? null : ReflectUtils.newInstance(converterClass);
-        boolean isCollectionField = false;
+        int fieldType = 0; //字段类型，1为列表，2为map
         Class<?> filedTypeClass = field.getType();
         Object fieldValue = getFieldValue(object, field);
         if (Collection.class.isAssignableFrom(filedTypeClass)) {
-            isCollectionField = true;
+            fieldType = 1;
             if (fieldValue == null) {
                 if (filedTypeClass.isInterface() || Modifier.isAbstract(filedTypeClass.getModifiers())) {
                     if (java.util.SortedSet.class.isAssignableFrom(filedTypeClass)) {
@@ -89,11 +90,13 @@ abstract public class Parser {
                 }
                 setFieldValue(object, field, fieldValue);
             }
+        } else if (Map.class.isAssignableFrom(filedTypeClass)) {
+            fieldType = 2;
         }
         for (String confColName : eles) {
             confColName = confColName.trim().replaceAll(" ", "");
             String value = analyzer.getContent(confColName);
-            if (isCollectionField) {
+            if (fieldType == 1) {
                 Object resultValue = converter != null ? converter.transform(value) : null;
                 if (resultValue != null && fieldValue != null) {
                     Collection<Object> collection = (Collection<Object>) fieldValue;
@@ -107,6 +110,17 @@ abstract public class Parser {
                         }
                     } else {
                         collection.add(resultValue);
+                    }
+                }
+            } else if (fieldType == 2) {
+                Object resultValue = converter != null ? converter.transform(value) : null;
+                if (resultValue != null) {
+                    if (fieldValue == null) {
+                        setFieldValue(object, field, resultValue);
+                        fieldValue = resultValue;
+                    } else {
+                        Map map = (Map) fieldValue;
+                        map.putAll((Map) resultValue);
                     }
                 }
             } else {
