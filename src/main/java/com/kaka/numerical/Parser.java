@@ -1,7 +1,7 @@
 package com.kaka.numerical;
 
-import com.kaka.numerical.annotation.NumericField;
-import com.kaka.numerical.annotation.NumericField.Converter;
+import com.kaka.numerical.NumericField.BiConverter;
+import com.kaka.numerical.NumericField.Converter;
 import com.kaka.util.ArrayUtils;
 import com.kaka.util.ReflectUtils;
 
@@ -49,90 +49,104 @@ abstract public class Parser {
             return;
         }
         String[] eles = att.elements();
-        Class<? extends Converter> converterClass = att.converter();
-        Converter<?> converter = converterClass == Converter.class ? null : ReflectUtils.newInstance(converterClass);
-        int fieldType = 0; //字段类型，1为列表，2为map
-        Class<?> filedTypeClass = field.getType();
-        Object fieldValue = getFieldValue(object, field);
-        if (Collection.class.isAssignableFrom(filedTypeClass)) {
-            fieldType = 1;
-            if (fieldValue == null) {
-                if (filedTypeClass.isInterface() || Modifier.isAbstract(filedTypeClass.getModifiers())) {
-                    if (java.util.SortedSet.class.isAssignableFrom(filedTypeClass)) {
-                        fieldValue = new java.util.TreeSet<>();
-                    } else if (java.util.LinkedHashSet.class.isAssignableFrom(filedTypeClass)) {
-                        fieldValue = new java.util.LinkedHashSet<>();
-                    } else if (java.util.Set.class.isAssignableFrom(filedTypeClass)) {
-                        fieldValue = new java.util.HashSet<>();
-                    } else if (java.util.Stack.class.isAssignableFrom(filedTypeClass)) {
-                        fieldValue = new java.util.Stack<>();
-                    } else if (java.util.LinkedList.class.isAssignableFrom(filedTypeClass)) {
-                        fieldValue = new java.util.LinkedList<>();
-                    } else if (java.util.Queue.class.isAssignableFrom(filedTypeClass)) {
-                        fieldValue = new java.util.LinkedList<>();
-                    } else {
-                        fieldValue = new java.util.ArrayList<>();
-                    }
-                } else {
-                    Constructor<?>[] constructors = filedTypeClass.getConstructors();
-                    for (Constructor<?> constructor : constructors) {
-                        int modifier = constructor.getModifiers();
-                        if (!Modifier.isPublic(modifier)) {
-                            continue;
-                        }
-                        int paramCount = constructor.getParameterCount();
-                        if (paramCount > 0) {
-                            continue;
-                        }
-                        fieldValue = constructor.newInstance();
-                        break;
-                    }
+        Class<? extends FieldConverter> converterClass = att.converter();
+        FieldConverter converter = converterClass == FieldConverter.class ? null : ReflectUtils.newInstance(converterClass);
+        if (converter == null) {
+            String value = analyzer.getContent(eles[0].trim().replaceAll(" ", ""));
+            setFieldValue(object, field, value);
+        } else if (converter instanceof BiConverter<?> biConverter) {
+            Object fieldValue = getFieldValue(object, field);
+            Class<?> fieldClass = field.getType();
+            for (String confColName : eles) {
+                confColName = confColName.trim().replaceAll(" ", "");
+                String value = analyzer.getContent(confColName);
+                Object resultValue = biConverter.transform(confColName, value, object, field);
+                if (fieldValue == null && resultValue != null && (resultValue.getClass() == fieldClass || fieldClass.isAssignableFrom(resultValue.getClass()))) {
+                    setFieldValue(object, field, resultValue);
+                    fieldValue = resultValue;
                 }
-                setFieldValue(object, field, fieldValue);
             }
-        } else if (Map.class.isAssignableFrom(filedTypeClass)) {
-            fieldType = 2;
-        }
-        for (String confColName : eles) {
-            confColName = confColName.trim().replaceAll(" ", "");
-            String value = analyzer.getContent(confColName);
-            if (fieldType == 1) {
-                Object resultValue = converter != null ? converter.transform(value) : null;
-                if (resultValue != null && fieldValue != null) {
-                    Collection<Object> collection = (Collection<Object>) fieldValue;
-                    if (resultValue.getClass().isArray()) {
-                        int len = ArrayUtils.getLength(resultValue);
-                        for (int i = 0; i < len; i++) {
-                            Object arrVal = ArrayUtils.get(resultValue, i);
-                            if (arrVal != null) {
-                                collection.add(arrVal);
-                            }
+        } else {
+            Converter<?> siConverter = (Converter<?>) converter;
+            int fieldType = 0; //字段类型，1为列表，2为map
+            Class<?> filedTypeClass = field.getType();
+            Object fieldValue = getFieldValue(object, field);
+            if (Collection.class.isAssignableFrom(filedTypeClass)) {
+                fieldType = 1;
+                if (fieldValue == null) {
+                    if (filedTypeClass.isInterface() || Modifier.isAbstract(filedTypeClass.getModifiers())) {
+                        if (java.util.SortedSet.class.isAssignableFrom(filedTypeClass)) {
+                            fieldValue = new java.util.TreeSet<>();
+                        } else if (java.util.LinkedHashSet.class.isAssignableFrom(filedTypeClass)) {
+                            fieldValue = new java.util.LinkedHashSet<>();
+                        } else if (java.util.Set.class.isAssignableFrom(filedTypeClass)) {
+                            fieldValue = new java.util.HashSet<>();
+                        } else if (java.util.Stack.class.isAssignableFrom(filedTypeClass)) {
+                            fieldValue = new java.util.Stack<>();
+                        } else if (java.util.LinkedList.class.isAssignableFrom(filedTypeClass)) {
+                            fieldValue = new java.util.LinkedList<>();
+                        } else if (java.util.Queue.class.isAssignableFrom(filedTypeClass)) {
+                            fieldValue = new java.util.LinkedList<>();
+                        } else {
+                            fieldValue = new java.util.ArrayList<>();
                         }
                     } else {
-                        collection.add(resultValue);
+                        Constructor<?>[] constructors = filedTypeClass.getConstructors();
+                        for (Constructor<?> constructor : constructors) {
+                            int modifier = constructor.getModifiers();
+                            if (!Modifier.isPublic(modifier)) {
+                                continue;
+                            }
+                            int paramCount = constructor.getParameterCount();
+                            if (paramCount > 0) {
+                                continue;
+                            }
+                            fieldValue = constructor.newInstance();
+                            break;
+                        }
                     }
+                    setFieldValue(object, field, fieldValue);
                 }
-            } else if (fieldType == 2) {
-                Object resultValue = converter != null ? converter.transform(value) : null;
-                if (resultValue != null) {
-                    if (fieldValue == null) {
-                        setFieldValue(object, field, resultValue);
-                        fieldValue = resultValue;
-                    } else {
-                        Map map = (Map) fieldValue;
-                        map.putAll((Map) resultValue);
+            } else if (Map.class.isAssignableFrom(filedTypeClass)) {
+                fieldType = 2;
+            }
+            for (String confColName : eles) {
+                confColName = confColName.trim().replaceAll(" ", "");
+                String value = analyzer.getContent(confColName);
+                if (fieldType == 1) {
+                    Object resultValue = siConverter.transform(value);
+                    if (resultValue != null && fieldValue != null) {
+                        Collection<Object> collection = (Collection<Object>) fieldValue;
+                        if (resultValue.getClass().isArray()) {
+                            int len = ArrayUtils.getLength(resultValue);
+                            for (int i = 0; i < len; i++) {
+                                Object arrVal = ArrayUtils.get(resultValue, i);
+                                if (arrVal != null) {
+                                    collection.add(arrVal);
+                                }
+                            }
+                        } else {
+                            collection.add(resultValue);
+                        }
                     }
-                }
-            } else {
-                if (converter == null) {
-                    setFieldValue(object, field, value);
+                } else if (fieldType == 2) {
+                    Object resultValue = siConverter.transform(value);
+                    if (resultValue != null) {
+                        if (fieldValue == null) {
+                            setFieldValue(object, field, resultValue);
+                            fieldValue = resultValue;
+                        } else {
+                            Map map = (Map) fieldValue;
+                            map.putAll((Map) resultValue);
+                        }
+                    }
                 } else {
-                    Object resultValue = converter.transform(value);
+                    Object resultValue = siConverter.transform(value);
                     if (resultValue != null) {
                         setFieldValue(object, field, resultValue);
                     }
+                    break;
                 }
-                break;
             }
         }
     }

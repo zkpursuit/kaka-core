@@ -1,4 +1,4 @@
-package com.kaka.numerical.annotation;
+package com.kaka.numerical;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

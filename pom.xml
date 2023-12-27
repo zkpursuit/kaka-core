@@ -6,14 +6,14 @@
 
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.9.4</version>
+    <version>5.9.5</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>An event driven framework</description>
     <url>https://github.com/zkpursuit/kaka-core</url>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
@@ -49,7 +49,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -135,8 +135,8 @@
                         <version>3.11.0</version>
                         <configuration>
                             <encoding>UTF-8</encoding>
-                            <source>8</source>
-                            <target>8</target>
+                            <source>17</source>
+                            <target>17</target>
                             <fork>true</fork>
                             <verbose>true</verbose>
                             <showWarnings>false</showWarnings>

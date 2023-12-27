@@ -4,7 +4,6 @@ import com.kaka.notice.Facade;
 import com.kaka.notice.FacadeFactory;
 import com.kaka.notice.Proxy;
 import com.kaka.notice.detector.PriorityDetector;
-import com.kaka.numerical.annotation.Numeric;
 import com.kaka.util.StringUtils;
 
 import java.util.ArrayList;
