@@ -10,8 +10,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.kaka.util.ReflectUtils.getFieldValue;
 import static com.kaka.util.ReflectUtils.setFieldValue;
@@ -22,11 +20,6 @@ import static com.kaka.util.ReflectUtils.setFieldValue;
  * @author zkpursuit
  */
 abstract public class Parser {
-
-    /**
-     * 日志记录
-     */
-    private static final Logger logger = Logger.getLogger(Parser.class.getTypeName());
 
     /**
      * 为对象的字段赋值
@@ -44,7 +37,7 @@ abstract public class Parser {
             try {
                 setFieldValue(object, field, value);
             } catch (Exception ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                throw new IllegalArgumentException(ex);
             }
             return;
         }
