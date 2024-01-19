@@ -41,19 +41,19 @@ abstract public class Parser {
             }
             return;
         }
-        String[] eles = att.elements();
+        String[] elements = att.elements();
         Class<? extends FieldConverter> converterClass = att.converter();
         FieldConverter converter = converterClass == FieldConverter.class ? null : ReflectUtils.newInstance(converterClass);
         if (converter == null) {
-            String value = analyzer.getContent(eles[0].trim().replaceAll(" ", ""));
+            String value = analyzer.getContent(elements[0].trim().replaceAll(" ", ""));
             setFieldValue(object, field, value);
         } else if (converter instanceof BiConverter<?> biConverter) {
             Object fieldValue = getFieldValue(object, field);
             Class<?> fieldClass = field.getType();
-            for (String confColName : eles) {
-                confColName = confColName.trim().replaceAll(" ", "");
-                String value = analyzer.getContent(confColName);
-                Object resultValue = biConverter.transform(confColName, value, object, field);
+            for (int i = 0; i < elements.length; i++) {
+                String element = elements[i].trim();
+                String value = analyzer.getContent(element);
+                Object resultValue = biConverter.transform(element, value, i, elements.length, object, field);
                 if (fieldValue == null && resultValue != null && (resultValue.getClass() == fieldClass || fieldClass.isAssignableFrom(resultValue.getClass()))) {
                     setFieldValue(object, field, resultValue);
                     fieldValue = resultValue;
@@ -103,9 +103,9 @@ abstract public class Parser {
             } else if (Map.class.isAssignableFrom(filedTypeClass)) {
                 fieldType = 2;
             }
-            for (String confColName : eles) {
-                confColName = confColName.trim().replaceAll(" ", "");
-                String value = analyzer.getContent(confColName);
+            for (String element : elements) {
+                element = element.trim();
+                String value = analyzer.getContent(element);
                 if (fieldType == 1) {
                     Object resultValue = siConverter.transform(value);
                     if (resultValue != null && fieldValue != null) {

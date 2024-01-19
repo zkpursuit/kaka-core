@@ -3,7 +3,8 @@ package com.kaka.util;
 import com.kaka.util.ObjectPool.Poolable;
 
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Function;
 
 /**
  * 对象池
@@ -46,13 +47,26 @@ abstract public class ObjectPool<T extends Poolable> {
     }
 
     /**
+     * 构造方法
+     *
+     * @param max             对象池中可缓存的最大池化对象
+     * @param initQueueAction 初始化队列回调函数，当为null时使用initQueue方法初始化队列
+     */
+    public ObjectPool(int max, Function<Integer, Queue<T>> initQueueAction) {
+        this.max = max;
+        if (this.max > 0) {
+            freeObjects = initQueueAction != null ? initQueueAction.apply(max) : initQueue(max);
+        }
+    }
+
+    /**
      * 初始化对象池存储队列
      *
      * @param initialCapacity 队列初始化大小
      * @return 对象池队列
      */
     protected Queue<T> initQueue(int initialCapacity) {
-        return new ConcurrentLinkedQueue<>();
+        return new LinkedBlockingQueue<>(initialCapacity);
     }
 
     /**
@@ -87,8 +101,7 @@ abstract public class ObjectPool<T extends Poolable> {
         if (freeObjects != null) {
             int idleCount = freeObjects.size();
             if (idleCount < max) {
-                freeObjects.add(object);
-                peak = Math.max(peak, idleCount + 1);
+                this.peak = freeObjects.add(object) ? Math.max(peak, idleCount + 1) : Math.max(peak, idleCount);
             }
         }
     }

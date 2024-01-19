@@ -6,7 +6,7 @@
 
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.9.6</version>
+    <version>5.9.7</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>An event driven framework</description>
     <url>https://github.com/zkpursuit/kaka-core</url>

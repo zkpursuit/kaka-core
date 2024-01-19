@@ -52,12 +52,14 @@ public @interface NumericField {
          * 将字符串数据转换为字段定义类型 <br>
          * 需要主动使用反射功能赋值，此方法可用于将多个数值表字段合并为一个对象
          *
-         * @param title     数值表字段名
-         * @param value     数值表字段值
-         * @param pojo      数值表映射的JavaBean对象
-         * @param pojoField JavaBean对象中的字段
+         * @param title         数值表字段名，为{@link NumericField}.elements中的值
+         * @param value         数值表字段值
+         * @param elementIndex  当前元素索引，其中的“元素”为：{@link NumericField}.elements
+         * @param elementTotals 总元素数量，其中的“元素”为：{@link NumericField}.elements
+         * @param pojo          数值表映射的JavaBean对象
+         * @param pojoField     JavaBean对象中的字段
          */
-        T transform(String title, String value, Object pojo, Field pojoField);
+        T transform(String title, String value, int elementIndex, int elementTotals, Object pojo, Field pojoField);
     }
 
 }

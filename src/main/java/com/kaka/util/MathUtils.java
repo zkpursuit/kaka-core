@@ -1,9 +1,6 @@
 package com.kaka.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -350,9 +347,8 @@ public final class MathUtils {
                     || (linePointY1 > rectangleLeftTopY && linePointY2 > rectangleLeftTopY)
                     || (linePointY1 < rectangleRightBottomY && linePointY2 < rectangleRightBottomY)) {
                 return false;
-            } else {
-                return true;
             }
+            return true;
         } else {
             return false;
         }
@@ -855,8 +851,7 @@ public final class MathUtils {
         if (rate >= total) {
             return true;
         }
-        float hitValue = MathUtils.random(total);
-        return hitValue <= rate;
+        return MathUtils.random(total) <= rate;
     }
 
     /**
@@ -870,31 +865,36 @@ public final class MathUtils {
         for (int rate : rates) {
             totals += rate;
         }
-        //取[1, totals]闭区间中的一个随机数
-        double randomPoint = MathUtils.random(1, totals);
+        //取[1, totals)区间中的一个随机数
+        double randomPoint = MathUtils.random(0, totals - 1);
         for (int i = 0; i < rates.length; i++) {
             if (randomPoint < rates[i]) {
                 return i;
-            } else {
-                randomPoint -= rates[i];
             }
+            randomPoint -= rates[i];
         }
         return rates.length - 1;
     }
 
-    static public int hitProbability(Random random, int[] rates) {
+    /**
+     * 概率命中算法
+     *
+     * @param random 随机数发生器
+     * @param rates  各种概率值
+     * @return 命中的索引位置
+     */
+    public static int hitProbability(Random random, int[] rates) {
         int totals = 0;
         for (int rate : rates) {
             totals += rate;
         }
-        //取[1, totals]闭区间中的一个随机数
-        double randomPoint = random(random, 1, totals);
+        //取[1, totals)区间中的一个随机数
+        double randomPoint = random(random, 0, totals - 1);
         for (int i = 0; i < rates.length; i++) {
             if (randomPoint < rates[i]) {
                 return i;
-            } else {
-                randomPoint -= rates[i];
             }
+            randomPoint -= rates[i];
         }
         return rates.length - 1;
     }
@@ -910,14 +910,36 @@ public final class MathUtils {
         for (double rate : rates) {
             totals += rate;
         }
-        //取[0, totals]之间的随机数
+        //取[0, totals)之间的随机数
         double randomPoint = getRandom().nextDouble() * totals;
         for (int i = 0; i < rates.length; i++) {
             if (randomPoint < rates[i]) {
                 return i;
-            } else {
-                randomPoint -= rates[i];
             }
+            randomPoint -= rates[i];
+        }
+        return rates.length - 1;
+    }
+
+    /**
+     * 概率命中算法
+     *
+     * @param random 随机数发生器
+     * @param rates  各种概率值
+     * @return 命中的索引位置
+     */
+    public static int hitProbability(Random random, double[] rates) {
+        double totals = 0d;
+        for (double rate : rates) {
+            totals += rate;
+        }
+        //取[0, totals)之间的随机数
+        double randomPoint = random.nextDouble() * totals;
+        for (int i = 0; i < rates.length; i++) {
+            if (randomPoint < rates[i]) {
+                return i;
+            }
+            randomPoint -= rates[i];
         }
         return rates.length - 1;
     }
@@ -974,7 +996,6 @@ public final class MathUtils {
                 double rty = tx * sin + ty * cos;
                 rx += Math.abs(rtx);                //再反向平移
                 ry += Math.abs(rty);
-
                 int _x = (int) Math.round(rx);
                 int _y = (int) Math.round(ry);
                 _x = Math.abs(_x);
@@ -997,6 +1018,28 @@ public final class MathUtils {
             throw new IllegalArgumentException("angle角度参数必须能整除90");
         }
         return rotate(matrix, angle, null);
+    }
+
+    /**
+     * 二维矩阵旋转90度
+     *
+     * @param matrix        二维矩阵（二维数组）
+     * @param anticlockwise true表示是否逆时针旋转，false表示顺时针旋转
+     * @return 旋转后的新矩阵
+     */
+    public static int[][] rotate90(int[][] matrix, boolean anticlockwise) {
+        int m = matrix.length, n = matrix[0].length;
+        int[][] rotated = new int[n][m];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (anticlockwise) {
+                    rotated[n - 1 - j][i] = matrix[i][j];
+                } else {
+                    rotated[j][m - 1 - i] = matrix[i][j];
+                }
+            }
+        }
+        return rotated;
     }
 
     /**
@@ -1164,6 +1207,16 @@ public final class MathUtils {
 //
 //        result = knapsack(new int[]{1, 5, 8, 9, 10, 17, 17, 20, 24, 30}, new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 30);
 //        System.out.println(Arrays.deepToString(result.toArray()));
+
+//        int[][] a = new int[][]{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}};
+//        System.out.println("--------------------------------");
+//        for (int[] subArr : a) {
+//            System.out.println(Arrays.toString(subArr));
+//        }
+//        a = MathUtils.rotate90(a, false);
+//        for (int[] subArr : a) {
+//            System.out.println(Arrays.toString(subArr));
+//        }
 //    }
 
 }
