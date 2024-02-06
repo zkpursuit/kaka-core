@@ -10,42 +10,29 @@ import java.util.function.Consumer;
  */
 public class IOUtils {
 
-    public static final int bufferSize = 64 * 1024;
+    public static final int bufferSize = 4 * 1024;
+    public static final int EOF = -1;
 
     /**
-     * 从输入流中读取字节数据
+     * 从输入流中读取字节放入目标输出流
      *
-     * @param in      输入流
-     * @param dest    目标字节数组，存储输入流中的字节数据
-     * @param destPos 存入目标字节数组时的起始位置
-     * @param length  从输入流中读取字节的数量
+     * @param in     输入流
+     * @param output 目标输出流
      * @return 字节数组
      * @throws IOException 数据流访问异常
      */
-    public static int readBytes(InputStream in, byte[] dest, int destPos, int length) throws IOException {
+    public static long readBytes(final InputStream in, final OutputStream output) throws IOException {
         if (in == null) {
             return -1;
         }
-        if (length == 0) {
-            return -1;
+        byte[] buffer = new byte[bufferSize];
+        long count = 0;
+        int n;
+        while (EOF != (n = in.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
         }
-        int c = in.read();
-        if (c == -1) {
-            return -1;
-        }
-        dest[destPos] = (byte) c;
-        int i = 1;
-        try {
-            for (; i < length; i++) {
-                c = in.read();
-                if (c == -1) {
-                    break;
-                }
-                dest[destPos + i] = (byte) c;
-            }
-        } catch (IOException ee) {
-        }
-        return i;
+        return count;
     }
 
     /**
@@ -56,32 +43,10 @@ public class IOUtils {
      * @throws IOException 数据流访问异常
      */
     public static byte[] readBytes(final InputStream in) throws IOException {
-        return readBytes(in, bufferSize);
-    }
-
-    /**
-     * 从输入流中读取字节数据
-     *
-     * @param input 输入流
-     * @param size  预估大小
-     * @return 字节数组
-     * @throws IOException 数据流访问异常
-     */
-    public static byte[] readBytes(final InputStream input, final int size) throws IOException {
-        if (size < 0) {
-            throw new IllegalArgumentException("Size must be equal or greater than zero: " + size);
+        try (final ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            readBytes(in, output);
+            return output.toByteArray();
         }
-        if (size == 0) {
-            return new byte[0];
-        }
-        byte[] bytes = new byte[size];
-        int count = readBytes(input, bytes, 0, size);
-        if (size > count) {
-            byte[] newBytes = new byte[count];
-            System.arraycopy(bytes, 0, newBytes, 0, count);
-            return newBytes;
-        }
-        return bytes;
     }
 
     /**
