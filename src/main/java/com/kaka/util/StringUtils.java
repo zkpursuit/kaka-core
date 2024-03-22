@@ -553,9 +553,9 @@ public class StringUtils {
         return null;
     }
 
-    public static void main(String[] args) {
-        System.out.println(getMaxSubstring("dsafjdsafdf3qewrdf", "rrqrewqfjdsafdf3qewjdlfaj"));
-        System.out.println(getMaxSubstring("ab", "b"));
-    }
+//    public static void main(String[] args) {
+//        System.out.println(getMaxSubstring("dsafjdsafdf3qewrdf", "rrqrewqfjdsafdf3qewjdlfaj"));
+//        System.out.println(getMaxSubstring("ab", "b"));
+//    }
 
 }
