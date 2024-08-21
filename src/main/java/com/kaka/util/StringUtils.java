@@ -2,9 +2,7 @@ package com.kaka.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,13 +18,15 @@ public class StringUtils {
     /**
      * 随机生成字符串
      *
-     * @param chars      字符数组
+     * @param random     随机数发生器
+     * @param chars      字符数组，为null时使用默认字符数组
      * @param count      字符串字符个数
      * @param charRepeat 是否允许字符串中有重复字符，true为可以有重复字符
      * @return 随机的字符串
      */
-    public static String randomString(char[] chars, int count, boolean charRepeat) {
+    public static String randomString(Random random, char[] chars, int count, boolean charRepeat) {
         StringBuilder sb = new StringBuilder();
+        chars = chars == null ? nameChars : chars;
         int len = chars.length - 1;
         int index;
         char c;
@@ -34,7 +34,7 @@ public class StringUtils {
         while (ci < count) {
             if (!charRepeat) {
                 do {
-                    c = chars[MathUtils.getRandom().nextInt(len)];
+                    c = chars[random.nextInt(len)];
                     int length = sb.length();
                     index = -1;
                     for (int i = 0; i < length; i++) {
@@ -52,6 +52,30 @@ public class StringUtils {
             ci++;
         }
         return sb.toString();
+    }
+
+    /**
+     * 随机生成字符串
+     *
+     * @param chars      字符数组，为null时使用默认字符数组
+     * @param count      字符串字符个数
+     * @param charRepeat 是否允许字符串中有重复字符，true为可以有重复字符
+     * @return 随机的字符串
+     */
+    public static String randomString(char[] chars, int count, boolean charRepeat) {
+        return randomString(MathUtils.getRandom(), chars, count, charRepeat);
+    }
+
+    /**
+     * 随机生成字符串
+     *
+     * @param random     随机数发生器
+     * @param count      字符串字符个数
+     * @param charRepeat 是否允许字符串中有重复字符，true为可以有重复字符
+     * @return 随机的字符串
+     */
+    public static String randomString(Random random, int count, boolean charRepeat) {
+        return randomString(random, nameChars, count, charRepeat);
     }
 
     /**
@@ -102,7 +126,7 @@ public class StringUtils {
     public static String replaceByRegex(String src, String regex, Object... args) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(src);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Object arg : args) {
             if (!matcher.find()) {
                 break;
@@ -132,7 +156,7 @@ public class StringUtils {
      * @param count  位数
      * @return count位字符串
      */
-    public static String repairZeroToFirst(int number, int count) {
+    public static String leftPadZero(long number, int count) {
         return String.format("%0" + count + "d", number);
     }
 
@@ -143,8 +167,13 @@ public class StringUtils {
      * @param count  位数
      * @return count位字符串
      */
-    public static String repairZeroToLast(int number, int count) {
-        return String.format("%1$0" + count + "d", number);
+    public static String rightPadZero(long number, int count) {
+        String v = String.valueOf(number);
+        if (v.length() >= count) return v;
+        int offset = count - v.length();
+        char[] chars = new char[offset];
+        Arrays.fill(chars, '0');
+        return v + new String(chars);
     }
 
     private static void getNextVal(char[] p, int[] next) {
@@ -255,7 +284,7 @@ public class StringUtils {
     /**
      * 是否为数字的正则
      */
-    private final static Pattern intPattern = Pattern.compile("^(\\-|\\+)?[0-9]*$");
+    private final static Pattern intPattern = Pattern.compile("^([-+])?[0-9]*$");
 
     /**
      * 判断字符串是否为纯整型数字
@@ -276,7 +305,7 @@ public class StringUtils {
     /**
      * 是否为数字的正则
      */
-    private final static Pattern numberPattern = Pattern.compile("^(\\-|\\+)?[0-9]*(\\.[0-9]*)?$");
+    private final static Pattern numberPattern = Pattern.compile("^([-+])?[0-9]*(\\.[0-9]*)?$");
 
     /**
      * 判断字符串是否为数字
@@ -364,7 +393,7 @@ public class StringUtils {
      * @param toDigits 基础编码数据
      * @return 编码后的字符数组
      */
-    public static char[] encodeByteToHex(final byte[] data, final char[] toDigits) {
+    public static char[] encodeHex(final byte[] data, final char[] toDigits) {
         final int len = data.length;
         final char[] out = new char[len << 1];
         //两个字符构成十六进制值。
@@ -381,18 +410,8 @@ public class StringUtils {
      * @param data 字节数组
      * @return 编码后的字符数组
      */
-    public static char[] encodeByteToHex(final byte[] data) {
-        return encodeByteToHex(data, DIGITS_UPPER);
-    }
-
-    /**
-     * 编码字节数组为16进制字符
-     *
-     * @param data 字节数组
-     * @return 编码后的字符串
-     */
-    public static String encodeByteToHexString(final byte[] data) {
-        return new String(encodeByteToHex(data));
+    public static char[] encodeHex(final byte[] data) {
+        return encodeHex(data, DIGITS_UPPER);
     }
 
     /**
@@ -401,7 +420,7 @@ public class StringUtils {
      * @param data 字符数组
      * @return 字节数组
      */
-    public static byte[] decodeHexToByte(final char[] data) {
+    public static byte[] decodeHex(final char[] data) {
         final int len = data.length;
         if ((len & 0x01) != 0) {
             throw new IllegalArgumentException("字符数组长度必然为偶数。");
@@ -423,8 +442,8 @@ public class StringUtils {
      * @param data 字符串
      * @return 字节数组
      */
-    public static byte[] decodeHexToByte(final String data) {
-        return decodeHexToByte(data.toCharArray());
+    public static byte[] decodeHex(final String data) {
+        return decodeHex(data.toCharArray());
     }
 
     /**

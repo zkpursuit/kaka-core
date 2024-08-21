@@ -145,7 +145,7 @@ public final class Tool {
         for (NetworkInterface ni : nis) {
             byte[] bytes = ni.getHardwareAddress();
             if (bytes != null) {
-                return new String(StringUtils.encodeByteToHex(bytes));
+                return new String(StringUtils.encodeHex(bytes));
             }
         }
         return null;

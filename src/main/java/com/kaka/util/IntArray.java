@@ -15,7 +15,7 @@ public class IntArray implements Serializable {
 
     int[] items;
     int size;
-    private boolean ordered;
+    private final boolean ordered;
 
     /**
      * Creates an ordered array with a capacity of 16.

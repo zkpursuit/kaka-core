@@ -41,7 +41,7 @@ public final class MathUtils {
     }
 
     /**
-     * 获取高强度随机数生成器
+     * 获取高强度随机数生成器，云服务器或docker中可能报错
      *
      * @return 高强度随机数生成器
      */
@@ -73,9 +73,11 @@ public final class MathUtils {
      */
     static public int random(Random random, int start, int end) {
         if (random == null) {
-            return (int) (Math.random() * (end - start + 1)) + start;
+            //return (int) (Math.random() * (end - start + 1)) + start;
+            //return start + getRandom().nextInt(end - start + 1);
+            return getRandom().nextInt(start, end + 1);
         }
-        return start + random.nextInt(end - start + 1);
+        return random.nextInt(start, end + 1);
     }
 
     /**
@@ -99,9 +101,10 @@ public final class MathUtils {
      */
     static public long random(Random random, long start, long end) {
         if (random == null) {
-            return (long) (Math.random() * (end - start + 1)) + start;
+            //return (long) (Math.random() * (end - start + 1)) + start;
+            return getRandom().nextLong(start, end + 1);
         }
-        return start + (long) (random.nextDouble() * (end - start));
+        return random.nextLong(start, end + 1);
     }
 
     /**
@@ -116,18 +119,19 @@ public final class MathUtils {
     }
 
     /**
-     * 返回一个[start, end]之间的随机数
+     * 返回一个[start, end)之间的随机数
      *
      * @param random 随机发生器，可为null
-     * @param start  闭区间起始范围值
-     * @param end    闭区间结束范围值
+     * @param start  区间起始范围值
+     * @param end    区间结束范围值
      * @return 随机数
      */
     static public float random(Random random, float start, float end) {
         if (random == null) {
-            return (float) (Math.random() * (end - start + 1)) + start;
+            //return (float) (Math.random() * (end - start + 1)) + start;
+            return getRandom().nextFloat(start, end);
         }
-        return start + random.nextFloat() * (end - start);
+        return random.nextFloat(start, end);
     }
 
     /**
@@ -142,18 +146,20 @@ public final class MathUtils {
     }
 
     /**
-     * 返回一个[start, end]之间的随机数
+     * 返回一个[start, end)之间的随机数
      *
      * @param random 随机发生器，可为null
-     * @param start  闭区间起始范围值
-     * @param end    闭区间结束范围值
+     * @param start  区间起始范围值
+     * @param end    区间结束范围值
      * @return 随机数
      */
     static public double random(Random random, double start, double end) {
         if (random == null) {
-            return (Math.random() * (end - start + 1)) + start;
+            //return (Math.random() * (end - start + 1)) + start;
+            return getRandom().nextDouble(start, end);
         }
-        return start + random.nextFloat() * (end - start);
+        //return start + random.nextFloat() * (end - start);
+        return random.nextDouble(start, end);
     }
 
     /**
@@ -175,11 +181,7 @@ public final class MathUtils {
      * @return true命中
      */
     public static boolean isHitProbability(Random random, float rate, float total) {
-        if (rate >= total) {
-            return true;
-        }
-        double r = random == null ? Math.random() * total : random.nextDouble() * total;
-        return (float) r <= rate;
+        return rate >= total || random(random, 0, total) <= rate;
     }
 
     /**
@@ -201,12 +203,12 @@ public final class MathUtils {
      * @return 命中的索引位置
      */
     public static int hitProbability(Random random, int[] rates) {
-        int totals = 0;
+        double totals = 0;
         for (int rate : rates) {
             totals += rate;
         }
         //取[1, totals)区间中的一个随机数
-        double randomPoint = random == null ? Math.random() * totals : random.nextDouble() * totals;
+        double randomPoint = random(random, 1d, totals);
         for (int i = 0; i < rates.length; i++) {
             if (randomPoint < rates[i]) {
                 return i;
@@ -239,7 +241,7 @@ public final class MathUtils {
             totals += rate;
         }
         //取[0, totals)之间的随机数
-        double randomPoint = random == null ? Math.random() * totals : random.nextDouble() * totals;
+        double randomPoint = random(random, totals <= 1 ? 0 : 1d, totals);
         for (int i = 0; i < rates.length; i++) {
             if (randomPoint < rates[i]) {
                 return i;

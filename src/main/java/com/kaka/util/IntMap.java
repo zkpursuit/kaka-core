@@ -17,11 +17,11 @@ import static com.kaka.util.MathUtils.nextPowerOfTwo;
 public class IntMap<V> implements Serializable {
     // primes for hash functions 2, 3, and 4
 
-    private transient static final int PRIME2 = 0xbe1f14b1;
-    private transient static final int PRIME3 = 0xb4b82e39;
-    private transient static final int PRIME4 = 0xced1c241;
-    private transient static final int EMPTY = 0;
-    static transient Random random = new Random();
+    private static final int PRIME2 = 0xbe1f14b1;
+    private static final int PRIME3 = 0xb4b82e39;
+    private static final int PRIME4 = 0xced1c241;
+    private static final int EMPTY = 0;
+    static Random random = new Random();
 
     private int size;
 
