@@ -9,10 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -89,8 +86,18 @@ abstract public class NumericConfig<T> extends Proxy {
                 ((AtomicBoolean) v).set(false);
             } else {
                 if (v.getClass().isArray()) {
-                    if (v instanceof int[]) {
+                    if (v instanceof boolean[]) {
+                        Arrays.fill((boolean[]) v, false);
+                    } else if (v instanceof short[]) {
+                        Arrays.fill((short[]) v, (short) 0);
+                    } else if (v instanceof int[]) {
                         Arrays.fill((int[]) v, 0);
+                    } else if (v instanceof long[]) {
+                        Arrays.fill((long[]) v, 0);
+                    } else if (v instanceof float[]) {
+                        Arrays.fill((float[]) v, 0);
+                    } else if (v instanceof double[]) {
+                        Arrays.fill((double[]) v, 0);
                     } else if (v instanceof Object[]) {
                         Arrays.fill((Object[]) v, null);
                     }

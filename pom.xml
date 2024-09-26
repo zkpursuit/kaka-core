@@ -6,7 +6,7 @@
 
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.9.9</version>
+    <version>5.9.10</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>An event driven framework</description>
     <url>https://github.com/zkpursuit/kaka-core</url>
@@ -131,6 +131,11 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.0.1</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <version>3.11.0</version>
                         <configuration>
@@ -142,34 +147,8 @@
                             <showWarnings>false</showWarnings>
                         </configuration>
                     </plugin>
-                    <!--                    <plugin>-->
-                    <!--                        <groupId>org.sonatype.plugins</groupId>-->
-                    <!--                        <artifactId>nexus-staging-maven-plugin</artifactId>-->
-                    <!--                        <version>1.6.7</version>-->
-                    <!--                        <extensions>true</extensions>-->
-                    <!--                        <configuration>-->
-                    <!--                            <serverId>snapshots</serverId>-->
-                    <!--                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>-->
-                    <!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
-                    <!--                        </configuration>-->
-                    <!--                    </plugin>-->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-release-plugin</artifactId>
-                        <version>3.0.1</version>
-                    </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>snapshots</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <gpg.executable>D:/Program Files/GnuPG/bin/gpg.exe</gpg.executable>
-                <gpg.passphrase>zhoukai217</gpg.passphrase>
-            </properties>
         </profile>
     </profiles>
     <build>
@@ -183,7 +162,6 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass></mainClass>
                         </manifest>
                     </archive>
                 </configuration>
