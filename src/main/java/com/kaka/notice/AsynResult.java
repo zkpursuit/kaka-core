@@ -98,7 +98,6 @@ public class AsynResult<V> implements IResult<V> {
      * @param timeout 超时时间
      * @param unit    超时时间类型
      * @return true 成功赋值处理结果
-     * @throws InterruptedException
      */
     private boolean await(long timeout, TimeUnit unit) throws InterruptedException {
         timeout = unit.toMillis(timeout);

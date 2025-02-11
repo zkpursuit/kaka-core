@@ -43,7 +43,7 @@
 <dependency>
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>5.9.9</version>
+    <version>6.0.0</version>
 </dependency>
 ```
 
@@ -70,10 +70,9 @@
 15. 对接第三方消息队列时，稳定性完全由第三方消息队列决定。
 
 基于此模型构建的斗地主开放源代码 https://gitee.com/zkpursuit/fight-against-landlords
-，游戏体验地址 http://101.34.22.36:8080/ ，
-癞子玩法不支持机器人，需要开三个标签页，并需在匹配时间段（5秒）内同时进入游戏。
 
-### 运行时最低要求jdk8+，以下范例均在 jdk-17.0.3.1 测试运行
+### 运行时最低要求jdk17+，以下范例均在 jdk-17.0.3.1 测试运行
+### 从6.0.0版本开始引入虚拟线程，故最低运行时要求jdk21+
 
 ```java
 import com.kaka.Startup;

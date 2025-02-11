@@ -622,6 +622,90 @@ public class Facade implements INotifier {
         }
     }
 
+    private void executeMediator(final Mediator mediator, final Message msg) {
+        mediator.handleMessage0(msg);
+        msg.callback(mediator.getClass().getTypeName());
+    }
+
+    private void executeListener(final IListener listener, final Message msg) {
+        listener.onMessage(msg, this);
+        msg.callback(listener.getClass().getTypeName());
+    }
+
+    /**
+     * 消息调度处理
+     *
+     * @param msg         待处理的消息
+     * @param executeType 消息执行类型
+     */
+    public void sendMessage(final Message msg, final Message.ExecuteType executeType) {
+        if (msg == null || msg.getWhat() == null) {
+            return;
+        }
+        if (executeType == Message.ExecuteType.ASYN_REMOTE_QUEUE) {
+            if (this.remoteMessagePostman == null) {
+                throw new RuntimeException(String.format("执行sendRemoteMessage前请先调用 %s.initRemoteMessagePostman方法初始化", this.getClass()));
+            }
+            Map<Object, IResult> msgResultMap = msg.resultMap;
+            Message mqMsg = new Message(msg.getWhat(), msg.getBody());
+            String id = NanoId.randomNanoId();
+            if (msgResultMap != null) {
+                msgResultMap.forEach((Object key, IResult result) -> {
+                    if (result instanceof AsynResult) {
+                        mqMsg.setResult((String) key, new RemoteAsynResult<>());
+                    }
+                });
+            }
+            this.remoteMessagePostman.remoteMessageCache.add(id, msg);
+            RemoteMessage remoteMessage = new RemoteMessage(this.remoteMessagePostman.event_topic, id, mqMsg);
+            this.remoteMessagePostman.sendRemoteMessage(remoteMessage);
+            return;
+        }
+        final CommandPoolSortedSet poolSet = cmdPoolMap.get(msg.getWhat());
+        if (poolSet != null) {
+            if (executeType == Message.ExecuteType.SYNC) {
+                execCommands(poolSet, msg);
+            } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
+                if (threadPool == null) {
+                    throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
+                }
+                threadPool.execute(() -> execCommands(poolSet, msg));
+            } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
+                Thread.ofVirtual().start(() -> execCommands(poolSet, msg));
+            }
+        }
+        final List<Mediator> mediatorList = cmdMediatorMap.get(msg.getWhat());
+        if (mediatorList != null) {
+            for (Mediator mediator : mediatorList) {
+                if (executeType == Message.ExecuteType.SYNC) {
+                    executeMediator(mediator, msg);
+                } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
+                    if (threadPool == null) {
+                        throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
+                    }
+                    threadPool.execute(() -> executeMediator(mediator, msg));
+                } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
+                    Thread.ofVirtual().start(() -> executeMediator(mediator, msg));
+                }
+            }
+        }
+        final Set<IListener> listeners = listenerMap.get(msg.getWhat());
+        if (listeners != null) {
+            for (IListener listener : listeners) {
+                if (executeType == Message.ExecuteType.SYNC) {
+                    executeListener(listener, msg);
+                } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
+                    if (threadPool == null) {
+                        throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
+                    }
+                    threadPool.execute(() -> executeListener(listener, msg));
+                } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
+                    Thread.ofVirtual().start(() -> executeListener(listener, msg));
+                }
+            }
+        }
+    }
+
     /**
      * 消息调度处理
      *
@@ -630,44 +714,7 @@ public class Facade implements INotifier {
      */
     @Override
     public void sendMessage(final Message msg, final boolean asyn) {
-        if (msg == null) {
-            return;
-        }
-        final CommandPoolSortedSet poolSet = cmdPoolMap.get(msg.getWhat());
-        if (poolSet != null) {
-            if (!asyn) {
-                execCommands(poolSet, msg);
-            } else {
-                if (threadPool == null) {
-                    throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
-                }
-                threadPool.execute(() -> execCommands(poolSet, msg));
-            }
-        }
-        final List<Mediator> mediatorList = cmdMediatorMap.get(msg.getWhat());
-        if (mediatorList != null) {
-            for (Mediator mediator : mediatorList) {
-                if (!asyn) {
-                    mediator.handleMessage0(msg);
-                    msg.callback(mediator.getClass().getTypeName());
-                } else {
-                    if (threadPool == null) {
-                        throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass().toString()));
-                    }
-                    threadPool.execute(() -> {
-                        mediator.handleMessage0(msg);
-                        msg.callback(mediator.getClass().getTypeName());
-                    });
-                }
-            }
-        }
-        final Set<IListener> listeners = listenerMap.get(msg.getWhat());
-        if (listeners != null) {
-            for (IListener listener : listeners) {
-                listener.onMessage(msg, this);
-                msg.callback(listener.getClass().getTypeName());
-            }
-        }
+        sendMessage(msg, asyn ? Message.ExecuteType.SYNC : Message.ExecuteType.ASYN_THREAD);
     }
 
     /**
@@ -677,7 +724,7 @@ public class Facade implements INotifier {
      */
     @Override
     final public void sendMessage(Message msg) {
-        sendMessage(msg, false);
+        sendMessage(msg, Message.ExecuteType.SYNC);
     }
 
     /**
@@ -693,22 +740,7 @@ public class Facade implements INotifier {
      */
     @Override
     public void sendRemoteMessage(Message msg) {
-        if (this.remoteMessagePostman == null) {
-            throw new RuntimeException(String.format("执行sendRemoteMessage前请先调用 %s.initRemoteMessagePostman方法初始化", this.getClass().toString()));
-        }
-        Map<Object, IResult> msgResultMap = msg.resultMap;
-        Message mqMsg = new Message(msg.getWhat(), msg.getBody());
-        String id = NanoId.randomNanoId();
-        if (msgResultMap != null) {
-            msgResultMap.forEach((Object key, IResult result) -> {
-                if (result instanceof AsynResult) {
-                    mqMsg.setResult((String) key, new RemoteAsynResult<>());
-                }
-            });
-        }
-        this.remoteMessagePostman.remoteMessageCache.add(id, msg);
-        RemoteMessage remoteMessage = new RemoteMessage(this.remoteMessagePostman.event_topic, id, mqMsg);
-        this.remoteMessagePostman.sendRemoteMessage(remoteMessage);
+        this.sendMessage(msg, Message.ExecuteType.ASYN_REMOTE_QUEUE);
     }
 
     /**
@@ -731,7 +763,7 @@ public class Facade implements INotifier {
     @Override
     final public void sendMessage(final Message msg, Scheduler scheduler) {
         if (scheduleThreadPool == null) {
-            throw new RuntimeException(String.format("执行sendMessage定时调度前请先调用 %s.initScheduleThreadPool方法初始化线程池", this.getClass().toString()));
+            throw new RuntimeException(String.format("执行sendMessage定时调度前请先调用 %s.initScheduleThreadPool方法初始化线程池", this.getClass()));
         }
         if (scheduler.facade != null && scheduler.msg != null) {
             throw new RuntimeException(String.format("每次调用sendMessage进行事件调度时必须保证%s参数为新的且独立的对象", Scheduler.class.getTypeName()));

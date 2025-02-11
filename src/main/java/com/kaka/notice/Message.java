@@ -14,6 +14,28 @@ import java.util.function.Consumer;
  */
 public class Message implements Poolable, Serializable {
 
+    /**
+     * 消息（事件）执行类型
+     */
+    public enum ExecuteType {
+        /**
+         * 本地同步消息
+         */
+        SYNC,
+        /**
+         * 基于线程的本地异步消息
+         */
+        ASYN_THREAD,
+        /**
+         * 基于虚拟线程的本地异步消息
+         */
+        ASYN_VIRTUAL_THREAD,
+        /**
+         * 基于远程消息队列的异步消息
+         */
+        ASYN_REMOTE_QUEUE
+    }
+
     protected Object what;
     protected Object body;
     protected Map<Object, IResult> resultMap;
