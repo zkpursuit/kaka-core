@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * @author zkpursuit
  */
-public class Message implements Poolable, Serializable {
+public class Message implements Poolable, Serializable, Cloneable {
 
     /**
      * 消息（事件）执行类型
@@ -36,6 +36,10 @@ public class Message implements Poolable, Serializable {
         ASYN_REMOTE_QUEUE
     }
 
+    /**
+     * 是否可被池化
+     */
+    boolean poolable;
     protected Object what;
     protected Object body;
     protected Map<Object, IResult> resultMap;
@@ -79,6 +83,12 @@ public class Message implements Poolable, Serializable {
 
     public Object getBody() {
         return this.body;
+    }
+
+    public Message set(Object what, Object body) {
+        this.what = what;
+        this.body = body;
+        return this;
     }
 
     /**
@@ -172,6 +182,16 @@ public class Message implements Poolable, Serializable {
         }
         if (this.callback != null) {
             this.callback = null;
+        }
+        Pooled.release(this);
+    }
+
+    @Override
+    public Message clone() {
+        try {
+            return (Message) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
     }
 

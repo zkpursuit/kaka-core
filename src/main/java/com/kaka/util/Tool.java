@@ -134,8 +134,7 @@ public final class Tool {
         for (NetworkInterface ni : nis) {
             for (InterfaceAddress address : ni.getInterfaceAddresses()) {
                 InetAddress inetAddress = address.getAddress();
-                if (inetAddress instanceof Inet4Address) {
-                    Inet4Address inet4Address = (Inet4Address) inetAddress;
+                if (inetAddress instanceof Inet4Address inet4Address) {
                     String ip = inet4Address.getHostAddress();
                     if ("127.0.0.1".equals(ip)) continue;
                     return ip;
@@ -216,7 +215,7 @@ public final class Tool {
                     }
                 }
             }
-        } catch (SocketException ex) {
+        } catch (SocketException ignored) {
         }
         return list;
     }

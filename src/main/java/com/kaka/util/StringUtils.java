@@ -242,10 +242,7 @@ public class StringUtils {
      * @return 字符串集合
      */
     public static List<String> match(String src, String regex, int regexMatchIndex) {
-        if (src == null) {
-            return null;
-        }
-        if (regex == null) {
+        if (src == null || regex == null) {
             return null;
         }
         Pattern pattern = Pattern.compile(regex);
@@ -293,10 +290,7 @@ public class StringUtils {
      * @return true为纯整型数字
      */
     public static boolean isInteger(String src) {
-        if (src == null) {
-            return false;
-        }
-        if (src.isEmpty()) {
+        if (src == null || src.isEmpty()) {
             return false;
         }
         return intPattern.matcher(src).matches();
@@ -314,10 +308,7 @@ public class StringUtils {
      * @return true为数字
      */
     public static boolean isNumeric(String src) {
-        if (src == null) {
-            return false;
-        }
-        if (src.isEmpty()) {
+        if (src == null || src.isEmpty()) {
             return false;
         }
         return numberPattern.matcher(src).matches();
@@ -378,7 +369,7 @@ public class StringUtils {
                 //str[k++] = hexDigits[byte0 & 0xf];
             }
             s = new String(str);  // 换后的结果转换为字符串
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         if (s == null) {
             return 0;
@@ -488,8 +479,7 @@ public class StringUtils {
      * @return 组合后的字符串
      */
     public static String group(Collection<?> list, String open, String separator, String close) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(open);
+        StringBuilder sb = new StringBuilder(open);
         int size = list.size();
         list.forEach((v) -> sb.append(v).append(separator));
         if (size > 0) {
@@ -513,8 +503,7 @@ public class StringUtils {
         if (!array.getClass().isArray()) {
             return null;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append(open);
+        StringBuilder sb = new StringBuilder(open);
         int size = ArrayUtils.getLength(array);
         for (int i = 0; i < size; i++) {
             if (i > 0) {

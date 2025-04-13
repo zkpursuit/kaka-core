@@ -25,7 +25,7 @@ public class ResultCommand extends Command {
         } catch (InterruptedException ex) {
             Logger.getLogger(ResultCommand.class.getName()).log(Level.SEVERE, null, ex);
         }
-        IResult result = msg.getResult("ResultMsg");
+        IResult<String> result = msg.getResult("ResultMsg");
         if (result != null) {
             //必须设置处理结果
             if (result instanceof AsynResult) {

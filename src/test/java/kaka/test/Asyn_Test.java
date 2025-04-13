@@ -80,7 +80,7 @@ public class Asyn_Test extends Startup {
 
         facade.initScheduleThreadPool(Executors.newScheduledThreadPool(2));
         long c = System.currentTimeMillis();
-        Scheduler scheduler = Scheduler.create("com/test/units")
+        Scheduler scheduler = Scheduler.create("com.test.units")
                 .startTime(c + 3000) //3秒后开始执行
                 .endTime(c + 7000) //调度执行结束时间点
                 .interval(2000, TimeUnit.MILLISECONDS) //执行间隔

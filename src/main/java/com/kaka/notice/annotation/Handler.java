@@ -30,7 +30,7 @@ public @interface Handler {
      *
      * @return 命令号类型
      */
-    Class type() default Integer.class;
+    Class<?> type() default Integer.class;
 
     /**
      * 池化大小

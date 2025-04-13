@@ -53,7 +53,7 @@ abstract public class Parser {
             for (int i = 0; i < elements.length; i++) {
                 String element = elements[i].trim();
                 String value = analyzer.getContent(element);
-                Object resultValue = biConverter.transform(element, value, i, elements.length, object, field);
+                Object resultValue = biConverter.convert(element, value, i, elements.length, object, field);
                 if (fieldValue == null && resultValue != null && (resultValue.getClass() == fieldClass || fieldClass.isAssignableFrom(resultValue.getClass()))) {
                     setFieldValue(object, field, resultValue);
                     fieldValue = resultValue;
@@ -107,7 +107,7 @@ abstract public class Parser {
                 element = element.trim();
                 String value = analyzer.getContent(element);
                 if (fieldType == 1) {
-                    Object resultValue = siConverter.transform(value);
+                    Object resultValue = siConverter.convert(value);
                     if (resultValue != null && fieldValue != null) {
                         Collection<Object> collection = (Collection<Object>) fieldValue;
                         if (resultValue.getClass().isArray()) {
@@ -123,7 +123,7 @@ abstract public class Parser {
                         }
                     }
                 } else if (fieldType == 2) {
-                    Object resultValue = siConverter.transform(value);
+                    Object resultValue = siConverter.convert(value);
                     if (resultValue != null) {
                         if (fieldValue == null) {
                             setFieldValue(object, field, resultValue);
@@ -134,7 +134,7 @@ abstract public class Parser {
                         }
                     }
                 } else {
-                    Object resultValue = siConverter.transform(value);
+                    Object resultValue = siConverter.convert(value);
                     if (resultValue != null) {
                         setFieldValue(object, field, resultValue);
                     }

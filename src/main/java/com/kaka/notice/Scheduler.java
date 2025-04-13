@@ -51,11 +51,7 @@ public class Scheduler implements Runnable {
      * @return 调度器
      */
     public Scheduler startTime(long startTime) {
-        if (startTime <= System.currentTimeMillis()) {
-            this.startTime = -1;
-        } else {
-            this.startTime = startTime;
-        }
+        this.startTime = startTime <= System.currentTimeMillis() ? -1 : startTime;
         return this;
     }
 
@@ -66,11 +62,7 @@ public class Scheduler implements Runnable {
      * @return 调度器
      */
     public Scheduler endTime(long endTime) {
-        if (endTime < this.startTime) {
-            this.endTime = this.startTime;
-        } else {
-            this.endTime = endTime;
-        }
+        this.endTime = Math.max(endTime, this.startTime);
         return this;
     }
 
@@ -81,11 +73,7 @@ public class Scheduler implements Runnable {
      * @return 调度器
      */
     public Scheduler repeat(int repeat) {
-        if (repeat <= 0) {
-            this.repeatCount = 1;
-        } else {
-            this.repeatCount = repeat;
-        }
+        this.repeatCount = repeat <= 0 ? 1 : repeat;
         return this;
     }
 
@@ -93,15 +81,11 @@ public class Scheduler implements Runnable {
      * 调度器执行间隔时间
      *
      * @param interval 执行间隔
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @return 调度器
      */
     public Scheduler interval(long interval, TimeUnit unit) {
-        if (interval <= 0) {
-            this.interval = 0;
-        } else {
-            this.interval = unit.convert(interval, TimeUnit.MILLISECONDS);
-        }
+        this.interval = interval <= 0 ? 0 : unit.convert(interval, TimeUnit.MILLISECONDS);
         return this;
     }
 
@@ -114,18 +98,20 @@ public class Scheduler implements Runnable {
             facade.cancelSchedule(name);
             return;
         }
-        // System.out.println(this.endTime - this.prevExecTime.get());
         long last = this.prevExecTime.addAndGet(this.interval);
         try {
-            facade.sendMessage(msg, false);
+            facade.sendMessage(msg);
         } catch (Exception ex) {
+            msg.reset();
             facade.cancelSchedule(name);
         }
         int c = this.count.addAndGet(1);
         if (c >= this.repeatCount) {
+            msg.reset();
             facade.cancelSchedule(name);
         } else {
             if (last > this.endTime) {
+                msg.reset();
                 facade.cancelSchedule(name);
             }
         }

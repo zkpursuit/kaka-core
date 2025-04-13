@@ -18,8 +18,8 @@ public class SimulateAopCommand extends Command {
             e.printStackTrace();
         }
         System.out.println("Aop业务执行");
-        IResult result = msg.getResult("ResultMsg");
-        if(result != null) {
+        IResult<String> result = msg.getResult("ResultMsg");
+        if (result != null) {
             result.set("Aop业务执行结果");
         }
         returnCallbackResult("我爱我家");

@@ -103,7 +103,7 @@ public class Facade implements INotifier {
      * @param clasz 对象Class
      * @return 实例
      */
-    Object createObject(Class clasz) {
+    Object createObject(Class<?> clasz) {
         try {
             return ReflectUtils.newInstance(clasz);
         } catch (Exception ex) {
@@ -194,11 +194,11 @@ public class Facade implements INotifier {
      * @param proxy 数据处理集中代理器，当并发高的情况下需手动处理数据同步访问问题
      * @return 数据处理
      */
-    final public <T extends Proxy> T registerProxy(Proxy proxy) {
+    final public <T extends Proxy> T registerProxy(T proxy) {
         registerProxy(proxy.name, proxy);
         proxy.setFacade(this);
         proxy.onRegister();
-        return (T) proxy;
+        return proxy;
     }
 
     /**
@@ -266,7 +266,7 @@ public class Facade implements INotifier {
      * @param proxy 数据代理器
      * @return 数据代理
      */
-    final public <T extends Proxy> T removeProxy(Proxy proxy) {
+    final public <T extends Proxy> T removeProxy(T proxy) {
         if (proxy == null) {
             return null;
         }
@@ -382,10 +382,10 @@ public class Facade implements INotifier {
      * @param mediator 视图代理，能集中监听通知消息，可理解为可处理多个Command的对象
      * @return 事件观察者
      */
-    final <T extends Mediator> T registerMediator(Mediator mediator) {
+    final <T extends Mediator> T registerMediator(T mediator) {
         registerMediator(mediator.name, mediator);
         registerMediatorMessageInterests(mediator);
-        return (T) mediator;
+        return mediator;
     }
 
     /**
@@ -438,7 +438,7 @@ public class Facade implements INotifier {
      * @param mediator 事件观察者
      * @return 事件观察者
      */
-    final <T extends Mediator> T removeMediator(Mediator mediator) {
+    final <T extends Mediator> T removeMediator(T mediator) {
         if (mediator == null) {
             return null;
         }
@@ -633,7 +633,35 @@ public class Facade implements INotifier {
     }
 
     /**
-     * 消息调度处理
+     * 消息事件处理
+     *
+     * @param msg 待处理的消息
+     */
+    private void sendMessage0(final Message msg) {
+        if (msg == null || msg.getWhat() == null) {
+            return;
+        }
+        final CommandPoolSortedSet poolSet = cmdPoolMap.get(msg.getWhat());
+        if (poolSet != null) {
+            execCommands(poolSet, msg);
+        }
+        final List<Mediator> mediatorList = cmdMediatorMap.get(msg.getWhat());
+        if (mediatorList != null) {
+            for (Mediator mediator : mediatorList) {
+                executeMediator(mediator, msg);
+            }
+        }
+        final Set<IListener> listeners = listenerMap.get(msg.getWhat());
+        if (listeners != null) {
+            for (IListener listener : listeners) {
+                executeListener(listener, msg);
+            }
+        }
+        if (msg.poolable) msg.reset();
+    }
+
+    /**
+     * 消息事件处理
      *
      * @param msg         待处理的消息
      * @param executeType 消息执行类型
@@ -661,64 +689,31 @@ public class Facade implements INotifier {
             this.remoteMessagePostman.sendRemoteMessage(remoteMessage);
             return;
         }
-        final CommandPoolSortedSet poolSet = cmdPoolMap.get(msg.getWhat());
-        if (poolSet != null) {
-            if (executeType == Message.ExecuteType.SYNC) {
-                execCommands(poolSet, msg);
-            } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
-                if (threadPool == null) {
-                    throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
-                }
-                threadPool.execute(() -> execCommands(poolSet, msg));
-            } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
-                Thread.ofVirtual().start(() -> execCommands(poolSet, msg));
+        if (executeType == Message.ExecuteType.SYNC) {
+            this.sendMessage0(msg);
+        } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
+            if (threadPool == null) {
+                throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
             }
-        }
-        final List<Mediator> mediatorList = cmdMediatorMap.get(msg.getWhat());
-        if (mediatorList != null) {
-            for (Mediator mediator : mediatorList) {
-                if (executeType == Message.ExecuteType.SYNC) {
-                    executeMediator(mediator, msg);
-                } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
-                    if (threadPool == null) {
-                        throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
-                    }
-                    threadPool.execute(() -> executeMediator(mediator, msg));
-                } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
-                    Thread.ofVirtual().start(() -> executeMediator(mediator, msg));
-                }
-            }
-        }
-        final Set<IListener> listeners = listenerMap.get(msg.getWhat());
-        if (listeners != null) {
-            for (IListener listener : listeners) {
-                if (executeType == Message.ExecuteType.SYNC) {
-                    executeListener(listener, msg);
-                } else if (executeType == Message.ExecuteType.ASYN_THREAD) {
-                    if (threadPool == null) {
-                        throw new RuntimeException(String.format("执行异步sendMessage前请先调用 %s.initThreadPool方法初始化线程池", this.getClass()));
-                    }
-                    threadPool.execute(() -> executeListener(listener, msg));
-                } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
-                    Thread.ofVirtual().start(() -> executeListener(listener, msg));
-                }
-            }
+            threadPool.execute(() -> this.sendMessage0(msg));
+        } else if (executeType == Message.ExecuteType.ASYN_VIRTUAL_THREAD) {
+            Thread.ofVirtual().start(() -> this.sendMessage0(msg));
         }
     }
 
     /**
-     * 消息调度处理
+     * 消息事件处理
      *
      * @param msg  待处理的消息
      * @param asyn true为异步，设为true时须调用initThreadPool方法初始化线程池
      */
     @Override
     public void sendMessage(final Message msg, final boolean asyn) {
-        sendMessage(msg, asyn ? Message.ExecuteType.SYNC : Message.ExecuteType.ASYN_THREAD);
+        sendMessage(msg, asyn ? Message.ExecuteType.ASYN_THREAD : Message.ExecuteType.SYNC);
     }
 
     /**
-     * 同步消息调度处理
+     * 消息事件处理
      *
      * @param msg 通知消息
      */
@@ -768,6 +763,7 @@ public class Facade implements INotifier {
         if (scheduler.facade != null && scheduler.msg != null) {
             throw new RuntimeException(String.format("每次调用sendMessage进行事件调度时必须保证%s参数为新的且独立的对象", Scheduler.class.getTypeName()));
         }
+        msg.poolable = false;
         Object cmd = msg.what;
         scheduler.name += String.format("_$%s$_%s", cmd.getClass().getTypeName(), cmd);
         scheduler.facade = this;

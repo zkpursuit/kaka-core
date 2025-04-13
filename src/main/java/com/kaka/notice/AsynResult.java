@@ -101,10 +101,10 @@ public class AsynResult<V> implements IResult<V> {
      */
     private boolean await(long timeout, TimeUnit unit) throws InterruptedException {
         timeout = unit.toMillis(timeout);
-        long startTime = timeout <= 0 ? 0 : System.currentTimeMillis();
+        final long startTime = timeout <= 0 ? 0 : System.currentTimeMillis();
         long waitTime = timeout;
         synchronized (this) {
-            for (; ; ) {
+            for (; ;) {
                 if (_isDone()) {
                     return true;
                 }

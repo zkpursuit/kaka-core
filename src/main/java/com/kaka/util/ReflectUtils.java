@@ -229,7 +229,7 @@ public final class ReflectUtils {
             if (args.length == 0) {
                 method = ReflectUtils.getDeclaredMethod(obj.getClass(), methodName);
             } else {
-                Class[] parameterTypes = new Class[args.length];
+                Class<?>[] parameterTypes = new Class[args.length];
                 for (int i = 0; i < parameterTypes.length; i++) {
                     parameterTypes[i] = args[i].getClass();
                 }
@@ -315,9 +315,9 @@ public final class ReflectUtils {
      * @param ancestor  是否向父级追溯
      * @return 已声明的方法集合
      */
-    public static Field[] getDeclaredFields(Class beanClass, boolean ancestor) {
+    public static Field[] getDeclaredFields(Class<?> beanClass, boolean ancestor) {
         Field[] fields = null;
-        Class clazz = beanClass;
+        Class<?> clazz = beanClass;
         do {
             Field[] fs = clazz.getDeclaredFields();
             if (fields == null) {
@@ -342,7 +342,7 @@ public final class ReflectUtils {
      * @param beanClass 类对象
      * @return 已声明的方法集合
      */
-    public static Field[] getDeclaredFields(Class beanClass) {
+    public static Field[] getDeclaredFields(Class<?> beanClass) {
         return getDeclaredFields(beanClass, true);
     }
 
@@ -353,9 +353,9 @@ public final class ReflectUtils {
      * @param ancestor 是否向父级追溯
      * @return 已声明的方法集合
      */
-    public static Method[] getDeclaredMethods(Class clasz, boolean ancestor) {
+    public static Method[] getDeclaredMethods(Class<?> clasz, boolean ancestor) {
         Method[] methods = null;
-        Class clazz = clasz;
+        Class<?> clazz = clasz;
         do {
             Method[] ms = clazz.getDeclaredMethods();
             if (methods == null) {
@@ -370,7 +370,7 @@ public final class ReflectUtils {
                 break;
             }
             clazz = clazz.getSuperclass();
-        } while (clazz != Object.class);
+        } while (clazz != Object.class && clazz != null);
         return methods;
     }
 
@@ -380,7 +380,7 @@ public final class ReflectUtils {
      * @param clasz 类对象
      * @return 已声明的方法集合
      */
-    public static Method[] getDeclaredMethods(Class clasz) {
+    public static Method[] getDeclaredMethods(Class<?> clasz) {
         return getDeclaredMethods(clasz, true);
     }
 
@@ -391,7 +391,7 @@ public final class ReflectUtils {
      * @param consumer 父class访问器
      */
     public static void traversalSuperClasses(Class<?> clasz, Consumer<Class<?>> consumer) {
-        while (clasz != null) {
+        while (clasz != null && clasz != Object.class) {
             consumer.accept(clasz);
             clasz = clasz.getSuperclass();
         }
@@ -419,7 +419,7 @@ public final class ReflectUtils {
      * @param cls 带泛型的类
      * @return 泛型参数类型，找不到泛型类时默认使用Object.class
      */
-    public static Class<?> getGenericParadigmClass(Class cls) {
+    public static Class<?> getGenericParadigmClass(Class<?> cls) {
         return getGenericParadigmClass(cls, Object.class);
     }
 
@@ -431,7 +431,7 @@ public final class ReflectUtils {
      * @param defaultClass 如果从带泛型的类这个参数中未找到泛型类，将指定此类
      * @return 泛型类
      */
-    public static Class<?> getGenericParadigmClass(Class cls, Class defaultClass) {
+    public static Class<?> getGenericParadigmClass(Class<?> cls, Class<?> defaultClass) {
         return getGenericParadigmClass(cls, 0, defaultClass);
     }
 
@@ -444,15 +444,14 @@ public final class ReflectUtils {
      * @param defaultClass 如果从带泛型的类这个参数中未找到泛型类，将指定此类
      * @return 泛型类
      */
-    public static Class<?> getGenericParadigmClass(Class cls, int genericIndex, Class defaultClass) {
+    public static Class<?> getGenericParadigmClass(Class<?> cls, int genericIndex, Class<?> defaultClass) {
         do {
             Type genType = cls.getGenericSuperclass();
             if (genType instanceof ParameterizedType) {
                 Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-                Class<?> entityClass = (Class) params[genericIndex];
-                return entityClass;
+                return (Class<?>) params[genericIndex];
             }
-            cls = (Class) genType;
+            cls = (Class<?>) genType;
         } while (cls != Object.class);
         return defaultClass;
     }

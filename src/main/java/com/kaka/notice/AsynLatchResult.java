@@ -50,11 +50,11 @@ public class AsynLatchResult<V> extends AsynResult<V> {
         try {
             this.cdl.await();
         } catch (InterruptedException e) {
-            ExceptionUtils.processInterruptedException();
             this.cdl.countDown();
+            ExceptionUtils.processInterruptedException();
             return null;
         }
-        return (V) this.result;
+        return super._isDone() ? (V) this.result : null;
     }
 
     /**
@@ -67,8 +67,13 @@ public class AsynLatchResult<V> extends AsynResult<V> {
      */
     @Override
     public V get(long timeout, TimeUnit unit) throws Exception {
-        if (this.cdl.await(timeout, unit)) {
-            return (V) this.result;
+        try {
+            if (this.cdl.await(timeout, unit)) {
+                return super._isDone() ? (V) this.result : null;
+            }
+        } catch (InterruptedException e) {
+            this.cdl.countDown();
+            ExceptionUtils.processInterruptedException();
         }
         this.set(null);
         throw new TimeoutException("Getting result timeout");

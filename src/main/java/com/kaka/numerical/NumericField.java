@@ -39,7 +39,7 @@ public @interface NumericField {
          * @param value 数值表字段值
          * @return 数值表所映射的JavaBean对象字段定义的类型数据
          */
-        T transform(String value);
+        T convert(String value);
     }
 
     /**
@@ -59,7 +59,7 @@ public @interface NumericField {
          * @param pojo          数值表映射的JavaBean对象
          * @param pojoField     JavaBean对象中的字段
          */
-        T transform(String title, String value, int elementIndex, int elementTotals, Object pojo, Field pojoField);
+        T convert(String title, String value, int elementIndex, int elementTotals, Object pojo, Field pojoField);
     }
 
 }
