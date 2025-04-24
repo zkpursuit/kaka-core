@@ -3,6 +3,7 @@ package com.kaka.numerical;
 import com.kaka.numerical.NumericField.BiConverter;
 import com.kaka.numerical.NumericField.Converter;
 import com.kaka.util.ArrayUtils;
+import com.kaka.util.MethodAccessor;
 import com.kaka.util.ReflectUtils;
 
 import java.lang.reflect.Constructor;
@@ -43,7 +44,7 @@ abstract public class Parser {
         }
         String[] elements = att.elements();
         Class<? extends FieldConverter> converterClass = att.converter();
-        FieldConverter converter = converterClass == FieldConverter.class ? null : ReflectUtils.newInstance(converterClass);
+        FieldConverter converter = converterClass == FieldConverter.class ? null : MethodAccessor.newInstance(converterClass);
         if (converter == null) {
             String value = analyzer.getContent(elements[0].trim().replaceAll(" ", ""));
             setFieldValue(object, field, value);
@@ -149,14 +150,14 @@ abstract public class Parser {
      * 子类中必须调用此方法将文本反序列化为对象<br>
      *
      * @param <T>       JavaBean对象类型
-     * @param InfoClass 目标对象
+     * @param infoClass 目标对象
      * @param analyzer  字段内容分析处理器
      * @return 序列化后的JavaBean对象
      * @throws Exception 解析异常
      */
-    protected <T> T doParse(Class<T> InfoClass, IAnalyzer analyzer) throws Exception {
-        T object = InfoClass.getDeclaredConstructor().newInstance();
-        Field[] fields = ReflectUtils.getDeclaredFields(InfoClass);
+    protected <T> T doParse(Class<T> infoClass, IAnalyzer analyzer) throws Exception {
+        T object = MethodAccessor.newInstance(infoClass);
+        Field[] fields = ReflectUtils.getDeclaredFields(infoClass);
         for (Field field : fields) {
             int modifier = field.getModifiers();
             if (Modifier.isStatic(modifier) && Modifier.isFinal(modifier)) {

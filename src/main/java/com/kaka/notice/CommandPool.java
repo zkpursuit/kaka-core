@@ -1,8 +1,10 @@
 package com.kaka.notice;
 
+import com.kaka.util.MethodAccessor;
 import com.kaka.util.ObjectPool;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * {@link Command}对象池
@@ -11,33 +13,32 @@ import java.util.Objects;
  * @author zkpursuit
  */
 class CommandPool extends ObjectPool<Command> {
-
-    private final Facade context;
+    final Supplier<Command> constFunc;
     final Class<? extends Command> cls;
     final int priority;
+
 
     /**
      * 构造方法
      *
-     * @param context  事件调度中心
-     * @param maxSize  对象池大小，-1表示不进行池化
      * @param cls      池化的类
+     * @param maxSize  对象池大小，-1表示不进行池化
      * @param priority 执行优先级，数字小的先执行
      */
-    CommandPool(Facade context, int maxSize, Class<? extends Command> cls, int priority) {
+    CommandPool(Class<? extends Command> cls, int maxSize, int priority) {
         super(maxSize);
-        this.context = context;
         this.cls = cls;
         this.priority = priority;
+        this.constFunc = MethodAccessor.constructSupplier(cls);
     }
 
     CommandPool(Class<? extends Command> cls) {
-        this(null, 0, cls, 0);
+        this(cls, 0, 0);
     }
 
     @Override
     protected Command newObject() {
-        return (Command) this.context.createObject(cls);
+        return this.constFunc.get();
     }
 
     @Override

@@ -457,6 +457,30 @@ public final class ReflectUtils {
     }
 
     /**
+     * 获取无参构造方法
+     *
+     * @param clazz 类型
+     * @return 无参构造方法
+     */
+    public static Constructor<?> getConstructor0(Class<?> clazz) throws Exception {
+        Constructor<?> con;
+        try {
+            con = clazz.getDeclaredConstructor();
+        } catch (NoSuchMethodException | SecurityException e) {
+            try {
+                con = clazz.getConstructor();
+            } catch (NoSuchMethodException | SecurityException e2) {
+                throw e2;
+            }
+        }
+        int modifier = con.getModifiers();
+        if (!Modifier.isPublic(modifier)) {
+            con.setAccessible(true);
+        }
+        return con;
+    }
+
+    /**
      * 实例化对象
      *
      * @param cls  对象类型
@@ -470,9 +494,9 @@ public final class ReflectUtils {
                 con = cls.getDeclaredConstructor();
             } catch (NoSuchMethodException | SecurityException e) {
                 try {
-                    return cls.newInstance();
-                } catch (InstantiationException | IllegalAccessException ex) {
-                    throw new RuntimeException("无法找到无参构造方法", e);
+                    con = cls.getConstructor();
+                } catch (NoSuchMethodException | SecurityException e2) {
+                    throw new RuntimeException(e2);
                 }
             }
         } else {

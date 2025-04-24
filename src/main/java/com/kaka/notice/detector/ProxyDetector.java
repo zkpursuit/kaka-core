@@ -58,7 +58,7 @@ public class ProxyDetector extends PriorityDetector {
             Proxy proxy = !modelName.isEmpty() ? facade.registerProxy((Class<? extends Proxy>) cls, modelName) : facade.registerProxy((Class<? extends Proxy>) cls);
             proxy.setPriority(model.priority());
             if (facade.hasCommand("print_log")) {
-                facade.sendMessage(new Message("print_log", new Object[]{ProxyDetector.class, new Object[]{proxy.name, cls}}));
+                facade.sendMessage(new Message("print_log", new Object[]{ProxyDetector.class, new Object[]{proxy.getName(), cls}}));
             }
         });
         list.clear();

@@ -36,7 +36,7 @@ public class MediatorDetector implements IDetector {
         Facade facade = sc.context().isEmpty() ? FacadeFactory.getFacade() : FacadeFactory.getFacade(sc.context());
         Mediator observer = facade.registerMediator((Class<? extends Mediator>) cls);
         if (facade.hasCommand("print_log")) {
-            facade.sendMessage(new Message("print_log", new Object[]{MediatorDetector.class, new Object[]{observer.name, cls}}));
+            facade.sendMessage(new Message("print_log", new Object[]{MediatorDetector.class, new Object[]{observer.getName(), cls}}));
         }
         return true;
     }

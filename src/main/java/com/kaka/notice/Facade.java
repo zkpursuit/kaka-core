@@ -103,7 +103,7 @@ public class Facade implements INotifier {
      * @param clasz 对象Class
      * @return 实例
      */
-    Object createObject(Class<?> clasz) {
+    <T> T createObject(Class<T> clasz) {
         try {
             return ReflectUtils.newInstance(clasz);
         } catch (Exception ex) {
@@ -152,14 +152,14 @@ public class Facade implements INotifier {
      * @return 数据代理模型对象
      */
     final public <T extends Proxy> T registerProxy(Class<T> proxyClass, String... names) {
-        final Proxy proxy = (Proxy) createObject(proxyClass);
+        final Proxy proxy = this.createObject(proxyClass);
         String typeName = proxyClass.getTypeName();
         Set<String> aliasSet = names.length > 0 ? new HashSet<>(names.length + 1) : new HashSet<>(1);
         if (proxy.name != null) {
             registerProxy(proxy.name, proxy);
             aliasSet.add(typeName);
         } else {
-            ReflectUtils.setFieldValue(proxy, "name", typeName);
+            proxy.name = typeName;
             registerProxy(typeName, proxy);
         }
         for (String name : names) {
@@ -318,12 +318,12 @@ public class Facade implements INotifier {
      * @param mediator 事件观察者
      */
     final void registerMediatorMessageInterests(Mediator mediator) {
-        Object[] nids = mediator.listMessageInterests();
-        if (nids == null || nids.length == 0) {
+        Object[] evtIds = mediator.listMessageInterests();
+        if (evtIds == null || evtIds.length == 0) {
             return;
         }
-        for (Object nid : nids) {
-            List<Mediator> list = cmdMediatorMap.computeIfAbsent(nid, k -> Collections.synchronizedList(new ArrayList<>()));
+        for (Object eid : evtIds) {
+            List<Mediator> list = cmdMediatorMap.computeIfAbsent(eid, k -> Collections.synchronizedList(new ArrayList<>()));
             list.add(mediator);
         }
         mediator.setFacade(this);
@@ -341,27 +341,27 @@ public class Facade implements INotifier {
      * @return 事件观察者对象
      */
     <T extends Mediator> T registerMediator(Class<T> mediatorClass, String... names) {
-        final Mediator observer = (Mediator) createObject(mediatorClass);
+        final Mediator mediator = this.createObject(mediatorClass);
         String typeName = mediatorClass.getTypeName();
         Set<String> aliasSet = names.length > 0 ? new HashSet<>(names.length + 1) : new HashSet<>(1);
-        if (observer.name != null) {
-            registerMediator(observer.name, observer);
+        if (mediator.name != null) {
+            registerMediator(mediator.name, mediator);
             aliasSet.add(typeName);
         } else {
-            ReflectUtils.setFieldValue(observer, "name", typeName);
-            registerMediator(typeName, observer);
+            mediator.name = typeName;
+            registerMediator(typeName, mediator);
         }
         for (String name : names) {
-            if (name != null && !name.equals(observer.name) && !name.equals(typeName)) {
+            if (name != null && !name.equals(mediator.name) && !name.equals(typeName)) {
                 aliasSet.add(name);
             }
         }
         for (String name : aliasSet) {
-            registerMediator(name, observer);
-            observer.addAlias(name);
+            registerMediator(name, mediator);
+            mediator.addAlias(name);
         }
-        registerMediatorMessageInterests(observer);
-        return (T) observer;
+        registerMediatorMessageInterests(mediator);
+        return (T) mediator;
     }
 
     /**
@@ -523,7 +523,7 @@ public class Facade implements INotifier {
      */
     final public void registerCommand(Object cmd, Class<? extends Command> clasz, int pooledSize, int priority) {
         CommandPoolSortedSet sortedSet = cmdPoolMap.computeIfAbsent(cmd, k -> new CommandPoolSortedSet());
-        sortedSet.add(new CommandPool(this, pooledSize, clasz, priority));
+        sortedSet.add(new CommandPool(clasz, pooledSize, priority));
     }
 
     /**

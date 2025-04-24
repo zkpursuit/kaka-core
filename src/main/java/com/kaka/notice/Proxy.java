@@ -10,13 +10,17 @@ import java.util.Set;
  */
 abstract public class Proxy extends Notifier {
 
-    public final String name;
+    String name;
     public int priority;
 
     /**
      * 别名
      */
     private Set<String> aliasSet = null;
+
+    public String getName() {
+        return name;
+    }
 
     /**
      * 设置优先级
