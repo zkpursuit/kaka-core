@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ProxyDetector extends PriorityDetector {
 
-    private final List<Element> list = new ArrayList<>();
+    private final List<Element<? extends Proxy>> list = new ArrayList<>();
 
     @Override
     public String name() {
@@ -38,7 +38,8 @@ public class ProxyDetector extends PriorityDetector {
         if (model == null) {
             return false;
         }
-        list.add(new Element(model, cls));
+        Class<? extends Proxy> proxyClass = (Class<? extends Proxy>) cls;
+        list.add(new Element<>(model, proxyClass));
         return true;
     }
 
@@ -50,12 +51,12 @@ public class ProxyDetector extends PriorityDetector {
             Model m2 = e2.getAnnotation();
             return Integer.compare(m2.priority(), m1.priority());
         });
-        list.forEach((element) -> {
+        list.forEach(element -> {
             Model model = element.getAnnotation();
-            Class<?> cls = element.getClasz();
+            Class<? extends Proxy> cls = element.getClasz();
             Facade facade = model.context().isEmpty() ? FacadeFactory.getFacade() : FacadeFactory.getFacade(model.context());
             String modelName = model.value();
-            Proxy proxy = !modelName.isEmpty() ? facade.registerProxy((Class<? extends Proxy>) cls, modelName) : facade.registerProxy((Class<? extends Proxy>) cls);
+            Proxy proxy = !modelName.isEmpty() ? facade.registerProxy(cls, modelName) : facade.registerProxy(cls);
             proxy.setPriority(model.priority());
             if (facade.hasCommand("print_log")) {
                 facade.sendMessage(new Message("print_log", new Object[]{ProxyDetector.class, new Object[]{proxy.getName(), cls}}));

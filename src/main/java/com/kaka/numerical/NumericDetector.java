@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class NumericDetector extends PriorityDetector {
 
-    private final List<Element> list = new ArrayList<>();
+    private final List<Element<? extends NumericConfig<?>>> list = new ArrayList<>();
 
     @Override
     public String name() {
@@ -43,7 +43,8 @@ public class NumericDetector extends PriorityDetector {
         if (!StringUtils.isNotEmpty(numeric.src())) {
             return false;
         }
-        list.add(new Element(numeric, cls));
+        Class<? extends NumericConfig<?>> clazz = (Class<? extends NumericConfig<?>>) cls;
+        list.add(new Element<>(numeric, clazz));
         return true;
     }
 
@@ -55,16 +56,11 @@ public class NumericDetector extends PriorityDetector {
             Numeric numeric2 = e2.getAnnotation();
             return Integer.compare(numeric2.priority(), numeric1.priority());
         });
-        list.forEach((element) -> {
-            Class<?> cls = element.getClasz();
+        list.forEach(element -> {
+            Class<? extends NumericConfig<?>> cls = element.getClasz();
             Numeric numeric = element.getAnnotation();
             Facade facade = numeric.context().isEmpty() ? FacadeFactory.getFacade() : FacadeFactory.getFacade(numeric.context());
-            Proxy proxy;
-            if (numeric.ignoreCase()) {
-                proxy = facade.registerProxy((Class<? extends Proxy>) cls, numeric.src(), numeric.src().toLowerCase());
-            } else {
-                proxy = facade.registerProxy((Class<? extends Proxy>) cls, numeric.src());
-            }
+            Proxy proxy = numeric.ignoreCase() ? facade.registerProxy(cls, numeric.src(), numeric.src().toLowerCase()) : facade.registerProxy(cls, numeric.src());
             proxy.setPriority(numeric.priority());
         });
         list.clear();

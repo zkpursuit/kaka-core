@@ -25,7 +25,7 @@ public class TextAnalyzer implements IAnalyzer<String[][]> {
         for (int i = 0; i < lineDatas.length; i++) {
             String title = titles[i].trim();
             String value = lineDatas[i].trim();
-            if ("".equals(title)) {
+            if (title.isEmpty()) {
                 throw new RuntimeException("存在空列名（列号>>" + (i + 1) + "）");
             }
             if (title_content_map.containsKey(title)) {

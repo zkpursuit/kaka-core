@@ -40,9 +40,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             return ((Number) value).byteValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -60,9 +59,8 @@ public final class TypeUtils {
         if (value instanceof Character) {
             return (Character) value;
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -83,9 +81,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             return ((Number) value).shortValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -107,7 +104,7 @@ public final class TypeUtils {
             return new BigDecimal((BigInteger) value);
         }
         String strVal = value.toString();
-        if (strVal.length() == 0) {
+        if (strVal.isEmpty()) {
             return null;
         }
         if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -127,7 +124,7 @@ public final class TypeUtils {
             return BigInteger.valueOf(((Number) value).longValue());
         }
         String strVal = value.toString();
-        if (strVal.length() == 0) {
+        if (strVal.isEmpty()) {
             return null;
         }
         if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -145,7 +142,7 @@ public final class TypeUtils {
         }
         if (value instanceof String) {
             String strVal = value.toString();
-            if (strVal.length() == 0) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -165,7 +162,7 @@ public final class TypeUtils {
         }
         if (value instanceof String) {
             String strVal = value.toString();
-            if (strVal.length() == 0) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -191,8 +188,7 @@ public final class TypeUtils {
             longValue = ((Number) value).longValue();
             return new Date(longValue);
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
+        if (value instanceof String strVal) {
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
                 return null;
             }
@@ -212,7 +208,7 @@ public final class TypeUtils {
                     throw new ClassCastException("can not cast to Date, value : " + strVal);
                 }
             }
-            if (strVal.length() == 0) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             longValue = Long.parseLong(strVal);
@@ -240,9 +236,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             longValue = ((Number) value).longValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -273,9 +268,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             longValue = ((Number) value).longValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0 || "null".equalsIgnoreCase(strVal)) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty() || "null".equalsIgnoreCase(strVal)) {
                 return null;
             }
             longValue = Long.parseLong(strVal);
@@ -303,9 +297,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             longValue = ((Number) value).longValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -326,9 +319,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             return ((Number) value).longValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -353,9 +345,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             return ((Number) value).intValue();
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("null".equals(strVal) || "NULL".equals(strVal)) {
@@ -376,10 +367,8 @@ public final class TypeUtils {
         if (value instanceof Number) {
             return ((Number) value).intValue() == 1;
         }
-        if (value instanceof String) {
-            String strVal = (String) value;
-
-            if (strVal.length() == 0) {
+        if (value instanceof String strVal) {
+            if (strVal.isEmpty()) {
                 return null;
             }
             if ("true".equalsIgnoreCase(strVal)) {
@@ -510,7 +499,7 @@ public final class TypeUtils {
     }
 
     public static Class<?> loadClass(String className) {
-        if (className == null || className.length() == 0) {
+        if (className == null || className.isEmpty()) {
             return null;
         }
         Class<?> clazz = mappings.get(className);
@@ -602,7 +591,7 @@ public final class TypeUtils {
     }
 
     public static String decapitalize(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return name;
         }
         if (name.length() > 1 && Character.isUpperCase(name.charAt(1))

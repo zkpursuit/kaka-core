@@ -10,11 +10,11 @@ abstract public class PriorityDetector implements IDetector {
     /**
      * 集中处理元素
      */
-    protected static class Element {
+    protected static class Element<T> {
         private final Object annotation;
-        private final Class<?> clasz;
+        private final Class<T> clasz;
 
-        public Element(Object annotation, Class<?> clasz) {
+        public Element(Object annotation, Class<T> clasz) {
             this.annotation = annotation;
             this.clasz = clasz;
         }
@@ -23,7 +23,7 @@ abstract public class PriorityDetector implements IDetector {
             return (A) annotation;
         }
 
-        public Class<?> getClasz() {
+        public Class<T> getClasz() {
             return clasz;
         }
     }

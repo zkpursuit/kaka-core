@@ -112,19 +112,6 @@ public class Facade implements INotifier {
     }
 
     /**
-     * 注册
-     *
-     * @param obj 消息发送者
-     */
-    final void register(Notifier obj) {
-        if (obj instanceof Mediator) {
-            this.registerMediator((Mediator) obj);
-        } else if (obj instanceof Proxy) {
-            this.registerProxy((Proxy) obj);
-        }
-    }
-
-    /**
      * 注册数据代理
      *
      * @param name  数据代理唯一标识名

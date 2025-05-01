@@ -431,7 +431,7 @@ public final class Tool {
         if (ipSegment.isEmpty()) {
             throw new NullPointerException("IP段不能为空！");
         }
-        String[] ips = ipSegment.split("-|,|;");
+        String[] ips = ipSegment.split("[-,;]");
         return ipIsInNetworkSegment(ip, ips[0], ips[1]);
     }
 
@@ -465,7 +465,7 @@ public final class Tool {
      * @return IPv4地址
      */
     public static String numberToIpv4(long ip) {
-        long ip1 = ip & 0xFF000000;
+        long ip1 = ip & 0xFF000000L;
         ip1 = ip1 >> 24;
         long ip2 = ip & 0x00FF0000;
         ip2 = ip2 >> 16;

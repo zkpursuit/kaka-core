@@ -90,7 +90,7 @@ abstract public class TextNumericConfig<T> extends NumericConfig<T> {
             int sl = 0;
             TextParser parser = new TextParser();
             Class<T> beanClass = this.getMappingClass();
-            while ((line = reader.readLine()) != null && !"".equals(line)) {
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 if (sl < startLine) {
                     sl++;
                     continue;

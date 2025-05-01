@@ -73,33 +73,33 @@ abstract public class NumericConfig<T> extends Proxy {
             Object v = ReflectUtils.getFieldValue(this, f);
             if (v == null) continue;
             if (v instanceof Collection) {
-                ((Collection) v).clear();
+                ((Collection<?>) v).clear();
             } else if (v instanceof Map) {
-                ((Map) v).clear();
+                ((Map<?, ?>) v).clear();
             } else if (v instanceof AtomicReference) {
-                ((AtomicReference) v).set(null);
-            } else if (v instanceof AtomicInteger) {
-                ((AtomicInteger) v).set(0);
-            } else if (v instanceof AtomicLong) {
-                ((AtomicLong) v).set(0);
-            } else if (v instanceof AtomicBoolean) {
-                ((AtomicBoolean) v).set(false);
+                ((AtomicReference<?>) v).set(null);
+            } else if (v instanceof AtomicInteger ai) {
+                ai.set(0);
+            } else if (v instanceof AtomicLong al) {
+                al.set(0);
+            } else if (v instanceof AtomicBoolean ab) {
+                ab.set(false);
             } else {
                 if (v.getClass().isArray()) {
-                    if (v instanceof boolean[]) {
-                        Arrays.fill((boolean[]) v, false);
-                    } else if (v instanceof short[]) {
-                        Arrays.fill((short[]) v, (short) 0);
-                    } else if (v instanceof int[]) {
-                        Arrays.fill((int[]) v, 0);
-                    } else if (v instanceof long[]) {
-                        Arrays.fill((long[]) v, 0);
-                    } else if (v instanceof float[]) {
-                        Arrays.fill((float[]) v, 0);
-                    } else if (v instanceof double[]) {
-                        Arrays.fill((double[]) v, 0);
-                    } else if (v instanceof Object[]) {
-                        Arrays.fill((Object[]) v, null);
+                    if (v instanceof boolean[] bs) {
+                        Arrays.fill(bs, false);
+                    } else if (v instanceof short[] ss) {
+                        Arrays.fill(ss, (short) 0);
+                    } else if (v instanceof int[] is) {
+                        Arrays.fill(is, 0);
+                    } else if (v instanceof long[] ls) {
+                        Arrays.fill(ls, 0);
+                    } else if (v instanceof float[] fs) {
+                        Arrays.fill(fs, 0);
+                    } else if (v instanceof double[] ds) {
+                        Arrays.fill(ds, 0);
+                    } else if (v instanceof Object[] os) {
+                        Arrays.fill(os, null);
                     }
                 }
                 if (fieldResetValueFun != null) {

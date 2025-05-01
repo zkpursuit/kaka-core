@@ -51,7 +51,7 @@ public abstract class Startup {
      * @return 扫描到的类集合
      */
     final protected Set<Class<?>> scan(ClassLoader loader, String... packages) {
-        Set<Integer> delIdxs = new HashSet<>();
+        Set<Integer> delIndexes = new HashSet<>();
         //过滤子包和相同的包
         for (int i = 0; i < packages.length; i++) {
             String selectPackage = packages[i];
@@ -62,7 +62,7 @@ public abstract class Startup {
                     if (idx >= 0) {
                         idx += selectPackage.length();
                         if (currPackage.charAt(idx) == '.') {
-                            delIdxs.add(j);
+                            delIndexes.add(j);
                         }
                     }
                 } else if (selectPackage.length() > currPackage.length()) {
@@ -70,11 +70,11 @@ public abstract class Startup {
                     if (idx >= 0) {
                         idx += currPackage.length();
                         if (selectPackage.charAt(idx) == '.') {
-                            delIdxs.add(i);
+                            delIndexes.add(i);
                         }
                     }
                 } else if (selectPackage.equals(currPackage)) {
-                    delIdxs.add(j);
+                    delIndexes.add(j);
                 }
             }
         }
@@ -83,17 +83,15 @@ public abstract class Startup {
         }
         Set<Class<?>> classes = new HashSet<>();
         for (int i = 0; i < packages.length; i++) {
-            if (!delIdxs.contains(i)) {
-                Set<Class<?>> _classes = ClassScaner.getClasses(loader, packages[i]);
-                if (!_classes.isEmpty()) {
-                    classes.addAll(_classes);
-                }
-            }
+            if (delIndexes.contains(i)) continue;
+            Set<Class<?>> _classes = ClassScaner.getClasses(loader, packages[i]);
+            if (_classes.isEmpty()) continue;
+            classes.addAll(_classes);
         }
         detectorMap.forEach((String name, IDetector detector) -> {
             classes.forEach(detector::discern);
-            if (detector instanceof PriorityDetector) {
-                ((PriorityDetector) detector).centralizeProcess();
+            if (detector instanceof PriorityDetector d) {
+                d.centralizeProcess();
             }
         });
         return classes;

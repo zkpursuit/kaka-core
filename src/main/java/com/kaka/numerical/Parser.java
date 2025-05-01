@@ -6,7 +6,6 @@ import com.kaka.util.ArrayUtils;
 import com.kaka.util.MethodAccessor;
 import com.kaka.util.ReflectUtils;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -85,19 +84,7 @@ abstract public class Parser {
                             fieldValue = new java.util.ArrayList<>();
                         }
                     } else {
-                        Constructor<?>[] constructors = filedTypeClass.getConstructors();
-                        for (Constructor<?> constructor : constructors) {
-                            int modifier = constructor.getModifiers();
-                            if (!Modifier.isPublic(modifier)) {
-                                continue;
-                            }
-                            int paramCount = constructor.getParameterCount();
-                            if (paramCount > 0) {
-                                continue;
-                            }
-                            fieldValue = constructor.newInstance();
-                            break;
-                        }
+                        fieldValue = MethodAccessor.newInstance(filedTypeClass);
                     }
                     setFieldValue(object, field, fieldValue);
                 }

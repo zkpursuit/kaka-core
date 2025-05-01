@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 资源路径
@@ -21,7 +22,7 @@ public class ResourceUtils {
     public static String getProjectDirectoryPath() {
         try {
             return new File("").getCanonicalPath();
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
         return System.getProperty("user.dir");
     }
@@ -80,7 +81,7 @@ public class ResourceUtils {
             realPath = realPath.substring(0, realPath.lastIndexOf("/"));
         }
         try {
-            realPath = java.net.URLDecoder.decode(realPath, "utf-8");
+            realPath = java.net.URLDecoder.decode(realPath, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -99,26 +100,26 @@ public class ResourceUtils {
         InputStream is = null;
         try {
             is = cls.getResourceAsStream(fileName);
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         if (is == null) {
             //cls根包下读取
             try {
                 is = cls.getClassLoader().getResourceAsStream(fileName);
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
         if (is == null) {
             //编译后的classes文件夹下
             try {
                 is = cls.getProtectionDomain().getClassLoader().getResourceAsStream(fileName);
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
         if (is == null) {
             try {
                 is = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
         if (is == null) {
@@ -134,7 +135,7 @@ public class ResourceUtils {
                     filePath = path + "/" + fileName;
                     try {
                         is = new FileInputStream(filePath);
-                    } catch (FileNotFoundException e) {
+                    } catch (FileNotFoundException ignored) {
                     }
                 }
             }
