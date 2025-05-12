@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.kaka.util.CRC16.getCRC16;
+
 /**
  * 字符串辅助工具集
  *
@@ -363,10 +365,10 @@ public class StringUtils {
             char[] str = new char[16];
             int k = 0;
             for (int i = 0; i < 16; i++) {
-                byte byte0 = tmp[i];
+                byte b = tmp[i];
                 //只取高位
-                str[k++] = hex_digits_numbers[(byte0 >>> 4 & 0xf) % 10];
-                //str[k++] = hexDigits[byte0 & 0xf];
+                str[k++] = hex_digits_numbers[(b >>> 4 & 0xf) % 10];
+                //str[k++] = hexDigits[b & 0xf];
             }
             s = new String(str);  // 换后的结果转换为字符串
         } catch (Exception ignored) {
@@ -375,6 +377,67 @@ public class StringUtils {
             return 0;
         }
         return Long.parseLong(s);
+    }
+
+    /**
+     * 获取hash头<br>
+     * 此算法摘抄至jedis，在无需引入jedis的情况下方便使用CRC16Hash算法
+     *
+     * @param key 基于redis key命名规则
+     */
+    public static String getHashTag(String key) {
+        int s = key.indexOf("{");
+        if (s > -1) {
+            int e = key.indexOf("}", s + 1);
+            if (e > -1 && e != s + 1) {
+                return key.substring(s + 1, e);
+            }
+        }
+        return key;
+    }
+
+    /**
+     * 获取CRC16 hash值 <br>
+     * 此算法摘抄至jedis，在无需引入jedis的情况下方便使用CRC16Hash算法
+     *
+     * @param key 基于redis key命名规则
+     */
+    public static int getCRC16Hash(String key) {
+        if (key == null) {
+            throw new NullPointerException("Slot calculation of null is impossible");
+        }
+        key = getHashTag(key);
+        // optimization with modulo operator with power of 2 equivalent to getCRC16(key) % 16384
+        return getCRC16(key) & (16384 - 1);
+    }
+
+    /**
+     * 获取CRC16 hash值 <br>
+     * 此算法摘抄至jedis，在无需引入jedis的情况下方便使用CRC16Hash算法
+     *
+     * @param key 基于redis key命名规则
+     */
+    public static int getCRC16Hash(byte[] key) {
+        if (key == null) {
+            throw new NullPointerException("Slot calculation of null is impossible");
+        }
+        int s = -1;
+        int e = -1;
+        boolean sFound = false;
+        for (int i = 0; i < key.length; i++) {
+            if (key[i] == '{' && !sFound) {
+                s = i;
+                sFound = true;
+            }
+            if (key[i] == '}' && sFound) {
+                e = i;
+                break;
+            }
+        }
+        if (s > -1 && e > -1 && e != s + 1) {
+            return getCRC16(key, s + 1, e) & (16384 - 1);
+        }
+        return getCRC16(key) & (16384 - 1);
     }
 
     /**

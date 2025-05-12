@@ -43,7 +43,7 @@
 <dependency>
     <groupId>io.github.zkpursuit</groupId>
     <artifactId>kaka-core</artifactId>
-    <version>6.0.3</version>
+    <version>6.0.4</version>
 </dependency>
 ```
 
